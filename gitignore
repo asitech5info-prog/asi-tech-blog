@@ -1,0 +1,26 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Database (optional - uncomment if you want to ignore it)
+# blog.db
+
+# Uploaded images (keep structure but ignore actual uploads)
+static/uploads/*
+!static/uploads/.gitkeep

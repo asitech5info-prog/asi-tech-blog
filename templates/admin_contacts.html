@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Messages | Admin | ASI TECH{% endblock %}
+
+{% block content %}
+<section class="admin-section">
+    <div class="container">
+        <div class="admin-header">
+            <h1><i class="fas fa-envelope"></i> Contact Messages</h1>
+            <div class="admin-actions">
+                <a href="{{ url_for('admin_dashboard') }}" class="btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+                <a href="{{ url_for('admin_logout') }}" class="btn-danger">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+
+        <div class="admin-table-container">
+            <h2><i class="fas fa-inbox"></i> All Messages ({{ contacts|length }})</h2>
+            {% if contacts %}
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Subject</th>
+                            <th>Message</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for contact in contacts %}
+                        <tr>
+                            <td>{{ contact.id }}</td>
+                            <td><strong>{{ contact.name }}</strong></td>
+                            <td><a href="mailto:{{ contact.email }}">{{ contact.email }}</a></td>
+                            <td>{{ contact.subject or 'N/A' }}</td>
+                            <td style="max-width:300px;">{{ contact.message }}</td>
+                            <td>{{ contact.created_at[:10] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h3>No messages yet</h3>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

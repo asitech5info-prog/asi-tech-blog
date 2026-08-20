@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block title %}{% if edit_mode %}Edit{% else %}Create{% endif %} Blog | Admin | ASI TECH{% endblock %}
+
+{% block extra_css %}
+<style>
+.admin-form-section { padding: 40px 0; }
+.admin-form-card {
+    background: linear-gradient(145deg, #0a1f15, #0d281e);
+    border: 1px solid #10b981;
+    border-radius: 16px;
+    padding: 30px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+.admin-form-card h2 {
+    color: #10b981;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+
+.admin-form .form-group { margin-bottom: 20px; }
+.admin-form .form-group label {
+    display: block;
+    color: #34d399;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+.admin-form input[type="text"],
+.admin-form input[type="email"],
+.admin-form select,
+.admin-form textarea {
+    width: 100%;
+    padding: 12px 16px;
+    background: #064e3b;
+    border: 1px solid #059669;
+    border-radius: 10px;
+    color: #ecfdf5;
+    font-size: 15px;
+    transition: all 0.3s;
+}
+.admin-form input:focus,
+.admin-form select:focus,
+.admin-form textarea:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+.admin-form input[type="file"] {
+    padding: 10px;
+    background: #064e3b;
+    border: 2px dashed #059669;
+    border-radius: 10px;
+    color: #a7f3d0;
+    cursor: pointer;
+    width: 100%;
+}
+.admin-form textarea { min-height: 300px; font-family: monospace; resize: vertical; }
+
+.inline-images-section {
+    background: rgba(6, 78, 59, 0.5);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+.inline-images-section h4 {
+    color: #34d399;
+    margin-bottom: 15px;
+}
+.inline-image-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 12px;
+    padding: 12px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+}
+.inline-image-row code {
+    background: #064e3b;
+    padding: 4px 10px;
+    border-radius: 6px;
+    color: #6ee7b7;
+    font-size: 13px;
+    white-space: nowrap;
+}
+.inline-image-row input[type="file"] { flex: 1; }
+
+.help-box {
+    background: rgba(16, 185, 129, 0.1);
+    border-left: 4px solid #10b981;
+    padding: 15px 20px;
+    border-radius: 0 10px 10px 0;
+    margin-bottom: 20px;
+}
+.help-box h4 { color: #10b981; margin-bottom: 8px; }
+.help-box ul { margin: 0; padding-left: 20px; color: #a7f3d0; }
+.help-box li { margin-bottom: 5px; }
+.help-box code {
+    background: #064e3b;
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: #6ee7b7;
+}
+
+.admin-submit-btn {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border: none;
+    padding: 14px 30px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s;
+}
+.admin-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="admin-form-section">
+    <div class="container">
+        <div class="admin-form-card">
+            <h2>
+                <i class="fas fa-{% if edit_mode %}edit{% else %}plus-circle{% endif %}"></i>
+                {% if edit_mode %}Edit Blog{% else %}Create New Blog{% endif %}
+            </h2>
+
+            <div class="help-box">
+                <h4><i class="fas fa-lightbulb"></i> How to Add Images in Blog Content</h4>
+                <ul>
+                    <li>Upload images below using the file pickers</li>
+                    <li>Copy the placeholder code shown next to each image</li>
+                    <li>Paste that placeholder exactly where you want the image in your content</li>
+                    <li>The image will appear at that exact position when published!</li>
+                    <li>You can add up to 5 inline images per blog</li>
+                </ul>
+            </div>
+
+            <form action="{% if edit_mode %}{{ url_for('admin_edit', blog_id=blog.id) }}{% else %}{{ url_for('admin_create') }}{% endif %}" 
+                  method="post" enctype="multipart/form-data" class="admin-form">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-heading"></i> Blog Title *</label>
+                        <input type="text" name="title" placeholder="Enter blog title" 
+                               value="{% if edit_mode %}{{ blog.title }}{% endif %}" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-link"></i> URL Slug *</label>
+                        <input type="text" name="slug" placeholder="my-awesome-blog" 
+                               value="{% if edit_mode %}{{ blog.slug }}{% endif %}" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-tags"></i> Category *</label>
+                        <select name="category" required>
+                            <option value="">Select Category</option>
+                            <option value="Education" {% if edit_mode and blog.category == 'Education' %}selected{% endif %}>Education</option>
+                            <option value="Technology" {% if edit_mode and blog.category == 'Technology' %}selected{% endif %}>Technology</option>
+                            <option value="Artificial Intelligence" {% if edit_mode and blog.category == 'Artificial Intelligence' %}selected{% endif %}>Artificial Intelligence</option>
+                            <option value="Science" {% if edit_mode and blog.category == 'Science' %}selected{% endif %}>Science</option>
+                            <option value="Movies" {% if edit_mode and blog.category == 'Movies' %}selected{% endif %}>Movies</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-image"></i> Title Image (Cover)</label>
+                        <input type="file" name="title_image" accept="image/*">
+                        {% if edit_mode and blog.title_image %}
+                        <small style="color:#6ee7b7;">Current: {{ blog.title_image }}</small>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Inline Images Upload -->
+                <div class="inline-images-section">
+                    <h4><i class="fas fa-images"></i> Inline Images (Place anywhere in content)</h4>
+
+                    <div class="inline-image-row">
+                        <code>[inline_image_1]</code>
+                        <input type="file" name="inline_image_1" accept="image/*">
+                    </div>
+                    <div class="inline-image-row">
+                        <code>[inline_image_2]</code>
+                        <input type="file" name="inline_image_2" accept="image/*">
+                    </div>
+                    <div class="inline-image-row">
+                        <code>[inline_image_3]</code>
+                        <input type="file" name="inline_image_3" accept="image/*">
+                    </div>
+                    <div class="inline-image-row">
+                        <code>[inline_image_4]</code>
+                        <input type="file" name="inline_image_4" accept="image/*">
+                    </div>
+                    <div class="inline-image-row">
+                        <code>[inline_image_5]</code>
+                        <input type="file" name="inline_image_5" accept="image/*">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-pen"></i> Blog Content *</label>
+                    <textarea name="content" placeholder="Write your blog content here...
+
+You can use HTML tags like:
+&lt;h2&gt;Heading&lt;/h2&gt;
+&lt;p&gt;Paragraph text&lt;/p&gt;
+&lt;strong&gt;Bold text&lt;/strong&gt;
+&lt;em&gt;Italic text&lt;/em&gt;
+&lt;ul&gt;&lt;li&gt;List item&lt;/li&gt;&lt;/ul&gt;
+
+Paste image placeholders where you want images:
+[inline_image_1]
+[inline_image_2]
+etc." required>{% if edit_mode %}{{ blog.content }}{% endif %}</textarea>
+                </div>
+
+                <button type="submit" class="admin-submit-btn">
+                    <i class="fas fa-{% if edit_mode %}save{% else %}paper-plane{% endif %}"></i>
+                    {% if edit_mode %}Update Blog{% else %}Publish Blog{% endif %}
+                </button>
+
+                <a href="{{ url_for('admin_dashboard') }}" style="margin-left:15px;color:#6ee7b7;">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

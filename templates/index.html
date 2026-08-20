@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}ASI TECH - Tech, AI, Science & More{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-badge">
+            <i class="fas fa-bolt"></i> Welcome to the Future
+        </div>
+        <h1 class="hero-title">
+            <span class="gradient-text">ASI TECH</span>
+        </h1>
+        <p class="hero-subtitle">Exploring Technology, Artificial Intelligence, Science, Education & Movies</p>
+        <div class="hero-stats">
+            <div class="stat">
+                <span class="stat-number">{{ blogs|length }}+</span>
+                <span class="stat-label">Articles</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">5</span>
+                <span class="stat-label">Categories</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">100%</span>
+                <span class="stat-label">Free Content</span>
+            </div>
+        </div>
+        <a href="#latest-blogs" class="hero-cta">
+            <span>Explore Blogs</span>
+            <i class="fas fa-arrow-down"></i>
+        </a>
+    </div>
+    <div class="hero-glow"></div>
+</section>
+
+<!-- Categories Section -->
+<section class="categories-section">
+    <div class="container">
+        <h2 class="section-title">
+            <i class="fas fa-th-large"></i> Browse by Category
+        </h2>
+        <div class="categories-grid">
+            <a href="{{ url_for('category_page', category='Education') }}" class="category-card edu">
+                <div class="category-icon"><i class="fas fa-graduation-cap"></i></div>
+                <h3>Education</h3>
+                <p>Learn & Grow</p>
+            </a>
+            <a href="{{ url_for('category_page', category='Technology') }}" class="category-card tech">
+                <div class="category-icon"><i class="fas fa-laptop-code"></i></div>
+                <h3>Technology</h3>
+                <p>Latest Tech News</p>
+            </a>
+            <a href="{{ url_for('category_page', category='Artificial Intelligence') }}" class="category-card ai">
+                <div class="category-icon"><i class="fas fa-brain"></i></div>
+                <h3>AI</h3>
+                <p>Future of AI</p>
+            </a>
+            <a href="{{ url_for('category_page', category='Science') }}" class="category-card sci">
+                <div class="category-icon"><i class="fas fa-atom"></i></div>
+                <h3>Science</h3>
+                <p>Discover Science</p>
+            </a>
+            <a href="{{ url_for('category_page', category='Movies') }}" class="category-card mov">
+                <div class="category-icon"><i class="fas fa-film"></i></div>
+                <h3>Movies</h3>
+                <p>Cinema & Reviews</p>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Latest Blogs -->
+<section class="blogs-section" id="latest-blogs">
+    <div class="container">
+        <h2 class="section-title">
+            <i class="fas fa-fire"></i> Latest Blogs
+        </h2>
+
+        {% if blogs %}
+        <div class="blogs-grid">
+            {% for blog in blogs %}
+            <article class="blog-card">
+                <div class="blog-image">
+                    {% if blog.title_image %}
+                        <img src="{{ url_for('static', filename='uploads/' + blog.title_image) }}" alt="{{ blog.title }}">
+                    {% else %}
+                        <div class="blog-image-placeholder">
+                            <i class="fas fa-image"></i>
+                        </div>
+                    {% endif %}
+                    <span class="blog-category">{{ blog.category }}</span>
+                </div>
+                <div class="blog-content">
+                    <h3 class="blog-title">{{ blog.title }}</h3>
+                    <p class="blog-excerpt">{{ blog.content[:120] | striptags }}...</p>
+                    <div class="blog-meta">
+                        <span><i class="fas fa-calendar"></i> {{ blog.created_at[:10] }}</span>
+                        <span><i class="fas fa-eye"></i> {{ blog.views }} views</span>
+                    </div>
+                    <a href="{{ url_for('blog_detail', slug=blog.slug) }}" class="read-more">
+                        Read More <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-pen-fancy"></i>
+            <h3>No blogs yet!</h3>
+            <p>Check back soon for amazing content.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+
+{% endblock %}

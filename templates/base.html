@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ASI TECH{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{{ url_for('home') }}" class="logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="ASI TECH Logo" class="logo-img">
+            </a>
+
+            <div class="nav-links" id="navLinks">
+                <a href="{{ url_for('home') }}" class="nav-link {% if request.endpoint == 'home' %}active{% endif %}">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <div class="dropdown">
+                    <a href="#" class="nav-link dropdown-toggle">
+                        <i class="fas fa-th-large"></i> Categories <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a href="{{ url_for('category_page', category='Education') }}"><i class="fas fa-graduation-cap"></i> Education</a>
+                        <a href="{{ url_for('category_page', category='Technology') }}"><i class="fas fa-laptop-code"></i> Technology</a>
+                        <a href="{{ url_for('category_page', category='Artificial Intelligence') }}"><i class="fas fa-brain"></i> Artificial Intelligence</a>
+                        <a href="{{ url_for('category_page', category='Science') }}"><i class="fas fa-atom"></i> Science</a>
+                        <a href="{{ url_for('category_page', category='Movies') }}"><i class="fas fa-film"></i> Movies</a>
+                    </div>
+                </div>
+                <a href="{{ url_for('contact') }}" class="nav-link {% if request.endpoint == 'contact' %}active{% endif %}">
+                    <i class="fas fa-envelope"></i> Contact
+                </a>
+            </div>
+
+            <div class="nav-right">
+                <form action="{{ url_for('search') }}" method="get" class="search-form">
+                    <input type="text" name="q" placeholder="Search blogs..." value="{{ request.args.get('q', '') }}">
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-container">
+                {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}">
+                        <i class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+                        {{ message }}
+                        <span class="flash-close" onclick="this.parentElement.remove()">&times;</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <div class="footer-logo">
+                    <i class="fas fa-microchip"></i>
+                    <span>ASI TECH</span>
+                </div>
+                <p class="footer-desc">Your ultimate destination for technology, education, AI, science, and movie insights. Stay updated with the latest trends.</p>
+                <div class="social-links">
+                    <a href="mailto:asitech5info@gmail.com" class="social-link gmail" title="Gmail">
+                        <i class="fas fa-envelope"></i>
+                    </a>
+                    <a href="https://youtube.com/@howtech_works?si=gXvodLAXQ36FVHMZ" target="_blank" class="social-link youtube" title="HOW TECH WORKS">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <h3>Categories</h3>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('category_page', category='Education') }}"><i class="fas fa-graduation-cap"></i> Education</a></li>
+                    <li><a href="{{ url_for('category_page', category='Technology') }}"><i class="fas fa-laptop-code"></i> Technology</a></li>
+                    <li><a href="{{ url_for('category_page', category='Artificial Intelligence') }}"><i class="fas fa-brain"></i> Artificial Intelligence</a></li>
+                    <li><a href="{{ url_for('category_page', category='Science') }}"><i class="fas fa-atom"></i> Science</a></li>
+                    <li><a href="{{ url_for('category_page', category='Movies') }}"><i class="fas fa-film"></i> Movies</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('home') }}"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="{{ url_for('search') }}"><i class="fas fa-search"></i> Search</a></li>
+                    <li><a href="{{ url_for('contact') }}"><i class="fas fa-envelope"></i> Contact Us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3>Contact Admin</h3>
+                <div class="contact-info">
+                    <p><i class="fas fa-envelope"></i> <a href="mailto:asitech5info@gmail.com">asitech5info@gmail.com</a></p>
+                    <p><i class="fab fa-youtube"></i> <a href="https://youtube.com/@howtech_works?si=gXvodLAXQ36FVHMZ" target="_blank">HOW TECH WORKS</a></p>
+                </div>
+                <div class="yt-promo">
+                    <a href="https://youtube.com/@howtech_works?si=gXvodLAXQ36FVHMZ" target="_blank" class="yt-btn">
+                        <i class="fab fa-youtube"></i>
+                        <span>HOW TECH WORKS</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2024 ASI TECH. All rights reserved. | Built with <i class="fas fa-heart"></i> for tech enthusiasts</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
