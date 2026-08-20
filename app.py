@@ -8,7 +8,8 @@ app = Flask(__name__)
 app.secret_key = 'asi_tech_secret_key_2024_secure'
 
 # Configuration
-UPLOAD_FOLDER = 'static/uploads'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
@@ -16,7 +17,7 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 ADMIN_PASSWORD = "vape1098"
 ADMIN_URL = "/admin-portal-secret"
 
-DATABASE = 'blog.db'
+DATABASE = os.path.join(BASE_DIR, 'blog.db')
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -63,6 +64,12 @@ def init_db():
         """)
         db.commit()
 
+# Create uploads folder if it doesn't exist
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# Initialize database on startup
+init_db()
+
 @app.teardown_appcontext
 def close_connection(exception):
     db = getattr(g, '_database', None)
@@ -77,69 +84,52 @@ def allowed_file(filename):
 @app.route('/')
 def home():
     db = get_db()
-    # Featured/latest blogs
     blogs = db.execute(
         "SELECT * FROM blogs ORDER BY created_at DESC LIMIT 6"
     ).fetchall()
-
-    # Categories with count
     categories = db.execute(
         "SELECT category, COUNT(*) as count FROM blogs GROUP BY category"
     ).fetchall()
-
     return render_template('index.html', blogs=blogs, categories=categories)
 
 @app.route('/blog/<slug>')
 def blog_detail(slug):
     db = get_db()
     blog = db.execute("SELECT * FROM blogs WHERE slug = ?", (slug,)).fetchone()
-
     if blog is None:
         flash('Blog not found!', 'error')
         return redirect(url_for('home'))
-
-    # Increment views
     db.execute("UPDATE blogs SET views = views + 1 WHERE id = ?", (blog['id'],))
     db.commit()
-
-    # Get reviews
     reviews = db.execute(
         "SELECT * FROM reviews WHERE blog_id = ? ORDER BY created_at DESC",
         (blog['id'],)
     ).fetchall()
-
-    # Related blogs
     related = db.execute(
         "SELECT * FROM blogs WHERE category = ? AND id != ? LIMIT 3",
         (blog['category'], blog['id'])
     ).fetchall()
-
     return render_template('blog.html', blog=blog, reviews=reviews, related=related)
 
 @app.route('/blog/<slug>/review', methods=['POST'])
 def add_review(slug):
     db = get_db()
     blog = db.execute("SELECT id FROM blogs WHERE slug = ?", (slug,)).fetchone()
-
     if blog is None:
         flash('Blog not found!', 'error')
         return redirect(url_for('home'))
-
     name = request.form.get('name', 'Anonymous')
     email = request.form.get('email', '')
     rating = request.form.get('rating', 5)
     comment = request.form.get('comment', '')
-
     if not comment:
         flash('Please write a review!', 'error')
         return redirect(url_for('blog_detail', slug=slug))
-
     db.execute(
         "INSERT INTO reviews (blog_id, name, email, rating, comment) VALUES (?, ?, ?, ?, ?)",
         (blog['id'], name, email, rating, comment)
     )
     db.commit()
-
     flash('Review posted successfully!', 'success')
     return redirect(url_for('blog_detail', slug=slug) + '#reviews')
 
@@ -150,18 +140,15 @@ def category_page(category):
         "SELECT * FROM blogs WHERE category = ? ORDER BY created_at DESC",
         (category,)
     ).fetchall()
-
     categories = db.execute(
         "SELECT category, COUNT(*) as count FROM blogs GROUP BY category"
     ).fetchall()
-
     return render_template('category.html', blogs=blogs, current_category=category, categories=categories)
 
 @app.route('/search')
 def search():
     query = request.args.get('q', '')
     db = get_db()
-
     if query:
         blogs = db.execute(
             "SELECT * FROM blogs WHERE title LIKE ? OR content LIKE ? OR category LIKE ? ORDER BY created_at DESC",
@@ -169,11 +156,9 @@ def search():
         ).fetchall()
     else:
         blogs = []
-
     categories = db.execute(
         "SELECT category, COUNT(*) as count FROM blogs GROUP BY category"
     ).fetchall()
-
     return render_template('search.html', blogs=blogs, query=query, categories=categories)
 
 @app.route('/contact', methods=['GET', 'POST'])
@@ -183,7 +168,6 @@ def contact():
         email = request.form.get('email')
         subject = request.form.get('subject')
         message = request.form.get('message')
-
         if not name or not email or not message:
             flash('Please fill all required fields!', 'error')
         else:
@@ -195,12 +179,10 @@ def contact():
             db.commit()
             flash('Message sent successfully! We will get back to you soon.', 'success')
             return redirect(url_for('contact'))
-
     db = get_db()
     categories = db.execute(
         "SELECT category, COUNT(*) as count FROM blogs GROUP BY category"
     ).fetchall()
-
     return render_template('contact.html', categories=categories)
 
 # ============== ADMIN ROUTES (HIDDEN) ==============
@@ -226,33 +208,27 @@ def admin_auth():
 def admin_dashboard():
     if not session.get('admin_logged_in'):
         return redirect(url_for('admin_login'))
-
     db = get_db()
     blogs = db.execute("SELECT * FROM blogs ORDER BY created_at DESC").fetchall()
     total_blogs = db.execute("SELECT COUNT(*) as count FROM blogs").fetchone()['count']
     total_reviews = db.execute("SELECT COUNT(*) as count FROM reviews").fetchone()['count']
     total_contacts = db.execute("SELECT COUNT(*) as count FROM contacts").fetchone()['count']
-
-    return render_template('admin_dashboard.html', blogs=blogs, 
-                         total_blogs=total_blogs, total_reviews=total_reviews, 
+    return render_template('admin_dashboard.html', blogs=blogs,
+                         total_blogs=total_blogs, total_reviews=total_reviews,
                          total_contacts=total_contacts)
 
 @app.route(ADMIN_URL + '/create', methods=['GET', 'POST'])
 def admin_create():
     if not session.get('admin_logged_in'):
         return redirect(url_for('admin_login'))
-
     if request.method == 'POST':
         title = request.form.get('title')
         slug = request.form.get('slug')
         category = request.form.get('category')
         content = request.form.get('content')
-
         if not title or not slug or not category or not content:
             flash('Please fill all required fields!', 'error')
             return redirect(url_for('admin_create'))
-
-        # Handle title image
         title_image = None
         if 'title_image' in request.files:
             file = request.files['title_image']
@@ -260,8 +236,6 @@ def admin_create():
                 filename = secure_filename(f"title_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{file.filename}")
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 title_image = filename
-
-        # Handle inline images
         inline_images = {}
         for key in request.files:
             if key.startswith('inline_image_'):
@@ -270,12 +244,9 @@ def admin_create():
                     filename = secure_filename(f"inline_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{file.filename}")
                     file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                     inline_images[key] = filename
-
-        # Replace image placeholders in content
         for key, filename in inline_images.items():
             placeholder = f"[{key}]"
             content = content.replace(placeholder, f'<img src="/static/uploads/{filename}" class="blog-inline-img" alt="Blog Image">')
-
         db = get_db()
         try:
             db.execute(
@@ -288,28 +259,22 @@ def admin_create():
         except sqlite3.IntegrityError:
             flash('Slug already exists! Use a unique slug.', 'error')
             return redirect(url_for('admin_create'))
-
     return render_template('admin_create.html')
 
 @app.route(ADMIN_URL + '/edit/<int:blog_id>', methods=['GET', 'POST'])
 def admin_edit(blog_id):
     if not session.get('admin_logged_in'):
         return redirect(url_for('admin_login'))
-
     db = get_db()
     blog = db.execute("SELECT * FROM blogs WHERE id = ?", (blog_id,)).fetchone()
-
     if blog is None:
         flash('Blog not found!', 'error')
         return redirect(url_for('admin_dashboard'))
-
     if request.method == 'POST':
         title = request.form.get('title')
         slug = request.form.get('slug')
         category = request.form.get('category')
         content = request.form.get('content')
-
-        # Handle title image
         title_image = blog['title_image']
         if 'title_image' in request.files:
             file = request.files['title_image']
@@ -317,7 +282,6 @@ def admin_edit(blog_id):
                 filename = secure_filename(f"title_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{file.filename}")
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 title_image = filename
-
         db.execute(
             "UPDATE blogs SET title = ?, slug = ?, title_image = ?, content = ?, category = ? WHERE id = ?",
             (title, slug, title_image, content, category, blog_id)
@@ -325,14 +289,12 @@ def admin_edit(blog_id):
         db.commit()
         flash('Blog updated successfully!', 'success')
         return redirect(url_for('admin_dashboard'))
-
     return render_template('admin_create.html', blog=blog, edit_mode=True)
 
 @app.route(ADMIN_URL + '/delete/<int:blog_id>')
 def admin_delete(blog_id):
     if not session.get('admin_logged_in'):
         return redirect(url_for('admin_login'))
-
     db = get_db()
     db.execute("DELETE FROM blogs WHERE id = ?", (blog_id,))
     db.execute("DELETE FROM reviews WHERE blog_id = ?", (blog_id,))
@@ -344,7 +306,6 @@ def admin_delete(blog_id):
 def admin_contacts():
     if not session.get('admin_logged_in'):
         return redirect(url_for('admin_login'))
-
     db = get_db()
     contacts = db.execute("SELECT * FROM contacts ORDER BY created_at DESC").fetchall()
     return render_template('admin_contacts.html', contacts=contacts)
@@ -355,7 +316,6 @@ def admin_logout():
     flash('Logged out successfully!', 'success')
     return redirect(url_for('home'))
 
-# Context processor for categories
 @app.context_processor
 def inject_categories():
     db = get_db()
@@ -365,5 +325,5 @@ def inject_categories():
     return dict(all_categories=categories)
 
 if __name__ == '__main__':
-    init_db()
     app.run(host='0.0.0.0', port=5000, debug=True)
+Fix database for Render
