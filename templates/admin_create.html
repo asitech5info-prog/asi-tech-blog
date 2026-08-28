@@ -1,186 +1,161 @@
 {% extends "base.html" %}
 
-{% block title %}{% if edit_mode %}Edit Article{% else %}Compose Article{% endif %} | Admin Suite | ASI TECH{% endblock %}
+{% block title %}{% if edit_mode %}Edit Article: {{ blog.title }}{% else %}Compose New Publication{% endif %} | Admin Suite | ASI TECH{% endblock %}
 
 {% block content %}
-<section style="padding:40px 0 80px;">
-    <div class="container" style="max-width:960px;">
-        <!-- Header -->
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:28px; flex-wrap:wrap; gap:16px;">
-            <div>
-                <a href="{{ url_for('admin_dashboard') }}" style="color:var(--text-muted); font-size:0.85rem; display:inline-flex; align-items:center; gap:6px; margin-bottom:6px;">
-                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+<div class="admin-page-container">
+    <div class="container">
+        <!-- Top Command Breadcrumb & Action Bar -->
+        <div class="admin-header-bar composer">
+            <div class="admin-brand-lead">
+                <a href="{{ url_for('admin_dashboard') }}" class="admin-back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Dashboard</span>
                 </a>
-                <h1 style="font-size:2rem; font-weight:800; color:var(--text-highlight);">
-                    {% if edit_mode %}<i class="fas fa-pen-to-square" style="color:var(--accent-cyan);"></i> Edit Article{% else %}<i class="fas fa-feather-pointed" style="color:var(--accent-emerald);"></i> Compose Technical Article{% endif %}
+                <h1 class="admin-page-title">
+                    {% if edit_mode %}
+                    <i class="fas fa-pen-to-square" style="color:var(--accent-cyan);"></i> Edit Publication
+                    {% else %}
+                    <i class="fas fa-feather-pointed" style="color:var(--accent-emerald);"></i> Compose Publication
+                    {% endif %}
                 </h1>
+            </div>
+
+            <div class="admin-header-actions">
+                <a href="{{ url_for('admin_dashboard') }}" class="admin-action-btn ghost">
+                    <i class="fas fa-xmark"></i>
+                    <span>Cancel</span>
+                </a>
+                <button type="submit" form="adminArticleForm" class="admin-action-btn primary" id="btnTopPublish">
+                    <i class="fas fa-{% if edit_mode %}floppy-disk{% else %}paper-plane{% endif %}"></i>
+                    <span>{% if edit_mode %}Save Changes{% else %}Publish Live{% endif %}</span>
+                </button>
             </div>
         </div>
 
-        <!-- Form Card -->
-        <div class="contact-card-box">
-            <form action="{% if edit_mode %}{{ url_for('admin_edit', blog_id=blog.id) }}{% else %}{{ url_for('admin_create') }}{% endif %}" method="post" enctype="multipart/form-data">
+        <!-- 2-Column Responsive CMS Canvas -->
+        <form id="adminArticleForm" action="{% if edit_mode %}{{ url_for('admin_edit', blog_id=blog.id) }}{% else %}{{ url_for('admin_create') }}{% endif %}" method="post" enctype="multipart/form-data" class="admin-composer-layout">
+            
+            <!-- Left / Main Writing Canvas (70%) -->
+            <div class="admin-canvas-main">
                 
-                <!-- Title & Slug Row -->
-                <div class="form-grid-2">
-                    <div class="input-field-group">
-                        <label><i class="fas fa-heading"></i> Article Title *</label>
-                        <input type="text" name="title" placeholder="e.g. Next-Gen Autonomous AI Multi-Agent Systems" value="{% if edit_mode %}{{ blog.title }}{% endif %}" required>
+                <!-- Primary Meta Card -->
+                <div class="admin-composer-card">
+                    <!-- Title Input -->
+                    <div class="composer-field-group">
+                        <label for="articleTitle"><i class="fas fa-heading" style="color:var(--accent-emerald);"></i> Article Headline / Title *</label>
+                        <input type="text" id="articleTitle" name="title" class="composer-title-input" placeholder="e.g. Next-Gen Autonomous AI Multi-Agent Systems & Swarm Intelligence" value="{% if edit_mode %}{{ blog.title }}{% endif %}" required autocomplete="off" oninput="autoGenerateSlug()">
                     </div>
 
-                    <div class="input-field-group">
-                        <label><i class="fas fa-link"></i> URL Slug *</label>
-                        <input type="text" name="slug" placeholder="e.g. next-gen-autonomous-ai-multi-agents" value="{% if edit_mode %}{{ blog.slug }}{% endif %}" required>
-                    </div>
-                </div>
-
-                <!-- Category & Cover Image Row -->
-                <div class="form-grid-2">
-                    <div class="input-field-group">
-                        <label><i class="fas fa-layer-group"></i> Discipline / Category *</label>
-                        <select name="category" required>
-                            <option value="">Select a Category</option>
-                            <option value="Artificial Intelligence" {% if edit_mode and blog.category == 'Artificial Intelligence' %}selected{% endif %}>Artificial Intelligence</option>
-                            <option value="Technology" {% if edit_mode and blog.category == 'Technology' %}selected{% endif %}>Technology</option>
-                            <option value="Science" {% if edit_mode and blog.category == 'Science' %}selected{% endif %}>Science &amp; Space</option>
-                            <option value="Education" {% if edit_mode and blog.category == 'Education' %}selected{% endif %}>Education &amp; Dev</option>
-                            <option value="Movies" {% if edit_mode and blog.category == 'Movies' %}selected{% endif %}>Movies &amp; Cinema</option>
-                        </select>
-                    </div>
-
-                    <div class="input-field-group">
-                        <label><i class="fas fa-image"></i> Title Cover Image</label>
-                        <input type="file" name="title_image" accept="image/*" style="padding:8px;">
-                        {% if edit_mode and blog.title_image %}
-                        <small style="color:var(--accent-emerald-light); font-size:0.78rem; margin-top:4px;">Current cover: {{ blog.title_image }}</small>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Tags & Author Row -->
-                <div class="form-grid-2">
-                    <div class="input-field-group">
-                        <label><i class="fas fa-tags"></i> Tags (Comma Separated)</label>
-                        <input type="text" name="tags" placeholder="e.g. AI, Neural Networks, Quantum, Python" value="{% if edit_mode %}{{ blog.tags }}{% endif %}">
-                    </div>
-
-                    <div class="input-field-group">
-                        <label><i class="fas fa-user-pen"></i> Author Name</label>
-                        <input type="text" name="author" placeholder="ASI TECH" value="{% if edit_mode %}{{ blog.author }}{% else %}ASI TECH{% endif %}">
-                    </div>
-                </div>
-
-                <!-- Featured Toggle -->
-                <div style="margin-bottom:24px; display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.03); padding:12px 16px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
-                    <input type="checkbox" name="is_featured" id="featuredCheck" style="width:18px; height:18px; cursor:pointer;" {% if edit_mode and blog.is_featured %}checked{% endif %}>
-                    <label for="featuredCheck" style="cursor:pointer; font-weight:600; color:var(--text-highlight); font-size:0.92rem;">
-                        <i class="fas fa-bolt" style="color:#fbbf24;"></i> Feature this story on Homepage Bento Grid
-                    </label>
-                </div>
-
-                <!-- Easy Syntax Writing Guide Card -->
-                <div style="background:rgba(16, 185, 129, 0.08); border:1px solid rgba(16, 185, 129, 0.3); border-radius:var(--radius-md); padding:18px; margin-bottom:20px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <h4 style="color:var(--accent-emerald-light); font-size:0.95rem; display:flex; align-items:center; gap:8px;">
-                            <i class="fas fa-magic"></i> Easy Writing Syntax Rules (No HTML Needed!)
-                        </h4>
-                        <span style="font-size:0.75rem; color:var(--text-muted); background:rgba(255,255,255,0.06); padding:2px 8px; border-radius:4px;">Special Prefix Rules</span>
-                    </div>
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px; font-size:0.82rem; color:var(--text-muted);">
-                        <div><code style="color:#38bdf8;"># Big Heading</code> &rarr; Big Heading</div>
-                        <div><code style="color:#38bdf8;">### Small Heading</code> &rarr; Subheading</div>
-                        <div><code style="color:#34d399;">**bold text**</code> &rarr; <strong>bold</strong></div>
-                        <div><code style="color:#f472b6;">_italic text_</code> &rarr; <em>italic</em></div>
-                        <div><code style="color:#fbbf24;">- Bullet item</code> &rarr; • Bullet list</div>
-                        <div><code style="color:#fbbf24;">1. Numbered item</code> &rarr; 1. Numbered list</div>
-                        <div><code style="color:#a78bfa;">&gt; Quote text</code> &rarr; Blockquote</div>
-                        <div><code style="color:#f87171;">! Key takeaway</code> &rarr; Highlight box</div>
-                    </div>
-                </div>
-
-                <!-- Inline Images Accordion / Dropzone -->
-                <div style="background:rgba(6, 182, 212, 0.08); border:1px solid rgba(6, 182, 212, 0.25); border-radius:var(--radius-md); padding:18px; margin-bottom:24px;">
-                    <h4 style="color:var(--accent-cyan-light); margin-bottom:8px; font-size:0.95rem;">
-                        <i class="fas fa-images"></i> Inline Images
-                    </h4>
-                    <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:12px;">
-                        Upload files below, then click any button to insert <code>[inline_image_X]</code> into your writeup!
-                    </p>
-
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px;">
-                        {% for i in range(1, 6) %}
-                        <div style="background:var(--bg-secondary); padding:8px 12px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle); display:flex; flex-direction:column; gap:6px;">
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <button type="button" onclick="insertSyntaxTag('[inline_image_{{ i }}]', '')" style="background:rgba(6,182,212,0.15); border:1px solid rgba(6,182,212,0.4); color:var(--accent-cyan-light); border-radius:4px; padding:2px 8px; font-family:var(--font-mono); font-size:0.75rem; cursor:pointer;">
-                                    + [inline_image_{{ i }}]
-                                </button>
-                            </div>
-                            <input type="file" name="inline_image_{{ i }}" accept="image/*" style="font-size:0.75rem; padding:2px;">
+                    <!-- URL Slug -->
+                    <div class="composer-field-group slug-row">
+                        <div class="slug-input-wrapper">
+                            <span class="slug-prefix">asitech.com/blog/</span>
+                            <input type="text" id="articleSlug" name="slug" class="composer-slug-input" placeholder="next-gen-autonomous-ai-multi-agents" value="{% if edit_mode %}{{ blog.slug }}{% endif %}" required autocomplete="off">
                         </div>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <!-- Content Editor Toolbar & Tabs -->
-                <div class="input-field-group">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                        <label><i class="fas fa-pen-nib"></i> Article Content *</label>
-                        <div class="editor-tab-nav">
-                            <button type="button" id="tabEditorBtn" class="editor-tab-btn active"><i class="fas fa-pen"></i> Write</button>
-                            <button type="button" id="tabPreviewBtn" class="editor-tab-btn"><i class="fas fa-eye"></i> Live Preview</button>
-                        </div>
-                    </div>
-
-                    <!-- Fast Syntax Toolbar -->
-                    <div class="editor-toolbar">
-                        <button type="button" class="tool-btn" onclick="insertSyntaxTag('# ', '')" title="Big Heading"><b># Heading</b></button>
-                        <button type="button" class="tool-btn" onclick="insertSyntaxTag('### ', '')" title="Small Heading"><b>### Subheading</b></button>
-                        <button type="button" class="tool-btn" onclick="insertSyntaxTag('**', '**')" title="Bold"><i class="fas fa-bold"></i></button>
-                        <button type="button" class="tool-btn" onclick="insertSyntaxTag('_', '_')" title="Italic"><i class="fas fa-italic"></i></button>
-                        <button type="button" class="tool-btn" onclick="insertSyntaxTag('- ', '')" title="Bullet List"><i class="fas fa-list-ul"></i> Bullet</button>
-                        <button type="button" class="tool-btn" onclick="insertSyntaxTag('1. ', '')" title="Numbered List"><i class="fas fa-list-ol"></i> Numbered</button>
-                        <button type="button" class="tool-btn" onclick="insertSyntaxTag('> ', '')" title="Quote"><i class="fas fa-quote-left"></i> Quote</button>
-                        <button type="button" class="tool-btn" onclick="insertSyntaxTag('! ', '')" title="Key Takeaway Highlight"><i class="fas fa-lightbulb"></i> Highlight</button>
-                        <button type="button" class="tool-btn" onclick="insertSyntaxTag('```\n', '\n```')" title="Code Block"><i class="fas fa-code"></i> Code</button>
-                    </div>
-
-                    <!-- Textarea Container -->
-                    <div id="editorInputWrap">
-                        <textarea name="content" id="articleContentInput" class="editor-textarea" placeholder="Write your technical writeup here using easy prefix rules:
-
-# 1. Introduction & Overview
-This is the opening lead paragraph describing the core breakthrough.
-
-### Key Innovations
-- **Neural Reasoning:** Self-correction and multi-step backtracking.
-- **Hardware Acceleration:** Zero-cost GPU kernel compilation.
-
-> 'Reasoning models reflect the dawn of deliberate cognitive computation.'
-
-! Make sure to test your benchmarks across varied distributed topologies." required>{% if edit_mode %}{{ blog.content }}{% endif %}</textarea>
-                    </div>
-
-                    <!-- Live Preview Container -->
-                    <div id="editorPreviewPane" class="preview-pane-box blog-prose"></div>
-                </div>
-
-                <!-- Explain Like I'm 5 (ELI5) Content Section -->
-                <div style="background:rgba(192, 132, 252, 0.07); border:1px solid rgba(192, 132, 252, 0.3); border-radius:var(--radius-md); padding:20px; margin-top:28px; margin-bottom:24px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
-                        <div>
-                            <h4 style="color:#c084fc; font-size:1.05rem; display:flex; align-items:center; gap:8px;">
-                                <i class="fas fa-wand-magic-sparkles"></i> Explain Like I'm 5 (ELI5) Simplified Version
-                            </h4>
-                            <p style="color:var(--text-muted); font-size:0.82rem; margin-top:2px;">
-                                Readers can toggle this at the top of the article for instant high-level analogies and zero-jargon understanding.
-                            </p>
-                        </div>
-                        <button type="button" id="btnAutoGenerateEli5" class="btn-secondary" style="background:linear-gradient(135deg, rgba(168,85,247,0.25), rgba(236,72,153,0.25)); border:1px solid rgba(192,132,252,0.5); color:#f3e8ff; padding:7px 16px; border-radius:var(--radius-full); font-size:0.85rem; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
-                            <i class="fas fa-sparkles"></i> ✨ Auto-Generate ELI5 Summary
+                        <button type="button" class="slug-refresh-btn" onclick="forceSyncSlug()" title="Regenerate slug from title">
+                            <i class="fas fa-arrows-rotate"></i> Sync
                         </button>
                     </div>
 
-                    <textarea name="eli5_content" id="eli5ContentInput" class="editor-textarea" rows="8" placeholder="# 👶 Explain Like I'm 5: Simple Title
+                    <!-- Category & Author Grid -->
+                    <div class="composer-grid-2">
+                        <div class="composer-field-group">
+                            <label><i class="fas fa-layer-group" style="color:var(--accent-cyan);"></i> Category / Discipline *</label>
+                            <select name="category" class="composer-select" required>
+                                <option value="">Select Category</option>
+                                <option value="Artificial Intelligence" {% if edit_mode and blog.category == 'Artificial Intelligence' %}selected{% endif %}>🧠 Artificial Intelligence</option>
+                                <option value="Technology" {% if edit_mode and blog.category == 'Technology' %}selected{% endif %}>💻 Technology &amp; Systems</option>
+                                <option value="Science" {% if edit_mode and blog.category == 'Science' %}selected{% endif %}>⚛️ Science &amp; Space</option>
+                                <option value="Education" {% if edit_mode and blog.category == 'Education' %}selected{% endif %}>🎓 Education &amp; Dev</option>
+                                <option value="Movies" {% if edit_mode and blog.category == 'Movies' %}selected{% endif %}>🎬 Movies &amp; Cinema</option>
+                            </select>
+                        </div>
+
+                        <div class="composer-field-group">
+                            <label><i class="fas fa-user-pen" style="color:var(--accent-purple-light);"></i> Author Name</label>
+                            <input type="text" name="author" class="composer-input" placeholder="ASI TECH Editorial" value="{% if edit_mode %}{{ blog.author }}{% else %}ASI TECH{% endif %}">
+                        </div>
+                    </div>
+
+                    <!-- Tags Field -->
+                    <div class="composer-field-group">
+                        <label><i class="fas fa-tags" style="color:var(--accent-amber);"></i> Topic Tags (Comma separated)</label>
+                        <input type="text" name="tags" class="composer-input" placeholder="AI, Deep Learning, Quantum Computing, Python, LLMs" value="{% if edit_mode %}{{ blog.tags }}{% endif %}">
+                    </div>
+                </div>
+
+                <!-- Markdown Content Editor Card -->
+                <div class="admin-composer-card editor-card">
+                    <div class="editor-header-bar">
+                        <div class="editor-title-box">
+                            <h3><i class="fas fa-pen-nib" style="color:var(--accent-emerald);"></i> Article Content</h3>
+                            <span class="editor-meta-count" id="editorWordStats">0 words • 0 min read</span>
+                        </div>
+
+                        <div class="editor-mode-switch">
+                            <button type="button" id="tabModeWrite" class="editor-switch-btn active" onclick="switchEditorTab('write')">
+                                <i class="fas fa-pen"></i> Write
+                            </button>
+                            <button type="button" id="tabModePreview" class="editor-switch-btn" onclick="switchEditorTab('preview')">
+                                <i class="fas fa-eye"></i> Live Preview
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Formatting Toolbar -->
+                    <div class="composer-toolbar" id="composerToolbar">
+                        <button type="button" class="toolbar-tool-btn" onclick="insertSyntax('# ', '')" title="Level 1 Heading"><b>H1</b></button>
+                        <button type="button" class="toolbar-tool-btn" onclick="insertSyntax('### ', '')" title="Level 2 Subheading"><b>H2</b></button>
+                        <span class="toolbar-divider"></span>
+                        <button type="button" class="toolbar-tool-btn" onclick="insertSyntax('**', '**')" title="Bold (Ctrl+B)"><i class="fas fa-bold"></i></button>
+                        <button type="button" class="toolbar-tool-btn" onclick="insertSyntax('_', '_')" title="Italic (Ctrl+I)"><i class="fas fa-italic"></i></button>
+                        <button type="button" class="toolbar-tool-btn" onclick="insertSyntax('`', '`')" title="Inline Code"><i class="fas fa-code"></i></button>
+                        <span class="toolbar-divider"></span>
+                        <button type="button" class="toolbar-tool-btn" onclick="insertSyntax('- ', '')" title="Bullet List"><i class="fas fa-list-ul"></i></button>
+                        <button type="button" class="toolbar-tool-btn" onclick="insertSyntax('1. ', '')" title="Numbered List"><i class="fas fa-list-ol"></i></button>
+                        <button type="button" class="toolbar-tool-btn" onclick="insertSyntax('> ', '')" title="Blockquote"><i class="fas fa-quote-left"></i></button>
+                        <button type="button" class="toolbar-tool-btn highlight" onclick="insertSyntax('! ', '')" title="Key Takeaway Highlight Box"><i class="fas fa-lightbulb"></i> Note</button>
+                        <button type="button" class="toolbar-tool-btn codeblock" onclick="insertSyntax('```\n', '\n```')" title="Code Block"><i class="fas fa-terminal"></i> Code Block</button>
+                    </div>
+
+                    <!-- Editor Textarea Area -->
+                    <div class="editor-pane-wrap" id="editorPaneWrap">
+                        <textarea name="content" id="articleContentInput" class="composer-textarea" placeholder="Start typing your technical editorial using clean Markdown:
+
+# 1. Executive Summary & Overview
+Write your opening paragraph here highlighting the significance of this technical breakthrough.
+
+### Key Architectural Breakthroughs
+- **Distributed Agent Orchestration:** Real-time multi-agent cooperation.
+- **Hardware Acceleration:** Ultra-low latency tensor execution.
+
+> 'Autonomous reasoning systems will transform how humans engineer software.'
+
+! Remember to benchmark across diverse distributed cloud environments." required oninput="updateWordCount()">{% if edit_mode %}{{ blog.content }}{% endif %}</textarea>
+                    </div>
+
+                    <!-- Live Markdown Preview Pane -->
+                    <div class="preview-pane-wrap blog-prose" id="previewPaneWrap" style="display:none;"></div>
+                </div>
+
+                <!-- Explain Like I'm 5 (ELI5) Card -->
+                <div class="admin-composer-card eli5-section-card">
+                    <div class="eli5-card-header">
+                        <div class="eli5-brand">
+                            <div class="eli5-spark-circle"><i class="fas fa-wand-magic-sparkles"></i></div>
+                            <div>
+                                <h4>Explain Like I'm 5 (ELI5) Simplified Version</h4>
+                                <p>Readers can toggle this mode for intuitive analogies, zero-jargon metaphors, and simplified summaries.</p>
+                            </div>
+                        </div>
+                        <button type="button" id="btnAutoGenerateEli5" class="btn-eli5-ai-sparkle">
+                            <i class="fas fa-sparkles"></i> ✨ Auto-Generate from Content
+                        </button>
+                    </div>
+
+                    <div class="composer-field-group">
+                        <textarea name="eli5_content" id="eli5ContentInput" class="composer-textarea eli5" rows="8" placeholder="# 👶 Explain Like I'm 5: Simple Title
 
 ### 🎈 The Kid-Friendly Analogy
 Explain the core idea using an everyday metaphor (e.g. race cars, spinning coins, Lego blocks).
@@ -191,21 +166,216 @@ Explain the core idea using an everyday metaphor (e.g. race cars, spinning coins
 - **3. Point Three:** The real-world impact.
 
 > 'A simple, memorable quote or summary takeaway!'">{% if edit_mode %}{{ blog.eli5_content }}{% endif %}</textarea>
+                    </div>
                 </div>
+            </div>
 
-                <!-- Submit Buttons -->
-                <div style="display:flex; align-items:center; gap:16px; margin-top:24px;">
-                    <button type="submit" class="btn-primary-action" style="padding:14px 36px; font-size:1.05rem;">
+            <!-- Right Sidebar Panel (30%) -->
+            <div class="admin-canvas-sidebar">
+                
+                <!-- Publish & Status Card -->
+                <div class="admin-sidebar-card publish-card">
+                    <h3 class="sidebar-card-title"><i class="fas fa-bolt" style="color:var(--accent-emerald);"></i> Publication Status</h3>
+                    
+                    <div class="publish-feature-toggle">
+                        <label class="custom-switch-wrap">
+                            <input type="checkbox" name="is_featured" id="featuredCheck" {% if edit_mode and blog.is_featured %}checked{% endif %}>
+                            <span class="custom-switch-slider"></span>
+                        </label>
+                        <label for="featuredCheck" class="switch-label-text">
+                            <strong>Featured Spotlight</strong>
+                            <small>Showcase in Homepage Hero Bento Grid</small>
+                        </label>
+                    </div>
+
+                    <hr class="sidebar-divider">
+
+                    <div class="publish-meta-stats">
+                        <div class="meta-stat-item">
+                            <span>Status:</span>
+                            <strong style="color:var(--accent-emerald-light);">Published (Live)</strong>
+                        </div>
+                        <div class="meta-stat-item">
+                            <span>Estimated Read:</span>
+                            <strong id="sidebarReadTime">{% if edit_mode %}{{ blog.read_time or 4 }}{% else %}4{% endif %} min read</strong>
+                        </div>
+                        {% if edit_mode %}
+                        <div class="meta-stat-item">
+                            <span>All-Time Views:</span>
+                            <strong>{{ blog.views }} views</strong>
+                        </div>
+                        <div class="meta-stat-item">
+                            <span>Applauds / Claps:</span>
+                            <strong>{{ blog.likes or 0 }} claps</strong>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="admin-action-btn primary full-width" style="margin-top:16px;">
                         <i class="fas fa-{% if edit_mode %}floppy-disk{% else %}paper-plane{% endif %}"></i>
-                        {% if edit_mode %}Save &amp; Update Article{% else %}Publish Article to Live Site{% endif %}
+                        <span>{% if edit_mode %}Save &amp; Update Publication{% else %}Publish Publication{% endif %}</span>
                     </button>
-
-                    <a href="{{ url_for('admin_dashboard') }}" style="color:var(--text-muted); font-size:0.92rem;">
-                        Cancel
-                    </a>
                 </div>
-            </form>
-        </div>
+
+                <!-- Title Cover Image Dropzone Card -->
+                <div class="admin-sidebar-card">
+                    <h3 class="sidebar-card-title"><i class="fas fa-image" style="color:var(--accent-cyan);"></i> Title Cover Image</h3>
+                    
+                    <div class="cover-dropzone-box" onclick="document.getElementById('coverFileInput').click()">
+                        <input type="file" id="coverFileInput" name="title_image" accept="image/*" style="display:none;" onchange="previewCoverImage(this)">
+                        
+                        <div id="coverPlaceholderWrap" {% if edit_mode and blog.title_image %}style="display:none;"{% endif %}>
+                            <i class="fas fa-cloud-arrow-up dropzone-icon"></i>
+                            <p class="dropzone-text">Click to upload cover image</p>
+                            <span class="dropzone-hint">PNG, JPG, WebP, SVG up to 10MB</span>
+                        </div>
+
+                        <div id="coverPreviewWrap" class="cover-preview-box" {% if not (edit_mode and blog.title_image) %}style="display:none;"{% endif %}>
+                            <img id="coverPreviewImg" src="{% if edit_mode and blog.title_image %}{{ url_for('static', filename='uploads/' + blog.title_image) }}{% endif %}" alt="Cover Preview">
+                            <span class="cover-change-pill"><i class="fas fa-camera"></i> Change Image</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inline Article Assets (5 Slots) -->
+                <div class="admin-sidebar-card">
+                    <div class="sidebar-card-header-flex">
+                        <h3 class="sidebar-card-title"><i class="fas fa-images" style="color:var(--accent-purple-light);"></i> Inline Images</h3>
+                        <span class="badge-mini-info">5 Slots</span>
+                    </div>
+                    <p class="sidebar-desc-text">Upload figures or charts below, then click the button to insert the tag directly into your article.</p>
+
+                    <div class="inline-assets-list">
+                        {% for i in range(1, 6) %}
+                        <div class="inline-asset-row">
+                            <div class="inline-asset-header">
+                                <button type="button" class="btn-insert-tag" onclick="insertSyntax('[inline_image_{{ i }}]', '')" title="Insert tag at cursor position">
+                                    <i class="fas fa-plus"></i> [inline_image_{{ i }}]
+                                </button>
+                                <span class="slot-num">Slot {{ i }}</span>
+                            </div>
+                            <input type="file" name="inline_image_{{ i }}" accept="image/*" class="inline-file-input">
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
-</section>
+</div>
+
+<script>
+function autoGenerateSlug() {
+    {% if not edit_mode %}
+    const titleInput = document.getElementById('articleTitle');
+    const slugInput = document.getElementById('articleSlug');
+    if (titleInput && slugInput) {
+        const slug = titleInput.value
+            .toLowerCase()
+            .trim()
+            .replace(/[^\w\s-]/g, '')
+            .replace(/[\s_-]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+        slugInput.value = slug;
+    }
+    {% endif %}
+}
+
+function forceSyncSlug() {
+    const titleInput = document.getElementById('articleTitle');
+    const slugInput = document.getElementById('articleSlug');
+    if (titleInput && slugInput) {
+        const slug = titleInput.value
+            .toLowerCase()
+            .trim()
+            .replace(/[^\w\s-]/g, '')
+            .replace(/[\s_-]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+        slugInput.value = slug;
+    }
+}
+
+function insertSyntax(prefix, suffix) {
+    const textarea = document.getElementById('articleContentInput');
+    if (!textarea) return;
+    
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const selected = text.substring(start, end);
+    const replacement = prefix + selected + suffix;
+    
+    textarea.value = text.substring(0, start) + replacement + text.substring(end);
+    textarea.focus();
+    textarea.setSelectionRange(start + prefix.length, start + prefix.length + selected.length);
+    updateWordCount();
+}
+
+function updateWordCount() {
+    const textarea = document.getElementById('articleContentInput');
+    if (!textarea) return;
+    const text = textarea.value.trim();
+    const words = text.length > 0 ? text.split(/\s+/).length : 0;
+    const readTime = Math.max(1, Math.ceil(words / 200));
+    
+    const statsEl = document.getElementById('editorWordStats');
+    const sidebarTimeEl = document.getElementById('sidebarReadTime');
+    
+    if (statsEl) statsEl.textContent = `${words} words • ${readTime} min read`;
+    if (sidebarTimeEl) sidebarTimeEl.textContent = `${readTime} min read`;
+}
+
+function switchEditorTab(mode) {
+    const writeBtn = document.getElementById('tabModeWrite');
+    const previewBtn = document.getElementById('tabModePreview');
+    const toolbar = document.getElementById('composerToolbar');
+    const editorWrap = document.getElementById('editorPaneWrap');
+    const previewWrap = document.getElementById('previewPaneWrap');
+    const content = document.getElementById('articleContentInput').value;
+
+    if (mode === 'write') {
+        writeBtn.classList.add('active');
+        previewBtn.classList.remove('active');
+        toolbar.style.display = 'flex';
+        editorWrap.style.display = 'block';
+        previewWrap.style.display = 'none';
+    } else {
+        previewBtn.classList.add('active');
+        writeBtn.classList.remove('active');
+        toolbar.style.display = 'none';
+        editorWrap.style.display = 'none';
+        previewWrap.style.display = 'block';
+
+        // Render basic Markdown preview
+        let html = content
+            .replace(/^# (.*$)/gim, '<h2>$1</h2>')
+            .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+            .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+            .replace(/_(.*?)_/gim, '<em>$1</em>')
+            .replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>')
+            .replace(/^! (.*$)/gim, '<div class="tech-highlight-box"><p>$1</p></div>')
+            .replace(/```([\s\S]*?)```/gim, '<pre><code>$1</code></pre>')
+            .replace(/`([^`]+)`/gim, '<code>$1</code>')
+            .replace(/\n\n/gim, '<br><br>');
+
+        previewWrap.innerHTML = html || '<p style="color:var(--text-muted);">Nothing to preview yet. Start typing your article...</p>';
+    }
+}
+
+function previewCoverImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('coverPlaceholderWrap').style.display = 'none';
+            document.getElementById('coverPreviewWrap').style.display = 'block';
+            document.getElementById('coverPreviewImg').src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateWordCount();
+});
+</script>
 {% endblock %}

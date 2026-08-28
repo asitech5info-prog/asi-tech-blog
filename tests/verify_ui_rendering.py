@@ -29,8 +29,8 @@ def verify_all():
         assert 'class="logo"' in html
         assert 'class="logo-badge"' in html
         assert 'class="logo-title"' in html
-        assert 'class="tech-tag">AI<' in html
-        print("✓ Brand Logo: 'ASI TECH' and 'AI' tag formatted on clean single line")
+        assert 'class="tech-tag">AI<' not in html
+        print("✓ Brand Logo: 'ASI TECH' is clean without 'AI' badge")
 
         # Chatbot Floating Widget & Window checks
         assert 'id="asiAiWidgetWrapper"' in html

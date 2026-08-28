@@ -3,119 +3,283 @@
 {% block title %}Executive Dashboard | Admin Suite | ASI TECH{% endblock %}
 
 {% block content %}
-<section style="padding:40px 0 80px;">
+<div class="admin-page-container">
     <div class="container">
-        <!-- Dashboard Top Action Bar -->
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px; flex-wrap:wrap; gap:16px;">
-            <div>
-                <span class="card-badge badge-tech" style="margin-bottom:8px;"><i class="fas fa-shield-alt"></i> ADMIN SUITE</span>
-                <h1 style="font-size:2.2rem; font-weight:800; color:#ffffff;">Content &amp; Platform Operations</h1>
+        <!-- Admin Sub-Navigation & Command Header -->
+        <div class="admin-header-bar">
+            <div class="admin-brand-lead">
+                <div class="admin-badge-pill">
+                    <span class="pulse-dot"></span>
+                    <i class="fas fa-shield-halved"></i>
+                    <span>ADMIN SUITE</span>
+                </div>
+                <h1 class="admin-page-title">Executive Management Hub</h1>
+                <p class="admin-page-subtitle">Centralized operations for publications, reader reviews, and incoming contact inquiries.</p>
             </div>
 
-            <div style="display:flex; gap:12px; flex-wrap:wrap;">
-                <a href="{{ url_for('admin_create') }}" class="btn-primary-action" style="text-decoration:none;">
-                    <i class="fas fa-plus-circle"></i> Create New Article
+            <div class="admin-header-actions">
+                <a href="{{ url_for('admin_create') }}" class="admin-action-btn primary">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Write Article</span>
                 </a>
-                <a href="{{ url_for('admin_contacts') }}" class="btn-primary-action" style="background:var(--bg-card); border:1px solid var(--border-card); color:var(--text-main); text-decoration:none;">
-                    <i class="fas fa-inbox"></i> Inbox ({{ total_contacts }})
+                <a href="{{ url_for('home') }}" class="admin-action-btn ghost" target="_blank">
+                    <i class="fas fa-external-link-alt"></i>
+                    <span>Live Site</span>
                 </a>
-                <a href="{{ url_for('admin_logout') }}" class="btn-primary-action" style="background:rgba(239, 68, 68, 0.15); border:1px solid rgba(239, 68, 68, 0.3); color:#f87171; text-decoration:none;">
-                    <i class="fas fa-arrow-right-from-bracket"></i> Logout
+                <a href="{{ url_for('admin_logout') }}" class="admin-action-btn danger">
+                    <i class="fas fa-arrow-right-from-bracket"></i>
+                    <span>Logout</span>
                 </a>
             </div>
         </div>
 
-        <!-- 4 Metric Stat Cards -->
-        <div class="admin-stats-grid">
-            <div class="admin-stat-card-modern">
-                <div class="admin-stat-icon emerald">
-                    <i class="fas fa-file-lines"></i>
+        <!-- 4 Metric KPI Stat Cards -->
+        <div class="admin-kpi-grid">
+            <div class="admin-kpi-card emerald" onclick="switchDashboardTab('blogs')" style="cursor:pointer;" title="Click to view Articles">
+                <div class="admin-kpi-icon">
+                    <i class="fas fa-newspaper"></i>
                 </div>
-                <div>
-                    <div class="admin-stat-val">{{ total_blogs }}</div>
-                    <div class="admin-stat-lbl">Published Posts</div>
+                <div class="admin-kpi-info">
+                    <span class="admin-kpi-val">{{ total_blogs }}</span>
+                    <span class="admin-kpi-label">Published Articles</span>
                 </div>
+                <span class="admin-kpi-tag emerald">Live in 5 Domains</span>
             </div>
 
-            <div class="admin-stat-card-modern">
-                <div class="admin-stat-icon cyan">
+            <div class="admin-kpi-card cyan">
+                <div class="admin-kpi-icon">
                     <i class="fas fa-eye"></i>
                 </div>
-                <div>
-                    <div class="admin-stat-val">{{ total_views }}</div>
-                    <div class="admin-stat-lbl">Global Reads</div>
+                <div class="admin-kpi-info">
+                    <span class="admin-kpi-val">{{ total_views }}</span>
+                    <span class="admin-kpi-label">Global Reads</span>
                 </div>
+                <span class="admin-kpi-tag cyan">All-Time Views</span>
             </div>
 
-            <div class="admin-stat-card-modern">
-                <div class="admin-stat-icon violet">
+            <div class="admin-kpi-card violet" onclick="switchDashboardTab('reviews')" style="cursor:pointer;" title="Click to view Reviews">
+                <div class="admin-kpi-icon">
                     <i class="fas fa-comments"></i>
                 </div>
-                <div>
-                    <div class="admin-stat-val">{{ total_reviews }}</div>
-                    <div class="admin-stat-lbl">Reader Reviews</div>
+                <div class="admin-kpi-info">
+                    <span class="admin-kpi-val">{{ total_reviews }}</span>
+                    <span class="admin-kpi-label">Reader Reviews</span>
                 </div>
+                <span class="admin-kpi-tag violet">Community Discussions</span>
             </div>
 
-            <div class="admin-stat-card-modern">
-                <div class="admin-stat-icon amber">
+            <div class="admin-kpi-card amber" onclick="switchDashboardTab('contacts')" style="cursor:pointer;" title="Click to view Inbox">
+                <div class="admin-kpi-icon">
                     <i class="fas fa-envelope-open-text"></i>
                 </div>
-                <div>
-                    <div class="admin-stat-val">{{ total_contacts }}</div>
-                    <div class="admin-stat-lbl">Inbox Messages</div>
+                <div class="admin-kpi-info">
+                    <span class="admin-kpi-val">{{ total_contacts }}</span>
+                    <span class="admin-kpi-label">Contact Inquiries</span>
                 </div>
+                <span class="admin-kpi-tag amber">Inbox Submissions</span>
             </div>
         </div>
 
-        <!-- Blogs Management Data Table -->
-        <div class="admin-table-wrapper">
-            <div class="admin-table-header">
-                <h2 style="font-size:1.3rem; color:#ffffff; display:flex; align-items:center; gap:10px;">
-                    <i class="fas fa-layer-group" style="color:var(--accent-emerald);"></i> Article Directory
-                </h2>
+        <!-- Dashboard Master Tab Navigation -->
+        <div class="dashboard-tabs-bar">
+            <button type="button" class="dash-tab-btn active" id="tabBtnBlogs" onclick="switchDashboardTab('blogs')">
+                <i class="fas fa-newspaper"></i>
+                <span>Articles &amp; Publications</span>
+                <span class="tab-count-pill">{{ blogs|length }}</span>
+            </button>
+            <button type="button" class="dash-tab-btn" id="tabBtnReviews" onclick="switchDashboardTab('reviews')">
+                <i class="fas fa-star" style="color:#fbbf24;"></i>
+                <span>Reader Reviews</span>
+                <span class="tab-count-pill">{{ reviews|length }}</span>
+            </button>
+            <button type="button" class="dash-tab-btn" id="tabBtnContacts" onclick="switchDashboardTab('contacts')">
+                <i class="fas fa-inbox" style="color:var(--accent-amber);"></i>
+                <span>Inbox Messages</span>
+                <span class="tab-count-pill">{{ contacts|length }}</span>
+            </button>
+        </div>
 
-                <input type="text" id="adminTableSearch" class="admin-search-box" placeholder="Filter articles by title or category..." onkeyup="filterAdminTable()">
+        <!-- ==================================================================
+             SECTION 1: ARTICLES DIRECTORY
+             ================================================================== -->
+        <div class="admin-card-panel dash-section" id="sectionBlogs">
+            <div class="admin-panel-top">
+                <div class="admin-panel-title-wrap">
+                    <h2><i class="fas fa-layer-group" style="color:var(--accent-emerald);"></i> Published Publications ({{ blogs|length }})</h2>
+                    <span class="admin-panel-count" id="articleDisplayCount">Showing all {{ blogs|length }} articles</span>
+                </div>
+
+                <!-- Search & Filters -->
+                <div class="admin-filter-bar">
+                    <div class="admin-search-wrap">
+                        <i class="fas fa-search admin-search-icon"></i>
+                        <input type="text" id="adminTableSearch" class="admin-search-input" placeholder="Search by title, category, or slug..." onkeyup="filterAdminTable()">
+                        <button type="button" class="admin-search-clear" id="searchClearBtn" onclick="clearAdminSearch()" style="display:none;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
+                    <div class="admin-category-chips" id="categoryChips">
+                        <button type="button" class="admin-chip active" data-cat="all" onclick="filterByCategory('all', this)">All</button>
+                        <button type="button" class="admin-chip" data-cat="Artificial Intelligence" onclick="filterByCategory('Artificial Intelligence', this)">AI</button>
+                        <button type="button" class="admin-chip" data-cat="Technology" onclick="filterByCategory('Technology', this)">Tech</button>
+                        <button type="button" class="admin-chip" data-cat="Science" onclick="filterByCategory('Science', this)">Science</button>
+                        <button type="button" class="admin-chip" data-cat="Education" onclick="filterByCategory('Education', this)">Education</button>
+                        <button type="button" class="admin-chip" data-cat="Movies" onclick="filterByCategory('Movies', this)">Movies</button>
+                    </div>
+                </div>
             </div>
 
-            <div style="overflow-x:auto;">
-                <table class="modern-data-table" id="adminBlogsTable">
+            <!-- Articles Table -->
+            <div class="admin-table-container">
+                <table class="admin-table" id="adminBlogsTable">
                     <thead>
                         <tr>
-                            <th style="width:60px;">ID</th>
-                            <th>Title &amp; Slug</th>
+                            <th style="width: 50px;">ID</th>
+                            <th>Article &amp; Route</th>
                             <th>Category</th>
-                            <th>Reads</th>
-                            <th>Claps</th>
-                            <th>Date</th>
-                            <th style="text-align:right;">Actions</th>
+                            <th>Engagement</th>
+                            <th>Published</th>
+                            <th style="text-align: right; width: 140px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for blog in blogs %}
-                        <tr>
-                            <td style="font-family:var(--font-mono); color:var(--text-dim);">#{{ blog.id }}</td>
-                            <td>
-                                <strong style="color:var(--text-highlight); font-size:0.95rem; display:block;">{{ blog.title }}</strong>
-                                <span style="font-size:0.75rem; color:var(--text-muted); font-family:var(--font-mono);">/blog/{{ blog.slug }}</span>
+                        <tr data-category="{{ blog.category }}" data-title="{{ blog.title|lower }}" data-slug="{{ blog.slug|lower }}">
+                            <td class="col-id">#{{ blog.id }}</td>
+                            <td class="col-main">
+                                <div class="admin-article-meta-row">
+                                    <div class="admin-row-thumb">
+                                        {% if blog.title_image %}
+                                        <img src="{{ url_for('static', filename='uploads/' + blog.title_image) }}" alt="" onerror="this.src='/static/uploads/cover_ai_deepseek.svg'">
+                                        {% else %}
+                                        <div class="thumb-placeholder"><i class="fas fa-newspaper"></i></div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="admin-row-text">
+                                        <a href="{{ url_for('admin_edit', blog_id=blog.id) }}" class="admin-row-title" title="Click to edit">{{ blog.title }}</a>
+                                        <div class="admin-row-sub">
+                                            <span class="admin-row-slug">/blog/{{ blog.slug }}</span>
+                                            {% if blog.is_featured %}
+                                            <span class="admin-badge-featured"><i class="fas fa-star"></i> Featured</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
                             </td>
-                            <td>
+                            <td class="col-cat">
                                 <span class="card-badge {% if blog.category == 'Artificial Intelligence' %}badge-ai{% elif blog.category == 'Technology' %}badge-tech{% elif blog.category == 'Science' %}badge-sci{% elif blog.category == 'Education' %}badge-edu{% else %}badge-mov{% endif %}">
                                     {{ blog.category }}
                                 </span>
                             </td>
-                            <td><i class="far fa-eye" style="color:var(--accent-cyan);"></i> {{ blog.views }}</td>
-                            <td><i class="fas fa-hands-clapping" style="color:var(--accent-emerald);"></i> {{ blog.likes or 0 }}</td>
-                            <td style="font-size:0.85rem; color:var(--text-muted);">{{ blog.created_at[:10] }}</td>
-                            <td>
-                                <div class="table-action-btns" style="justify-content:flex-end;">
-                                    <a href="{{ url_for('blog_detail', slug=blog.slug) }}" target="_blank" class="tbl-btn view" title="View Public Article">
-                                        <i class="fas fa-external-link"></i>
+                            <td class="col-metrics">
+                                <div class="admin-metrics-list">
+                                    <span title="Views"><i class="far fa-eye" style="color:var(--accent-cyan);"></i> {{ blog.views }}</span>
+                                    <span title="Claps"><i class="fas fa-hands-clapping" style="color:var(--accent-emerald);"></i> {{ blog.likes or 0 }}</span>
+                                </div>
+                            </td>
+                            <td class="col-date">
+                                <span class="admin-date-text">{{ blog.created_at[:10] }}</span>
+                            </td>
+                            <td class="col-actions">
+                                <div class="admin-btn-group">
+                                    <a href="{{ url_for('blog_detail', slug=blog.slug) }}" target="_blank" class="admin-tbl-btn view" title="View Public Article">
+                                        <i class="fas fa-arrow-up-right-from-square"></i>
                                     </a>
-                                    <a href="{{ url_for('admin_edit', blog_id=blog.id) }}" class="tbl-btn edit" title="Edit Article">
+                                    <a href="{{ url_for('admin_edit', blog_id=blog.id) }}" class="admin-tbl-btn edit" title="Edit Article">
                                         <i class="fas fa-pen-to-square"></i>
                                     </a>
-                                    <a href="{{ url_for('admin_delete', blog_id=blog.id) }}" class="tbl-btn del" title="Delete Article" onclick="return confirm('Are you sure you want to permanently delete this article?')">
+                                    <a href="{{ url_for('admin_delete', blog_id=blog.id) }}" class="admin-tbl-btn del" title="Delete Article" onclick="return confirm('Permanently delete \'{{ blog.title }}\'?')">
+                                        <i class="fas fa-trash-can"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="admin-empty-results" id="adminEmptyResults" style="display:none;">
+                    <i class="fas fa-magnifying-glass"></i>
+                    <h3>No matching articles found</h3>
+                    <p>Try searching with another keyword or reset the category filter.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================================================================
+             SECTION 2: REVIEWS & COMMUNITY FEEDBACK
+             ================================================================== -->
+        <div class="admin-card-panel dash-section" id="sectionReviews" style="display:none;">
+            <div class="admin-panel-top">
+                <div class="admin-panel-title-wrap">
+                    <h2><i class="fas fa-star" style="color:#fbbf24;"></i> Reader Reviews &amp; Feedback ({{ reviews|length }})</h2>
+                    <span class="admin-panel-count">Moderation panel for reader comments and ratings</span>
+                </div>
+
+                <div class="admin-search-wrap">
+                    <i class="fas fa-search admin-search-icon"></i>
+                    <input type="text" id="adminReviewSearch" class="admin-search-input" placeholder="Search reviews by reviewer, comment, or article..." onkeyup="filterReviewsTable()">
+                </div>
+            </div>
+
+            {% if reviews %}
+            <div class="admin-table-container">
+                <table class="admin-table" id="adminReviewsTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">ID</th>
+                            <th>Reviewer</th>
+                            <th>Rating</th>
+                            <th>Comment / Feedback</th>
+                            <th>Associated Article</th>
+                            <th>Date</th>
+                            <th style="text-align: right; width: 100px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in reviews %}
+                        <tr data-reviewer="{{ r.name|lower }}" data-comment="{{ r.comment|lower }}" data-article="{{ (r.blog_title or '')|lower }}">
+                            <td class="col-id">#{{ r.id }}</td>
+                            <td class="col-sender">
+                                <div class="admin-sender-box">
+                                    <div class="sender-avatar-circle" style="background:linear-gradient(135deg, #a855f7, #ec4899);">{{ r.name[:1] }}</div>
+                                    <div>
+                                        <strong class="sender-name">{{ r.name }}</strong>
+                                        {% if r.email %}
+                                        <span class="sender-email">{{ r.email }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="col-rating" style="white-space:nowrap;">
+                                <div style="color:#fbbf24; font-size:0.88rem;">
+                                    {% for i in range(r.rating) %}
+                                        <i class="fas fa-star"></i>
+                                    {% endfor %}
+                                    {% for i in range(5 - r.rating) %}
+                                        <i class="far fa-star" style="color:var(--text-dim);"></i>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <td class="col-msg">
+                                <p class="admin-inbox-msg-body">{{ r.comment }}</p>
+                            </td>
+                            <td class="col-article-link">
+                                {% if r.blog_slug %}
+                                <a href="{{ url_for('blog_detail', slug=r.blog_slug) }}" target="_blank" style="color:var(--accent-cyan-light); font-size:0.85rem; text-decoration:none; font-weight:600;">
+                                    {{ r.blog_title or 'View Article' }} <i class="fas fa-external-link-alt" style="font-size:0.75rem;"></i>
+                                </a>
+                                {% else %}
+                                <span style="color:var(--text-dim); font-size:0.85rem;">Article #{{ r.blog_id }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="col-date">
+                                <span class="admin-date-text">{{ r.created_at[:10] }}</span>
+                            </td>
+                            <td class="col-actions">
+                                <div class="admin-btn-group">
+                                    <a href="{{ url_for('admin_delete_review', review_id=r.id) }}" class="admin-tbl-btn del" title="Delete Review" onclick="return confirm('Delete this review from {{ r.name }}?')">
                                         <i class="fas fa-trash-can"></i>
                                     </a>
                                 </div>
@@ -125,25 +289,214 @@
                     </tbody>
                 </table>
             </div>
+            {% else %}
+            <div class="admin-empty-state">
+                <div class="empty-icon-circle" style="background:rgba(251, 191, 36, 0.1); border-color:rgba(251, 191, 36, 0.3);">
+                    <i class="fas fa-star" style="color:#fbbf24;"></i>
+                </div>
+                <h3>No reader reviews yet</h3>
+                <p>When readers leave star reviews and discussions on your publications, they will be listed here.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- ==================================================================
+             SECTION 3: CONTACT INBOX & INQUIRIES
+             ================================================================== -->
+        <div class="admin-card-panel dash-section" id="sectionContacts" style="display:none;">
+            <div class="admin-panel-top">
+                <div class="admin-panel-title-wrap">
+                    <h2><i class="fas fa-envelope-open-text" style="color:var(--accent-amber);"></i> Contact Inquiries &amp; Messages ({{ contacts|length }})</h2>
+                    <span class="admin-panel-count">Incoming submissions from public contact portal</span>
+                </div>
+
+                <div class="admin-search-wrap">
+                    <i class="fas fa-search admin-search-icon"></i>
+                    <input type="text" id="adminInboxSearch" class="admin-search-input" placeholder="Search by sender, email, or subject..." onkeyup="filterInboxTable()">
+                </div>
+            </div>
+
+            {% if contacts %}
+            <div class="admin-table-container">
+                <table class="admin-table" id="adminInboxTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">ID</th>
+                            <th>Sender &amp; Contact</th>
+                            <th>Subject</th>
+                            <th>Message</th>
+                            <th>Received</th>
+                            <th style="text-align: right; width: 120px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in contacts %}
+                        <tr data-sender="{{ c.name|lower }}" data-email="{{ c.email|lower }}" data-subject="{{ (c.subject or '')|lower }}" data-msg="{{ c.message|lower }}">
+                            <td class="col-id">#{{ c.id }}</td>
+                            <td class="col-sender">
+                                <div class="admin-sender-box">
+                                    <div class="sender-avatar-circle">{{ c.name[:1] }}</div>
+                                    <div>
+                                        <strong class="sender-name">{{ c.name }}</strong>
+                                        <a href="mailto:{{ c.email }}?subject=Re: {{ c.subject or 'ASI TECH Inquiry' }}" class="sender-email" title="Click to email">
+                                            {{ c.email }}
+                                        </a>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="col-subject">
+                                <span class="subject-pill">{{ c.subject or 'General Inquiry' }}</span>
+                            </td>
+                            <td class="col-msg">
+                                <p class="admin-inbox-msg-body">{{ c.message }}</p>
+                            </td>
+                            <td class="col-date">
+                                <span class="admin-date-text">{{ c.created_at[:10] }}</span>
+                            </td>
+                            <td class="col-actions">
+                                <div class="admin-btn-group">
+                                    <a href="mailto:{{ c.email }}?subject=Re: {{ c.subject or 'ASI TECH Inquiry' }}" class="admin-tbl-btn view" title="Reply via Email">
+                                        <i class="fas fa-reply"></i>
+                                    </a>
+                                    <a href="{{ url_for('admin_delete_contact', contact_id=c.id) }}" class="admin-tbl-btn del" title="Delete Message" onclick="return confirm('Delete this message from {{ c.name }}?')">
+                                        <i class="fas fa-trash-can"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="admin-empty-state">
+                <div class="empty-icon-circle">
+                    <i class="fas fa-envelope-open"></i>
+                </div>
+                <h3>Your inbox is completely clear</h3>
+                <p>When readers reach out through the Contact form, their inquiries will appear here in real-time.</p>
+            </div>
+            {% endif %}
         </div>
     </div>
-</section>
+</div>
 
 <script>
-function filterAdminTable() {
-    const input = document.getElementById('adminTableSearch');
-    const filter = input.value.toLowerCase();
-    const table = document.getElementById('adminBlogsTable');
-    const rows = table.getElementsByTagName('tr');
+let currentCategory = 'all';
 
-    for (let i = 1; i < rows.length; i++) {
-        const text = rows[i].textContent.toLowerCase();
-        if (text.includes(filter)) {
-            rows[i].style.display = '';
-        } else {
-            rows[i].style.display = 'none';
-        }
+function switchDashboardTab(tabName) {
+    // Buttons
+    document.getElementById('tabBtnBlogs').classList.remove('active');
+    document.getElementById('tabBtnReviews').classList.remove('active');
+    document.getElementById('tabBtnContacts').classList.remove('active');
+    
+    // Sections
+    document.getElementById('sectionBlogs').style.display = 'none';
+    document.getElementById('sectionReviews').style.display = 'none';
+    document.getElementById('sectionContacts').style.display = 'none';
+
+    if (tabName === 'blogs') {
+        document.getElementById('tabBtnBlogs').classList.add('active');
+        document.getElementById('sectionBlogs').style.display = 'block';
+    } else if (tabName === 'reviews') {
+        document.getElementById('tabBtnReviews').classList.add('active');
+        document.getElementById('sectionReviews').style.display = 'block';
+    } else if (tabName === 'contacts') {
+        document.getElementById('tabBtnContacts').classList.add('active');
+        document.getElementById('sectionContacts').style.display = 'block';
     }
+}
+
+function filterByCategory(category, btnElement) {
+    currentCategory = category;
+    document.querySelectorAll('.admin-chip').forEach(c => c.classList.remove('active'));
+    if (btnElement) btnElement.classList.add('active');
+    filterAdminTable();
+}
+
+function filterAdminTable() {
+    const searchInput = document.getElementById('adminTableSearch');
+    const query = searchInput.value.trim().toLowerCase();
+    const clearBtn = document.getElementById('searchClearBtn');
+    
+    if (query.length > 0) clearBtn.style.display = 'block';
+    else clearBtn.style.display = 'none';
+
+    const rows = document.querySelectorAll('#adminBlogsTable tbody tr');
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+        const cat = row.getAttribute('data-category') || '';
+        const title = row.getAttribute('data-title') || '';
+        const slug = row.getAttribute('data-slug') || '';
+        
+        const matchesCat = (currentCategory === 'all' || cat === currentCategory);
+        const matchesQuery = (query === '' || title.includes(query) || slug.includes(query) || cat.toLowerCase().includes(query));
+
+        if (matchesCat && matchesQuery) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    const emptyBox = document.getElementById('adminEmptyResults');
+    const displayCount = document.getElementById('articleDisplayCount');
+    
+    if (visibleCount === 0) emptyBox.style.display = 'block';
+    else emptyBox.style.display = 'none';
+
+    if (displayCount) {
+        displayCount.textContent = `Showing ${visibleCount} of ${rows.length} articles`;
+    }
+}
+
+function clearAdminSearch() {
+    const searchInput = document.getElementById('adminTableSearch');
+    searchInput.value = '';
+    filterAdminTable();
+    searchInput.focus();
+}
+
+function filterReviewsTable() {
+    const input = document.getElementById('adminReviewSearch');
+    if (!input) return;
+    const query = input.value.trim().toLowerCase();
+    const rows = document.querySelectorAll('#adminReviewsTable tbody tr');
+
+    rows.forEach(row => {
+        const reviewer = row.getAttribute('data-reviewer') || '';
+        const comment = row.getAttribute('data-comment') || '';
+        const article = row.getAttribute('data-article') || '';
+        const text = row.textContent.toLowerCase();
+
+        if (query === '' || reviewer.includes(query) || comment.includes(query) || article.includes(query) || text.includes(query)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+function filterInboxTable() {
+    const input = document.getElementById('adminInboxSearch');
+    if (!input) return;
+    const query = input.value.trim().toLowerCase();
+    const rows = document.querySelectorAll('#adminInboxTable tbody tr');
+
+    rows.forEach(row => {
+        const sender = row.getAttribute('data-sender') || '';
+        const email = row.getAttribute('data-email') || '';
+        const subject = row.getAttribute('data-subject') || '';
+        const text = row.textContent.toLowerCase();
+
+        if (query === '' || sender.includes(query) || email.includes(query) || subject.includes(query) || text.includes(query)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
 }
 </script>
 {% endblock %}

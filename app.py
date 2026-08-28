@@ -223,6 +223,8 @@ def init_db():
         if 'eli5_content' not in existing_cols:
             cursor.execute("ALTER TABLE blogs ADD COLUMN eli5_content TEXT DEFAULT ''")
 
+        cursor.execute("UPDATE blogs SET title_image = 'cover_deepseek_reasoning.svg' WHERE title_image = 'cover_ai_deepseek.svg' OR slug LIKE '%deepseek%'")
+        cursor.execute("UPDATE blogs SET slug = 'deepseek-r1-claude-3-7-reasoning-llms-frontier' WHERE slug = 'deepseek-r1-claude-37-reasoning-llms-frontier'")
         db.commit()
         
         count = cursor.execute("SELECT COUNT(*) FROM blogs").fetchone()[0]
@@ -1031,6 +1033,12 @@ def blog_detail(slug):
     db = get_db()
     blog = db.execute("SELECT * FROM blogs WHERE slug = ?", (slug,)).fetchone()
     if blog is None:
+        alt_slug = slug.replace('-37-', '-3-7-') if '-37-' in slug else slug.replace('-3-7-', '-37-')
+        blog = db.execute("SELECT * FROM blogs WHERE slug = ?", (alt_slug,)).fetchone()
+        if blog:
+            return redirect(url_for('blog_detail', slug=blog['slug']), code=301)
+
+    if blog is None:
         flash('The requested article could not be found.', 'error')
         return redirect(url_for('home'))
     
@@ -1503,15 +1511,25 @@ def admin_dashboard():
     
     db = get_db()
     blogs = db.execute("SELECT * FROM blogs ORDER BY created_at DESC").fetchall()
-    total_blogs = db.execute("SELECT COUNT(*) as count FROM blogs").fetchone()['count']
+    reviews = db.execute("""
+        SELECT reviews.*, blogs.title as blog_title, blogs.slug as blog_slug 
+        FROM reviews 
+        LEFT JOIN blogs ON reviews.blog_id = blogs.id 
+        ORDER BY reviews.created_at DESC
+    """).fetchall()
+    contacts = db.execute("SELECT * FROM contacts ORDER BY created_at DESC").fetchall()
+    
+    total_blogs = len(blogs)
     total_views = db.execute("SELECT COALESCE(SUM(views), 0) as total FROM blogs").fetchone()['total']
-    total_reviews = db.execute("SELECT COUNT(*) as count FROM reviews").fetchone()['count']
-    total_contacts = db.execute("SELECT COUNT(*) as count FROM contacts").fetchone()['count']
+    total_reviews = len(reviews)
+    total_contacts = len(contacts)
     total_users = db.execute("SELECT COUNT(*) as count FROM users").fetchone()['count']
     
     return render_template(
         'admin_dashboard.html',
         blogs=blogs,
+        reviews=reviews,
+        contacts=contacts,
         total_blogs=total_blogs,
         total_views=total_views,
         total_reviews=total_reviews,
@@ -1673,8 +1691,19 @@ def admin_delete_contact(contact_id):
     db = get_db()
     db.execute("DELETE FROM contacts WHERE id = ?", (contact_id,))
     db.commit()
-    flash('Message deleted.', 'success')
-    return redirect(url_for('admin_contacts'))
+    flash('Contact inquiry deleted successfully.', 'success')
+    return redirect(url_for('admin_dashboard'))
+
+@app.route(ADMIN_URL + '/reviews/delete/<int:review_id>')
+def admin_delete_review(review_id):
+    if not session.get('admin_logged_in'):
+        return redirect(url_for('admin_login'))
+    
+    db = get_db()
+    db.execute("DELETE FROM reviews WHERE id = ?", (review_id,))
+    db.commit()
+    flash('Review deleted successfully.', 'success')
+    return redirect(url_for('admin_dashboard'))
 
 @app.route(ADMIN_URL + '/logout')
 def admin_logout():
@@ -1710,4 +1739,6 @@ def server_error(e):
     return render_template('500.html'), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() in ('true', '1', 't')
+    app.run(host='0.0.0.0', port=port, debug=debug_mode)
