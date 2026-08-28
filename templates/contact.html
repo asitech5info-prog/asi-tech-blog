@@ -1,65 +1,114 @@
 {% extends "base.html" %}
 
-{% block title %}Contact Us | ASI TECH{% endblock %}
+{% block title %}Contact &amp; Collaborate | ASI TECH{% endblock %}
+{% block meta_description %}Get in touch with the ASI TECH editorial and engineering team.{% endblock %}
 
 {% block content %}
-<section class="contact-page">
+<header class="category-hero-header" style="margin-bottom:0;">
     <div class="container">
-        <div class="contact-header">
-            <h1><i class="fas fa-envelope"></i> Contact Us</h1>
-            <p>Have a question or want to collaborate? Reach out to us!</p>
+        <div class="cat-hero-icon" style="color:var(--accent-emerald); box-shadow:0 0 25px rgba(16, 185, 129, 0.3);">
+            <i class="fas fa-paper-plane"></i>
         </div>
+        <h1 class="cat-hero-title">Get in Touch</h1>
+        <p class="cat-hero-desc">Have questions, sponsorship proposals, or want to collaborate on tech research? Send us a transmission.</p>
+    </div>
+</header>
 
-        <div class="contact-layout">
-            <div class="contact-form-section">
-                <form action="{{ url_for('contact') }}" method="post" class="contact-form">
-                    <div class="form-group">
-                        <label><i class="fas fa-user"></i> Your Name *</label>
+<section class="container">
+    <div class="contact-layout-grid">
+        <!-- Left Column: Contact Form -->
+        <div class="contact-card-box">
+            <h2 style="font-size:1.5rem; margin-bottom:20px; color:#ffffff;">
+                <i class="fas fa-envelope-open" style="color:var(--accent-emerald);"></i> Send a Direct Message
+            </h2>
+            <form action="{{ url_for('contact') }}" method="post">
+                <div class="form-grid-2">
+                    <div class="input-field-group">
+                        <label><i class="fas fa-user"></i> Full Name *</label>
                         <input type="text" name="name" placeholder="John Doe" required>
                     </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-envelope"></i> Your Email *</label>
+                    <div class="input-field-group">
+                        <label><i class="fas fa-envelope"></i> Email Address *</label>
                         <input type="email" name="email" placeholder="john@example.com" required>
                     </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-heading"></i> Subject</label>
-                        <input type="text" name="subject" placeholder="What's this about?">
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-comment-dots"></i> Message *</label>
-                        <textarea name="message" rows="6" placeholder="Write your message here..." required></textarea>
-                    </div>
-                    <button type="submit" class="btn-submit">
-                        <i class="fas fa-paper-plane"></i> Send Message
-                    </button>
-                </form>
+                </div>
+
+                <div class="input-field-group">
+                    <label><i class="fas fa-heading"></i> Subject</label>
+                    <input type="text" name="subject" placeholder="Collaboration / Inquiry / Technical Question">
+                </div>
+
+                <div class="input-field-group">
+                    <label><i class="fas fa-comment-dots"></i> Message *</label>
+                    <textarea name="message" rows="6" placeholder="Write your detailed message or proposal here..." required></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary-action" style="width:100%; justify-content:center; padding:14px;">
+                    <i class="fas fa-paper-plane"></i> Send Message
+                </button>
+            </form>
+        </div>
+
+        <!-- Right Column: Info Cards & FAQ -->
+        <div>
+            <!-- Direct Email Card -->
+            <div class="contact-direct-card">
+                <div class="contact-direct-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div>
+                    <h4 style="font-size:1.05rem; margin-bottom:2px; color:#ffffff;">Official Email</h4>
+                    <a href="mailto:asitech5info@gmail.com" style="font-size:0.92rem; color:var(--accent-emerald-light);">asitech5info@gmail.com</a>
+                </div>
             </div>
 
-            <div class="contact-info-section">
-                <div class="contact-card">
-                    <div class="contact-icon">
-                        <i class="fas fa-envelope"></i>
-                    </div>
-                    <h3>Email Us</h3>
-                    <a href="mailto:asitech5info@gmail.com">asitech5info@gmail.com</a>
+            <!-- YouTube Channel Card -->
+            <div class="contact-direct-card" style="border-color:rgba(239, 68, 68, 0.3);">
+                <div class="contact-direct-icon yt">
+                    <i class="fab fa-youtube"></i>
                 </div>
-
-                <div class="contact-card">
-                    <div class="contact-icon youtube-icon">
-                        <i class="fab fa-youtube"></i>
-                    </div>
-                    <h3>YouTube Channel</h3>
-                    <a href="https://youtube.com/@howtech_works?si=gXvodLAXQ36FVHMZ" target="_blank">HOW TECH WORKS</a>
+                <div>
+                    <h4 style="font-size:1.05rem; margin-bottom:2px; color:#ffffff;">HOW TECH WORKS</h4>
+                    <a href="https://youtube.com/@howtech_works?si=gXvodLAXQ36FVHMZ" target="_blank" style="font-size:0.92rem; color:#f87171;">Visit Channel on YouTube &rarr;</a>
                 </div>
+            </div>
 
-                <div class="contact-card yt-promo-card">
-                    <a href="https://youtube.com/@howtech_works?si=gXvodLAXQ36FVHMZ" target="_blank" class="yt-big-btn">
-                        <i class="fab fa-youtube"></i>
-                        <div>
-                            <span class="yt-label">Visit Our Channel</span>
-                            <span class="yt-name">HOW TECH WORKS</span>
+            <!-- FAQ Accordion -->
+            <div class="contact-card-box" style="margin-top:24px;">
+                <h3 style="font-size:1.2rem; margin-bottom:16px; color:#ffffff;">
+                    <i class="fas fa-circle-question" style="color:var(--accent-cyan);"></i> Frequently Asked Questions
+                </h3>
+                
+                <div class="faq-wrap">
+                    <div class="faq-item active">
+                        <div class="faq-question">
+                            <span>Can I submit guest articles or research?</span>
+                            <i class="fas fa-chevron-down"></i>
                         </div>
-                    </a>
+                        <div class="faq-answer">
+                            Yes! We welcome high-caliber technical writeups and case studies. Mention "Guest Article Proposal" in the subject line.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>How frequently is new content published?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            We release comprehensive in-depth articles multiple times per week across our 5 core disciplines.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Where can I find video breakdowns?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            Our official YouTube channel <strong>HOW TECH WORKS</strong> features weekly hands-on experiments, tutorials, and architectural walkthroughs.
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}404 - Article Not Found | ASI TECH{% endblock %}
+
+{% block content %}
+<section style="padding:100px 0 120px; text-align:center;">
+    <div class="container" style="max-width:600px;">
+        <div style="font-family:var(--font-mono); font-size:6rem; font-weight:900; line-height:1; margin-bottom:16px;" class="gradient-cyber">
+            404
+        </div>
+        <h1 style="font-size:2rem; font-weight:800; margin-bottom:12px; color:#ffffff;">Quantum State Lost in Space</h1>
+        <p style="color:var(--text-muted); font-size:1.05rem; margin-bottom:32px;">
+            The requested technical article or endpoint seems to have dissolved into the cosmic ether or been relocated.
+        </p>
+
+        <div style="display:flex; justify-content:center; gap:16px; flex-wrap:wrap;">
+            <a href="{{ url_for('home') }}" class="btn-primary-action" style="text-decoration:none;">
+                <i class="fas fa-home"></i> Return to Safety (Home)
+            </a>
+            <button type="button" class="quick-search-trigger btn-primary-action" style="background:var(--bg-card); border:1px solid var(--border-card); color:var(--text-main);">
+                <i class="fas fa-search"></i> Search Archive
+            </button>
+        </div>
+    </div>
+</section>
+{% endblock %}

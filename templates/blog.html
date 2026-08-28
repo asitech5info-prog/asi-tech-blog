@@ -1,176 +1,399 @@
 {% extends "base.html" %}
 
 {% block title %}{{ blog.title }} | ASI TECH{% endblock %}
+{% block meta_description %}{{ blog.content[:160] | striptags }}{% endblock %}
+
+{% block og_title %}{{ blog.title }} - ASI TECH{% endblock %}
+{% block og_description %}{{ blog.content[:160] | striptags }}{% endblock %}
 
 {% block content %}
-<!-- Blog Header -->
-<section class="blog-header">
+<!-- Article Header Section -->
+<header class="blog-detail-header">
     <div class="container">
-        <div class="blog-breadcrumb">
+        <!-- Breadcrumbs -->
+        <nav class="blog-breadcrumb" aria-label="breadcrumb">
             <a href="{{ url_for('home') }}"><i class="fas fa-home"></i> Home</a>
             <i class="fas fa-chevron-right"></i>
             <a href="{{ url_for('category_page', category=blog.category) }}">{{ blog.category }}</a>
             <i class="fas fa-chevron-right"></i>
-            <span>{{ blog.title }}</span>
-        </div>
+            <span style="color:var(--text-muted);">{{ blog.title[:45] }}...</span>
+        </nav>
 
-        <span class="blog-detail-category">{{ blog.category }}</span>
+        <span class="card-badge {% if blog.category == 'Artificial Intelligence' %}badge-ai{% elif blog.category == 'Technology' %}badge-tech{% elif blog.category == 'Science' %}badge-sci{% elif blog.category == 'Education' %}badge-edu{% else %}badge-mov{% endif %}" style="margin-bottom:16px;">
+            {{ blog.category }}
+        </span>
+
         <h1 class="blog-detail-title">{{ blog.title }}</h1>
 
-        <div class="blog-detail-meta">
-            <span><i class="fas fa-user"></i> {{ blog.author }}</span>
-            <span><i class="fas fa-calendar-alt"></i> {{ blog.created_at[:10] }}</span>
-            <span><i class="fas fa-eye"></i> {{ blog.views }} views</span>
+        <!-- Author & Meta Bar -->
+        <div class="blog-detail-meta-bar">
+            <div class="author-detail-box">
+                <div class="author-detail-avatar">
+                    {{ blog.author[:1] }}
+                </div>
+                <div class="author-detail-text">
+                    <h4>{{ blog.author }}</h4>
+                    <span>Senior Tech Analyst &amp; Contributor</span>
+                </div>
+            </div>
+
+            <div class="blog-stats-meta">
+                <span><i class="far fa-calendar-alt"></i> {{ blog.created_at[:10] }}</span>
+                <span><i class="far fa-clock"></i> {{ blog.read_time or 4 }} min read</span>
+                <span><i class="far fa-eye"></i> {{ blog.views }} views</span>
+                {% if reviews %}
+                <span style="color:#fbbf24;"><i class="fas fa-star"></i> {{ avg_rating }} ({{ reviews|length }})</span>
+                {% endif %}
+            </div>
         </div>
     </div>
-</section>
+</header>
 
-<!-- Blog Content -->
-<section class="blog-content-section">
-    <div class="container blog-layout">
-        <div class="blog-main">
+<!-- 2-Column Editorial Layout -->
+<div class="container">
+    <div class="blog-editorial-layout">
+        <!-- Main Content Area -->
+        <article class="blog-main-content">
             {% if blog.title_image %}
-            <div class="blog-title-image">
-                <img src="{{ url_for('static', filename='uploads/' + blog.title_image) }}" alt="{{ blog.title }}">
+            <div class="blog-hero-cover-wrap">
+                <img src="{{ url_for('static', filename='uploads/' + blog.title_image) }}" alt="{{ blog.title }}" class="blog-hero-cover">
             </div>
             {% endif %}
 
-            <div class="blog-body">
-                {{ blog.content | safe }}
+            <!-- Smart Article Control Deck: ELI5 Toggle & Audio Narration -->
+            <div class="article-deck-container">
+                <!-- Reading Mode Switcher (ELI5 Toggle) -->
+                <div class="reading-mode-deck">
+                    <div class="reading-mode-title-wrap">
+                        <span class="deck-label"><i class="fas fa-sliders"></i> Reading Mode:</span>
+                    </div>
+                    <div class="reading-mode-selector" id="readingModeSelector" role="tablist">
+                        <button type="button" class="mode-pill-btn active" id="btnModeTechnical" onclick="switchReadingMode('technical')" role="tab" aria-selected="true">
+                            <i class="fas fa-microscope"></i>
+                            <span>Technical Deep Dive</span>
+                            <span class="mode-read-time" id="modeTechTime">{{ blog.read_time or 4 }} min</span>
+                        </button>
+                        <button type="button" class="mode-pill-btn eli5-pill" id="btnModeEli5" onclick="switchReadingMode('eli5')" role="tab" aria-selected="false">
+                            <i class="fas fa-wand-magic-sparkles"></i>
+                            <span>Explain Like I'm 5</span>
+                            <span class="mode-badge-pill">ELI5</span>
+                            <span class="mode-read-time" id="modeEli5Time">{{ eli5_read_time or 2 }} min</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Text-to-Speech (TTS) Podcast-Grade Audio Narration Player -->
+                <div class="tts-narration-card" id="ttsNarrationCard">
+                    <div class="tts-header-bar">
+                        <div class="tts-brand-info">
+                            <div class="tts-equalizer" id="ttsEqualizer" aria-label="Audio Visualizer">
+                                <span></span><span></span><span></span><span></span>
+                            </div>
+                            <div class="tts-title-meta">
+                                <div class="tts-title-row">
+                                    <strong class="tts-headline"><i class="fas fa-headphones"></i> Audio Narration</strong>
+                                    <span class="tts-mode-tag" id="ttsModeTag">Technical Mode</span>
+                                </div>
+                                <span class="tts-status-text" id="ttsStatusText">Listen to AI audio narration with live read-along tracking</span>
+                            </div>
+                        </div>
+
+                        <!-- Voice & Speed Settings -->
+                        <div class="tts-quick-tools">
+                            <div class="tts-tool-item" title="Select Voice">
+                                <i class="fas fa-volume-high" style="color:var(--accent-cyan-light); font-size:0.85rem;"></i>
+                                <select id="ttsVoiceSelect" class="tts-select" aria-label="Select voice"></select>
+                            </div>
+                            <div class="tts-speed-group" id="ttsSpeedGroup" title="Playback speed">
+                                <button type="button" class="tts-speed-btn" data-speed="0.75">0.75x</button>
+                                <button type="button" class="tts-speed-btn active" data-speed="1.0">1.0x</button>
+                                <button type="button" class="tts-speed-btn" data-speed="1.25">1.25x</button>
+                                <button type="button" class="tts-speed-btn" data-speed="1.5">1.5x</button>
+                            </div>
+                            <label class="tts-readalong-toggle" title="Highlight currently spoken paragraph in real time">
+                                <input type="checkbox" id="ttsHighlightToggle" checked>
+                                <span>Read-Along</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Player Controls & Timeline Scrubber -->
+                    <div class="tts-player-body">
+                        <div class="tts-btn-controls">
+                            <button type="button" class="tts-action-btn" id="ttsRewindBtn" title="Rewind 10 seconds">
+                                <i class="fas fa-rotate-left"></i> <span>10s</span>
+                            </button>
+                            <button type="button" class="tts-primary-play-btn" id="ttsPlayPauseBtn" title="Play / Pause narration">
+                                <i class="fas fa-play" id="ttsPlayIcon"></i>
+                            </button>
+                            <button type="button" class="tts-action-btn" id="ttsForwardBtn" title="Skip forward 10 seconds">
+                                <i class="fas fa-rotate-right"></i> <span>10s</span>
+                            </button>
+                            <button type="button" class="tts-action-btn" id="ttsStopBtn" title="Stop narration">
+                                <i class="fas fa-stop"></i>
+                            </button>
+                        </div>
+
+                        <!-- Timeline Scrubber -->
+                        <div class="tts-timeline-wrap">
+                            <span class="tts-time-current" id="ttsCurrentTime">0:00</span>
+                            <div class="tts-progress-track" id="ttsProgressTrack">
+                                <div class="tts-progress-fill" id="ttsProgressFill"></div>
+                                <div class="tts-scrubber-handle" id="ttsScrubberHandle"></div>
+                            </div>
+                            <span class="tts-time-total" id="ttsTotalTime">{{ blog.read_time or 4 }}:00</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Share -->
-            <div class="blog-share">
-                <h4><i class="fas fa-share-alt"></i> Share this article</h4>
-                <div class="share-buttons">
-                    <a href="https://twitter.com/intent/tweet?text={{ blog.title }}&url={{ request.url }}" target="_blank" class="share-btn twitter">
-                        <i class="fab fa-twitter"></i>
+            <!-- Dual Article Content Views (In-Place Swapping without Reload) -->
+            <!-- 1. Technical Deep-Dive View -->
+            <div class="blog-prose blog-prose-view active" id="blogProseTechnical">
+                {{ blog.content | parse_content | safe }}
+            </div>
+
+            <!-- 2. Explain Like I'm 5 (ELI5) Simplified View -->
+            <div class="blog-prose blog-prose-view" id="blogProseEli5" style="display:none;">
+                <div class="eli5-alert-card">
+                    <div class="eli5-alert-header">
+                        <div class="eli5-spark-badge"><i class="fas fa-wand-magic-sparkles"></i> ELI5 MODE ACTIVE</div>
+                        <button type="button" class="btn-eli5-return" onclick="switchReadingMode('technical')">
+                            <i class="fas fa-microscope"></i> Switch to Deep Dive
+                        </button>
+                    </div>
+                    <h3>👶 Explain Like I'm 5 Summary</h3>
+                    <p>Complex engineering jargon replaced with intuitive real-world analogies, high-level summaries, and core takeaways without changing pages.</p>
+                </div>
+
+                <div class="eli5-rendered-content">
+                    {{ eli5_content | parse_content | safe }}
+                </div>
+            </div>
+
+            <!-- Tags Cloud -->
+            {% if tag_list %}
+            <div class="article-tags-wrap">
+                <strong style="color:var(--text-highlight); font-size:0.9rem;"><i class="fas fa-tags"></i> Tags:</strong>
+                {% for tag in tag_list %}
+                <a href="{{ url_for('search') }}?q={{ tag }}" class="article-tag-pill">#{{ tag }}</a>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Interactive Claps & Share Bar -->
+            <div class="article-action-bar">
+                <button type="button" class="clap-btn" id="clapBtn" data-slug="{{ blog.slug }}" title="Applaud this article">
+                    <i class="fas fa-hands-clapping"></i>
+                    <span>Clap</span>
+                    <span class="clap-count" style="background:rgba(255,255,255,0.2); padding:2px 8px; border-radius:var(--radius-full); font-size:0.85rem;">{{ blog.likes or 0 }}</span>
+                </button>
+
+                <div class="share-buttons-row">
+                    <span style="font-size:0.88rem; color:var(--text-muted); font-weight:600;">Share:</span>
+                    <a href="https://twitter.com/intent/tweet?text={{ blog.title }}&url={{ request.url }}" target="_blank" class="share-pill twitter" title="Share on Twitter / X">
+                        <i class="fab fa-x-twitter"></i>
                     </a>
-                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url }}" target="_blank" class="share-btn facebook">
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url }}" target="_blank" class="share-pill facebook" title="Share on Facebook">
                         <i class="fab fa-facebook-f"></i>
                     </a>
-                    <a href="https://wa.me/?text={{ blog.title }}%20{{ request.url }}" target="_blank" class="share-btn whatsapp">
+                    <a href="https://wa.me/?text={{ blog.title }}%20{{ request.url }}" target="_blank" class="share-pill whatsapp" title="Share on WhatsApp">
                         <i class="fab fa-whatsapp"></i>
                     </a>
-                    <button onclick="copyLink()" class="share-btn copy">
+                    <button type="button" class="share-pill copy" onclick="copyArticleLink()" title="Copy Link to Clipboard">
                         <i class="fas fa-link"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- Reviews Section -->
-            <div class="reviews-section" id="reviews">
-                <h2><i class="fas fa-comments"></i> Reviews & Comments</h2>
+            <!-- Prev / Next Navigation -->
+            <div class="post-navigation-row">
+                {% if prev_blog %}
+                <a href="{{ url_for('blog_detail', slug=prev_blog.slug) }}" class="post-nav-card">
+                    <span class="nav-direction-label"><i class="fas fa-arrow-left"></i> Previous Article</span>
+                    <h4>{{ prev_blog.title }}</h4>
+                </a>
+                {% else %}
+                <div></div>
+                {% endif %}
+
+                {% if next_blog %}
+                <a href="{{ url_for('blog_detail', slug=next_blog.slug) }}" class="post-nav-card next">
+                    <span class="nav-direction-label">Next Article <i class="fas fa-arrow-right"></i></span>
+                    <h4>{{ next_blog.title }}</h4>
+                </a>
+                {% endif %}
+            </div>
+
+            <!-- Reviews & Comments Section -->
+            <section class="reviews-container-box" id="reviews">
+                <div class="reviews-header-wrap">
+                    <div>
+                        <h2 style="font-size:1.6rem; color:#ffffff;"><i class="fas fa-comments" style="color:var(--accent-emerald);"></i> Discussion &amp; Reviews</h2>
+                        <p style="color:var(--text-muted); font-size:0.9rem; margin-top:4px;">Share your insights with the ASI TECH engineering community</p>
+                    </div>
+                    {% if reviews %}
+                    <div class="rating-summary-badge">
+                        <i class="fas fa-star"></i>
+                        <span>{{ avg_rating }} / 5.0 ({{ reviews|length }} reviews)</span>
+                    </div>
+                    {% endif %}
+                </div>
 
                 <!-- Review Form -->
-                <div class="review-form-container">
-                    <h3>Leave a Review</h3>
-                    <form action="{{ url_for('add_review', slug=blog.slug) }}" method="post" class="review-form">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label><i class="fas fa-user"></i> Name</label>
-                                <input type="text" name="name" placeholder="Your name" required>
+                <div class="review-form-card">
+                    <h3 style="font-size:1.15rem; color:#ffffff; margin-bottom:12px;"><i class="fas fa-pen-nib" style="color:var(--accent-emerald-light);"></i> Leave a Review</h3>
+                    <form action="{{ url_for('add_review', slug=blog.slug) }}" method="post">
+                        <div class="form-grid-2">
+                            <div class="input-field-group">
+                                <label><i class="fas fa-user"></i> Your Name *</label>
+                                <input type="text" name="name" placeholder="e.g. Alex Turner" required>
                             </div>
-                            <div class="form-group">
-                                <label><i class="fas fa-envelope"></i> Email (optional)</label>
-                                <input type="email" name="email" placeholder="your@email.com">
+                            <div class="input-field-group">
+                                <label><i class="fas fa-envelope"></i> Email (Optional)</label>
+                                <input type="email" name="email" placeholder="alex@domain.com">
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-star"></i> Rating</label>
-                            <div class="star-rating">
+
+                        <div class="input-field-group">
+                            <label><i class="fas fa-star" style="color:#fbbf24;"></i> Rating</label>
+                            <div class="star-rating-picker">
                                 <input type="radio" name="rating" id="star5" value="5" checked>
-                                <label for="star5"><i class="fas fa-star"></i></label>
+                                <label for="star5" title="5 stars"><i class="fas fa-star"></i></label>
                                 <input type="radio" name="rating" id="star4" value="4">
-                                <label for="star4"><i class="fas fa-star"></i></label>
+                                <label for="star4" title="4 stars"><i class="fas fa-star"></i></label>
                                 <input type="radio" name="rating" id="star3" value="3">
-                                <label for="star3"><i class="fas fa-star"></i></label>
+                                <label for="star3" title="3 stars"><i class="fas fa-star"></i></label>
                                 <input type="radio" name="rating" id="star2" value="2">
-                                <label for="star2"><i class="fas fa-star"></i></label>
+                                <label for="star2" title="2 stars"><i class="fas fa-star"></i></label>
                                 <input type="radio" name="rating" id="star1" value="1">
-                                <label for="star1"><i class="fas fa-star"></i></label>
+                                <label for="star1" title="1 star"><i class="fas fa-star"></i></label>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-comment"></i> Your Review</label>
-                            <textarea name="comment" rows="4" placeholder="Write your review here..." required></textarea>
+
+                        <div class="input-field-group">
+                            <label><i class="fas fa-comment-alt"></i> Your Comment / Feedback *</label>
+                            <textarea name="comment" rows="4" placeholder="What are your thoughts on this architecture or discovery?" required></textarea>
                         </div>
-                        <button type="submit" class="btn-submit">
+
+                        <button type="submit" class="btn-primary-action">
                             <i class="fas fa-paper-plane"></i> Post Review
                         </button>
                     </form>
                 </div>
 
-                <!-- Reviews List -->
-                <div class="reviews-list">
-                    <h3>{{ reviews|length }} Review(s)</h3>
+                <!-- Reviews Feed -->
+                <div class="review-feed-list">
                     {% if reviews %}
-                        {% for review in reviews %}
-                        <div class="review-card">
-                            <div class="review-header">
-                                <div class="reviewer-avatar">
-                                    <i class="fas fa-user-circle"></i>
-                                </div>
-                                <div class="reviewer-info">
-                                    <h4>{{ review.name }}</h4>
-                                    <div class="review-rating">
-                                        {% for i in range(review.rating) %}
-                                            <i class="fas fa-star"></i>
-                                        {% endfor %}
-                                        {% for i in range(5 - review.rating) %}
-                                            <i class="far fa-star"></i>
-                                        {% endfor %}
+                        {% for r in reviews %}
+                        <div class="review-item-card">
+                            <div class="review-item-header">
+                                <div class="reviewer-user">
+                                    <div class="reviewer-avatar-circle">{{ r.name[:1] }}</div>
+                                    <div class="reviewer-name">
+                                        <h5>{{ r.name }}</h5>
+                                        <div class="star-rating-display">
+                                            {% for i in range(r.rating) %}
+                                                <i class="fas fa-star"></i>
+                                            {% endfor %}
+                                            {% for i in range(5 - r.rating) %}
+                                                <i class="far fa-star" style="color:var(--text-dim);"></i>
+                                            {% endfor %}
+                                        </div>
                                     </div>
                                 </div>
-                                <span class="review-date">{{ review.created_at[:10] }}</span>
+                                <span class="review-date-badge">{{ r.created_at[:10] }}</span>
                             </div>
-                            <p class="review-text">{{ review.comment }}</p>
+                            <p class="review-body-text">{{ r.comment }}</p>
                         </div>
                         {% endfor %}
                     {% else %}
-                        <div class="no-reviews">
-                            <i class="fas fa-comment-slash"></i>
-                            <p>No reviews yet. Be the first to review!</p>
+                        <div class="empty-state-modern" style="padding:30px;">
+                            <i class="far fa-comment-dots" style="font-size:2rem;"></i>
+                            <h4>No reviews yet</h4>
+                            <p style="font-size:0.88rem;">Be the first to share your thoughts on this story!</p>
                         </div>
                     {% endif %}
                 </div>
-            </div>
-        </div>
+            </section>
+        </article>
 
-        <!-- Sidebar -->
-        <aside class="blog-sidebar">
-            <!-- Related Blogs -->
+        <!-- Sticky Sidebar -->
+        <aside class="blog-sticky-sidebar">
+            <!-- Table of Contents Widget -->
+            <div class="sidebar-widget-box">
+                <h3 class="sidebar-widget-title">
+                    <i class="fas fa-list-ul"></i> Table of Contents
+                </h3>
+                <ul class="toc-list" id="tocList">
+                    <!-- Automatically built by script.js -->
+                </ul>
+            </div>
+
+            <!-- Related Articles Widget -->
             {% if related %}
-            <div class="sidebar-widget">
-                <h3><i class="fas fa-book-open"></i> Related Blogs</h3>
-                {% for r in related %}
-                <a href="{{ url_for('blog_detail', slug=r.slug) }}" class="related-blog">
-                    {% if r.title_image %}
-                        <img src="{{ url_for('static', filename='uploads/' + r.title_image) }}" alt="">
-                    {% else %}
-                        <div class="related-img-placeholder"><i class="fas fa-image"></i></div>
-                    {% endif %}
-                    <div class="related-info">
-                        <h4>{{ r.title }}</h4>
-                        <span>{{ r.category }}</span>
-                    </div>
-                </a>
-                {% endfor %}
+            <div class="sidebar-widget-box">
+                <h3 class="sidebar-widget-title">
+                    <i class="fas fa-book-open"></i> Related Stories
+                </h3>
+                <div class="related-mini-list">
+                    {% for item in related %}
+                    <a href="{{ url_for('blog_detail', slug=item.slug) }}" class="related-mini-item">
+                        {% if item.title_image %}
+                        <img src="{{ url_for('static', filename='uploads/' + item.title_image) }}" alt="" class="related-mini-img">
+                        {% else %}
+                        <div class="related-mini-img" style="background:#1e293b; display:flex; align-items:center; justify-content:center; color:var(--text-dim);">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        {% endif %}
+                        <div class="related-mini-info">
+                            <h5>{{ item.title }}</h5>
+                            <span><i class="far fa-clock"></i> {{ item.read_time or 3 }} min read</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
             </div>
             {% endif %}
 
-
-
-
+            <!-- Official YouTube Side Promo -->
+            <div class="sidebar-widget-box" style="background:linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(15, 23, 42, 0.9)); border-color:rgba(239, 68, 68, 0.3);">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                    <i class="fab fa-youtube" style="color:#ef4444; font-size:1.6rem;"></i>
+                    <h4 style="color:#ffffff; font-size:1rem;">HOW TECH WORKS</h4>
+                </div>
+                <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:14px;">Watch deep dive video explainers for this topic on YouTube.</p>
+                <a href="https://youtube.com/@howtech_works?si=gXvodLAXQ36FVHMZ" target="_blank" class="yt-spotlight-btn" style="padding:8px 16px; font-size:0.82rem; width:100%; justify-content:center;">
+                    Watch Video Tutorials
+                </a>
+            </div>
         </aside>
     </div>
-</section>
+</div>
 
-<script>
-function copyLink() {
-    navigator.clipboard.writeText(window.location.href).then(() => {
-        alert('Link copied to clipboard!');
-    });
-}
-</script>
+<!-- Floating Mini Audio Player Dock (Surfaces when scrolling down while listening) -->
+<div class="tts-floating-dock" id="ttsFloatingDock">
+    <div class="tts-floating-inner">
+        <button type="button" class="tts-dock-play-btn" id="ttsDockPlayBtn" title="Play / Pause">
+            <i class="fas fa-play" id="ttsDockPlayIcon"></i>
+        </button>
+        <div class="tts-dock-info">
+            <div class="tts-dock-title-row">
+                <span class="tts-dock-title">{{ blog.title }}</span>
+            </div>
+            <span class="tts-dock-meta" id="ttsDockMeta">Narrating: Technical Deep Dive</span>
+        </div>
+        <div class="tts-dock-progress-wrap" id="ttsDockProgressWrap" title="Click to seek">
+            <div class="tts-dock-progress-bar" id="ttsDockProgressBar"></div>
+        </div>
+        <div class="tts-dock-actions">
+            <button type="button" class="tts-dock-btn" id="ttsDockExpandBtn" onclick="window.scrollTo({top: document.getElementById('ttsNarrationCard').offsetTop - 80, behavior:'smooth'})" title="Expand Full Player">
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            <button type="button" class="tts-dock-btn" id="ttsDockCloseBtn" title="Close / Stop Audio">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+</div>
 {% endblock %}

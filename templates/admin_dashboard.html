@@ -1,83 +1,124 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Dashboard | ASI TECH{% endblock %}
+{% block title %}Executive Dashboard | Admin Suite | ASI TECH{% endblock %}
 
 {% block content %}
-<section class="admin-section">
+<section style="padding:40px 0 80px;">
     <div class="container">
-        <div class="admin-header">
-            <h1><i class="fas fa-cog"></i> Admin Dashboard</h1>
-            <div class="admin-actions">
-                <a href="{{ url_for('admin_create') }}" class="btn-primary">
-                    <i class="fas fa-plus"></i> New Blog
+        <!-- Dashboard Top Action Bar -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px; flex-wrap:wrap; gap:16px;">
+            <div>
+                <span class="card-badge badge-tech" style="margin-bottom:8px;"><i class="fas fa-shield-alt"></i> ADMIN SUITE</span>
+                <h1 style="font-size:2.2rem; font-weight:800; color:#ffffff;">Content &amp; Platform Operations</h1>
+            </div>
+
+            <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                <a href="{{ url_for('admin_create') }}" class="btn-primary-action" style="text-decoration:none;">
+                    <i class="fas fa-plus-circle"></i> Create New Article
                 </a>
-                <a href="{{ url_for('admin_contacts') }}" class="btn-secondary">
-                    <i class="fas fa-envelope"></i> Messages
+                <a href="{{ url_for('admin_contacts') }}" class="btn-primary-action" style="background:var(--bg-card); border:1px solid var(--border-card); color:var(--text-main); text-decoration:none;">
+                    <i class="fas fa-inbox"></i> Inbox ({{ total_contacts }})
                 </a>
-                <a href="{{ url_for('admin_logout') }}" class="btn-danger">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+                <a href="{{ url_for('admin_logout') }}" class="btn-primary-action" style="background:rgba(239, 68, 68, 0.15); border:1px solid rgba(239, 68, 68, 0.3); color:#f87171; text-decoration:none;">
+                    <i class="fas fa-arrow-right-from-bracket"></i> Logout
                 </a>
             </div>
         </div>
 
-        <!-- Stats Cards -->
-        <div class="admin-stats">
-            <div class="stat-card">
-                <div class="stat-icon blue"><i class="fas fa-blog"></i></div>
-                <div class="stat-info">
-                    <span class="stat-number">{{ total_blogs }}</span>
-                    <span class="stat-label">Total Blogs</span>
+        <!-- 4 Metric Stat Cards -->
+        <div class="admin-stats-grid">
+            <div class="admin-stat-card-modern">
+                <div class="admin-stat-icon emerald">
+                    <i class="fas fa-file-lines"></i>
+                </div>
+                <div>
+                    <div class="admin-stat-val">{{ total_blogs }}</div>
+                    <div class="admin-stat-lbl">Published Posts</div>
                 </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon green"><i class="fas fa-comments"></i></div>
-                <div class="stat-info">
-                    <span class="stat-number">{{ total_reviews }}</span>
-                    <span class="stat-label">Reviews</span>
+
+            <div class="admin-stat-card-modern">
+                <div class="admin-stat-icon cyan">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <div>
+                    <div class="admin-stat-val">{{ total_views }}</div>
+                    <div class="admin-stat-lbl">Global Reads</div>
                 </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon orange"><i class="fas fa-envelope"></i></div>
-                <div class="stat-info">
-                    <span class="stat-number">{{ total_contacts }}</span>
-                    <span class="stat-label">Messages</span>
+
+            <div class="admin-stat-card-modern">
+                <div class="admin-stat-icon violet">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div>
+                    <div class="admin-stat-val">{{ total_reviews }}</div>
+                    <div class="admin-stat-lbl">Reader Reviews</div>
+                </div>
+            </div>
+
+            <div class="admin-stat-card-modern">
+                <div class="admin-stat-icon amber">
+                    <i class="fas fa-envelope-open-text"></i>
+                </div>
+                <div>
+                    <div class="admin-stat-val">{{ total_contacts }}</div>
+                    <div class="admin-stat-lbl">Inbox Messages</div>
                 </div>
             </div>
         </div>
 
-        <!-- Blogs Table -->
-        <div class="admin-table-container">
-            <h2><i class="fas fa-list"></i> All Blogs</h2>
-            <div class="table-responsive">
-                <table class="admin-table">
+        <!-- Blogs Management Data Table -->
+        <div class="admin-table-wrapper">
+            <div class="admin-table-header">
+                <h2 style="font-size:1.3rem; color:#ffffff; display:flex; align-items:center; gap:10px;">
+                    <i class="fas fa-layer-group" style="color:var(--accent-emerald);"></i> Article Directory
+                </h2>
+
+                <input type="text" id="adminTableSearch" class="admin-search-box" placeholder="Filter articles by title or category..." onkeyup="filterAdminTable()">
+            </div>
+
+            <div style="overflow-x:auto;">
+                <table class="modern-data-table" id="adminBlogsTable">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Title</th>
+                            <th style="width:60px;">ID</th>
+                            <th>Title &amp; Slug</th>
                             <th>Category</th>
-                            <th>Views</th>
+                            <th>Reads</th>
+                            <th>Claps</th>
                             <th>Date</th>
-                            <th>Actions</th>
+                            <th style="text-align:right;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for blog in blogs %}
                         <tr>
-                            <td>{{ blog.id }}</td>
-                            <td>{{ blog.title }}</td>
-                            <td><span class="cat-badge">{{ blog.category }}</span></td>
-                            <td><i class="fas fa-eye"></i> {{ blog.views }}</td>
-                            <td>{{ blog.created_at[:10] }}</td>
-                            <td class="actions">
-                                <a href="{{ url_for('blog_detail', slug=blog.slug) }}" target="_blank" class="action-btn view" title="View">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                <a href="{{ url_for('admin_edit', blog_id=blog.id) }}" class="action-btn edit" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <a href="{{ url_for('admin_delete', blog_id=blog.id) }}" class="action-btn delete" title="Delete" onclick="return confirm('Are you sure you want to delete this blog?')">
-                                    <i class="fas fa-trash"></i>
-                                </a>
+                            <td style="font-family:var(--font-mono); color:var(--text-dim);">#{{ blog.id }}</td>
+                            <td>
+                                <strong style="color:var(--text-highlight); font-size:0.95rem; display:block;">{{ blog.title }}</strong>
+                                <span style="font-size:0.75rem; color:var(--text-muted); font-family:var(--font-mono);">/blog/{{ blog.slug }}</span>
+                            </td>
+                            <td>
+                                <span class="card-badge {% if blog.category == 'Artificial Intelligence' %}badge-ai{% elif blog.category == 'Technology' %}badge-tech{% elif blog.category == 'Science' %}badge-sci{% elif blog.category == 'Education' %}badge-edu{% else %}badge-mov{% endif %}">
+                                    {{ blog.category }}
+                                </span>
+                            </td>
+                            <td><i class="far fa-eye" style="color:var(--accent-cyan);"></i> {{ blog.views }}</td>
+                            <td><i class="fas fa-hands-clapping" style="color:var(--accent-emerald);"></i> {{ blog.likes or 0 }}</td>
+                            <td style="font-size:0.85rem; color:var(--text-muted);">{{ blog.created_at[:10] }}</td>
+                            <td>
+                                <div class="table-action-btns" style="justify-content:flex-end;">
+                                    <a href="{{ url_for('blog_detail', slug=blog.slug) }}" target="_blank" class="tbl-btn view" title="View Public Article">
+                                        <i class="fas fa-external-link"></i>
+                                    </a>
+                                    <a href="{{ url_for('admin_edit', blog_id=blog.id) }}" class="tbl-btn edit" title="Edit Article">
+                                        <i class="fas fa-pen-to-square"></i>
+                                    </a>
+                                    <a href="{{ url_for('admin_delete', blog_id=blog.id) }}" class="tbl-btn del" title="Delete Article" onclick="return confirm('Are you sure you want to permanently delete this article?')">
+                                        <i class="fas fa-trash-can"></i>
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}
@@ -87,4 +128,22 @@
         </div>
     </div>
 </section>
+
+<script>
+function filterAdminTable() {
+    const input = document.getElementById('adminTableSearch');
+    const filter = input.value.toLowerCase();
+    const table = document.getElementById('adminBlogsTable');
+    const rows = table.getElementsByTagName('tr');
+
+    for (let i = 1; i < rows.length; i++) {
+        const text = rows[i].textContent.toLowerCase();
+        if (text.includes(filter)) {
+            rows[i].style.display = '';
+        } else {
+            rows[i].style.display = 'none';
+        }
+    }
+}
+</script>
 {% endblock %}

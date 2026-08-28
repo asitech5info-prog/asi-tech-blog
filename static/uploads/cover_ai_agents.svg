@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgGrad6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19" />
+      <stop offset="50%" stop-color="#1e1136" />
+      <stop offset="100%" stop-color="#090514" />
+    </linearGradient>
+    <linearGradient id="agentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#a855f7" />
+      <stop offset="50%" stop-color="#c084fc" />
+      <stop offset="100%" stop-color="#38bdf8" />
+    </linearGradient>
+    <filter id="glow6" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="15" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bgGrad6)" />
+
+  <!-- Multi-Agent Network Diagram -->
+  <g transform="translate(680, 140)">
+    <circle cx="220" cy="180" r="160" fill="#a855f7" opacity="0.12" filter="url(#glow6)" />
+
+    <!-- Connecting lines -->
+    <line x1="220" y1="90" x2="120" y2="240" stroke="#a855f7" stroke-width="2" stroke-dasharray="6 4" />
+    <line x1="220" y1="90" x2="320" y2="240" stroke="#38bdf8" stroke-width="2" stroke-dasharray="6 4" />
+    <line x1="120" y1="240" x2="320" y2="240" stroke="#c084fc" stroke-width="2" stroke-dasharray="6 4" />
+
+    <!-- Planner Node -->
+    <g transform="translate(220, 90)">
+      <circle cx="0" cy="0" r="32" fill="#1e1b4b" stroke="#a855f7" stroke-width="2.5" />
+      <text x="0" y="5" fill="#e9d5ff" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="bold" text-anchor="middle">PLANNER</text>
+    </g>
+
+    <!-- Executor Node -->
+    <g transform="translate(120, 240)">
+      <circle cx="0" cy="0" r="32" fill="#0c4a6e" stroke="#38bdf8" stroke-width="2.5" />
+      <text x="0" y="5" fill="#bae6fd" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="bold" text-anchor="middle">EXECUTOR</text>
+    </g>
+
+    <!-- Verifier Node -->
+    <g transform="translate(320, 240)">
+      <circle cx="0" cy="0" r="32" fill="#064e3b" stroke="#34d399" stroke-width="2.5" />
+      <text x="0" y="5" fill="#a7f3d0" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="bold" text-anchor="middle">VERIFIER</text>
+    </g>
+  </g>
+
+  <!-- Typography -->
+  <g transform="translate(100, 160)">
+    <rect x="0" y="0" width="180" height="40" rx="20" fill="rgba(168, 85, 247, 0.15)" stroke="#a855f7" stroke-width="1.5" />
+    <text x="90" y="25" fill="#c084fc" font-family="'Plus Jakarta Sans', sans-serif" font-size="14" font-weight="700" text-anchor="middle" letter-spacing="1.5">AUTONOMOUS AI</text>
+
+    <text x="0" y="110" fill="#ffffff" font-family="'Plus Jakarta Sans', sans-serif" font-size="44" font-weight="800">The Multi-Agent</text>
+    <text x="0" y="170" fill="url(#agentGrad)" font-family="'Plus Jakarta Sans', sans-serif" font-size="44" font-weight="800">AI Revolution</text>
+    
+    <text x="0" y="235" fill="#94a3b8" font-family="'Inter', sans-serif" font-size="18">Orchestrating goal-directed collaborative agent systems.</text>
+
+    <g transform="translate(0, 280)">
+      <text x="0" y="0" fill="#a855f7" font-family="'JetBrains Mono', monospace" font-size="14">● ASI TECH AI LABS</text>
+      <text x="200" y="0" fill="#64748b" font-family="'Inter', sans-serif" font-size="14">|  4 min read</text>
+    </g>
+  </g>
+</svg>

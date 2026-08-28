@@ -1,120 +1,272 @@
 {% extends "base.html" %}
 
-{% block title %}ASI TECH - Tech, AI, Science & More{% endblock %}
+{% block title %}ASI TECH - Tech, AI, Science & Modern Innovation{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
 <section class="hero">
-    <div class="hero-content">
+    <div class="hero-glow-blob"></div>
+    <div class="container hero-content">
         <div class="hero-badge">
-            <i class="fas fa-bolt"></i> Welcome to the Future
+            <span class="pulse-dot"></span>
+            <span>Trending in AI, Quantum &amp; Systems</span>
         </div>
+
         <h1 class="hero-title">
-            <span class="gradient-text">ASI TECH</span>
+            Architecting the <br>
+            <span class="gradient-text">Future of Technology</span>
         </h1>
-        <p class="hero-subtitle">Exploring Technology, Artificial Intelligence, Science, Education & Movies</p>
-        <div class="hero-stats">
-            <div class="stat">
-                <span class="stat-number">{{ blogs|length }}+</span>
-                <span class="stat-label">Articles</span>
+
+        <p class="hero-subtitle">
+            Exploring quantum computing, next-gen neural architectures, space breakthroughs, modern engineering roadmaps, and virtual production cinema.
+        </p>
+
+        <!-- Live Site Stats (Compact 3-col on Phone) -->
+        <div class="hero-stats-row">
+            <div class="stat-pill">
+                <i class="fas fa-file-code"></i>
+                <div class="stat-pill-info">
+                    <div class="stat-pill-num">{{ total_blogs }}+</div>
+                    <div class="stat-pill-label">Articles</div>
+                </div>
             </div>
-            <div class="stat">
-                <span class="stat-number">5</span>
-                <span class="stat-label">Categories</span>
+            <div class="stat-pill">
+                <i class="fas fa-eye"></i>
+                <div class="stat-pill-info">
+                    <div class="stat-pill-num">{{ total_views }}+</div>
+                    <div class="stat-pill-label">Readers</div>
+                </div>
             </div>
-            <div class="stat">
-                <span class="stat-number">100%</span>
-                <span class="stat-label">Free Content</span>
+            <div class="stat-pill">
+                <i class="fas fa-star"></i>
+                <div class="stat-pill-info">
+                    <div class="stat-pill-num">{{ total_reviews }}</div>
+                    <div class="stat-pill-label">Reviews</div>
+                </div>
             </div>
         </div>
-        <a href="#latest-blogs" class="hero-cta">
-            <span>Explore Blogs</span>
-            <i class="fas fa-arrow-down"></i>
-        </a>
+
+        <!-- Quick Search Bar -->
+        <div class="hero-search-wrap">
+            <form action="{{ url_for('search') }}" method="get" class="hero-search-form">
+                <i class="fas fa-search hero-search-icon"></i>
+                <input type="text" name="q" placeholder="Search topics (e.g. Quantum, LLMs, Rust)..." required autocomplete="off">
+                <button type="submit" class="hero-search-btn">
+                    <span>Explore</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+        </div>
     </div>
-    <div class="hero-glow"></div>
 </section>
+
+<!-- Featured Bento Grid Section -->
+{% if featured_blogs %}
+<section class="featured-section">
+    <div class="container">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">
+                    <i class="fas fa-bolt"></i> Editor's Choice &amp; Trending
+                </h2>
+                <p class="section-subtitle">Top curated stories shaping the technological landscape</p>
+            </div>
+        </div>
+
+        <div class="bento-grid">
+            <!-- Main Featured Large Card -->
+            {% set main_post = featured_blogs[0] %}
+            <a href="{{ url_for('blog_detail', slug=main_post.slug) }}" class="bento-main-card">
+                {% if main_post.title_image %}
+                    <img src="{{ url_for('static', filename='uploads/' + main_post.title_image) }}" alt="{{ main_post.title }}" class="bento-bg-img" loading="lazy">
+                {% else %}
+                    <div class="bento-bg-img" style="background:linear-gradient(135deg, #0f172a, #1e293b);"></div>
+                {% endif %}
+                <div class="bento-overlay"></div>
+                <div class="bento-content">
+                    <span class="card-badge {% if main_post.category == 'Artificial Intelligence' %}badge-ai{% elif main_post.category == 'Technology' %}badge-tech{% elif main_post.category == 'Science' %}badge-sci{% elif main_post.category == 'Education' %}badge-edu{% else %}badge-mov{% endif %}">
+                        {{ main_post.category }}
+                    </span>
+                    <h3 class="bento-title">{{ main_post.title }}</h3>
+                    <div class="bento-meta">
+                        <span><i class="fas fa-user-circle"></i> {{ main_post.author }}</span>
+                        <span><i class="fas fa-clock"></i> {{ main_post.read_time or 4 }} min read</span>
+                        <span><i class="fas fa-eye"></i> {{ main_post.views }} views</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Side Stack Cards -->
+            <div class="bento-side-stack">
+                {% for side_post in featured_blogs[1:3] %}
+                <a href="{{ url_for('blog_detail', slug=side_post.slug) }}" class="bento-mini-card">
+                    {% if side_post.title_image %}
+                        <img src="{{ url_for('static', filename='uploads/' + side_post.title_image) }}" alt="{{ side_post.title }}" class="bento-bg-img" loading="lazy">
+                    {% else %}
+                        <div class="bento-bg-img" style="background:linear-gradient(135deg, #0f172a, #1e293b);"></div>
+                    {% endif %}
+                    <div class="bento-overlay"></div>
+                    <div class="bento-content">
+                        <span class="card-badge {% if side_post.category == 'Artificial Intelligence' %}badge-ai{% elif side_post.category == 'Technology' %}badge-tech{% elif side_post.category == 'Science' %}badge-sci{% elif side_post.category == 'Education' %}badge-edu{% else %}badge-mov{% endif %}">
+                            {{ side_post.category }}
+                        </span>
+                        <h4 class="bento-mini-title">{{ side_post.title }}</h4>
+                        <div class="bento-meta">
+                            <span><i class="fas fa-clock"></i> {{ side_post.read_time or 4 }} min</span>
+                            <span><i class="fas fa-eye"></i> {{ side_post.views }} views</span>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
 
 <!-- Categories Section -->
 <section class="categories-section">
     <div class="container">
-        <h2 class="section-title">
-            <i class="fas fa-th-large"></i> Browse by Category
-        </h2>
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">
+                    <i class="fas fa-compass"></i> Explore by Domain
+                </h2>
+                <p class="section-subtitle">Dive into dedicated research domains and technical disciplines</p>
+            </div>
+        </div>
+
         <div class="categories-grid">
-            <a href="{{ url_for('category_page', category='Education') }}" class="category-card edu">
-                <div class="category-icon"><i class="fas fa-graduation-cap"></i></div>
-                <h3>Education</h3>
-                <p>Learn & Grow</p>
+            {% for cat in categories %}
+            {% set info = category_config.get(cat.category, {'icon': 'fa-folder', 'badge': 'default', 'desc': 'Explore our latest articles in this field.'}) %}
+            <a href="{{ url_for('category_page', category=cat.category) }}" class="category-card-modern cat-{{ info.badge }}">
+                <div class="cat-icon-box">
+                    <i class="fas {{ info.icon }}"></i>
+                </div>
+                <h3>{{ cat.category }}</h3>
+                <p>{{ info.desc }}</p>
+                <div class="cat-article-count">
+                    <span>{{ cat.count }} Articles</span>
+                    <i class="fas fa-arrow-right"></i>
+                </div>
             </a>
-            <a href="{{ url_for('category_page', category='Technology') }}" class="category-card tech">
-                <div class="category-icon"><i class="fas fa-laptop-code"></i></div>
-                <h3>Technology</h3>
-                <p>Latest Tech News</p>
-            </a>
-            <a href="{{ url_for('category_page', category='Artificial Intelligence') }}" class="category-card ai">
-                <div class="category-icon"><i class="fas fa-brain"></i></div>
-                <h3>AI</h3>
-                <p>Future of AI</p>
-            </a>
-            <a href="{{ url_for('category_page', category='Science') }}" class="category-card sci">
-                <div class="category-icon"><i class="fas fa-atom"></i></div>
-                <h3>Science</h3>
-                <p>Discover Science</p>
-            </a>
-            <a href="{{ url_for('category_page', category='Movies') }}" class="category-card mov">
-                <div class="category-icon"><i class="fas fa-film"></i></div>
-                <h3>Movies</h3>
-                <p>Cinema & Reviews</p>
-            </a>
+            {% endfor %}
         </div>
     </div>
 </section>
 
-<!-- Latest Blogs -->
-<section class="blogs-section" id="latest-blogs">
+<!-- Latest Articles Stream with Filter Tabs -->
+<section class="blogs-section">
     <div class="container">
-        <h2 class="section-title">
-            <i class="fas fa-fire"></i> Latest Blogs
-        </h2>
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">
+                    <i class="fas fa-newspaper"></i> Latest Technical Articles
+                </h2>
+                <p class="section-subtitle">In-depth guides, analysis, and breakthrough chronicles</p>
+            </div>
+            <a href="{{ url_for('search') }}" class="view-all-link">
+                <span>View Full Archive</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
 
-        {% if blogs %}
-        <div class="blogs-grid">
+        <!-- Filter Tabs -->
+        <div class="category-filter-tabs">
+            <button class="filter-tab active" data-category="all">All Disciplines</button>
+            <button class="filter-tab" data-category="Artificial Intelligence">AI &amp; Neural Nets</button>
+            <button class="filter-tab" data-category="Technology">Systems &amp; Architecture</button>
+            <button class="filter-tab" data-category="Science">Science &amp; Cosmos</button>
+            <button class="filter-tab" data-category="Education">Roadmaps &amp; Dev</button>
+            <button class="filter-tab" data-category="Movies">Cinema &amp; VFX</button>
+        </div>
+
+        <!-- Articles Grid -->
+        <div class="blogs-grid-modern">
             {% for blog in blogs %}
-            <article class="blog-card">
-                <div class="blog-image">
+            <article class="blog-card-modern" data-category="{{ blog.category }}">
+                <div class="blog-thumb-wrap">
                     {% if blog.title_image %}
-                        <img src="{{ url_for('static', filename='uploads/' + blog.title_image) }}" alt="{{ blog.title }}">
+                        <img src="{{ url_for('static', filename='uploads/' + blog.title_image) }}" alt="{{ blog.title }}" class="blog-thumb-img" loading="lazy">
                     {% else %}
-                        <div class="blog-image-placeholder">
-                            <i class="fas fa-image"></i>
+                        <div class="blog-thumb-img" style="background: linear-gradient(135deg, #041f12, #0d3822); display:flex; align-items:center; justify-content:center; color:var(--accent-purple); font-size:2.5rem;">
+                            <i class="fas fa-brain"></i>
                         </div>
                     {% endif %}
-                    <span class="blog-category">{{ blog.category }}</span>
-                </div>
-                <div class="blog-content">
-                    <h3 class="blog-title">{{ blog.title }}</h3>
-                    <p class="blog-excerpt">{{ blog.content[:120] | striptags }}...</p>
-                    <div class="blog-meta">
-                        <span><i class="fas fa-calendar"></i> {{ blog.created_at[:10] }}</span>
-                        <span><i class="fas fa-eye"></i> {{ blog.views }} views</span>
+                    
+                    <div class="card-top-badges">
+                        <span class="card-badge {% if blog.category == 'Artificial Intelligence' %}badge-ai{% elif blog.category == 'Technology' %}badge-tech{% elif blog.category == 'Science' %}badge-sci{% elif blog.category == 'Education' %}badge-edu{% else %}badge-mov{% endif %}">
+                            {{ blog.category }}
+                        </span>
+                        <span class="read-time-tag"><i class="fas fa-clock"></i> {{ blog.read_time or 3 }} min</span>
                     </div>
-                    <a href="{{ url_for('blog_detail', slug=blog.slug) }}" class="read-more">
-                        Read More <i class="fas fa-arrow-right"></i>
-                    </a>
+                </div>
+
+                <div class="blog-card-body">
+                    <div class="blog-meta-top">
+                        <span><i class="fas fa-calendar-alt"></i> {{ blog.created_at[:10] }}</span>
+                        <span><i class="fas fa-eye"></i> {{ blog.views }}</span>
+                        <span><i class="fas fa-heart" style="color:var(--accent-magenta);"></i> {{ blog.likes or 0 }}</span>
+                    </div>
+
+                    <h3 class="blog-card-title">
+                        <a href="{{ url_for('blog_detail', slug=blog.slug) }}">{{ blog.title }}</a>
+                    </h3>
+
+                    <p class="blog-card-excerpt">
+                        {{ blog.content | replace('#', '') | replace('*', '') | replace('_', '') | truncate(110, True, '...') }}
+                    </p>
+
+                    <div class="blog-card-footer">
+                        <div class="author-chip">
+                            <div class="author-avatar-sm">{{ blog.author[:1] }}</div>
+                            <span>{{ blog.author }}</span>
+                        </div>
+                        <a href="{{ url_for('blog_detail', slug=blog.slug) }}" class="read-article-link">
+                            <span>Read</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
                 </div>
             </article>
             {% endfor %}
         </div>
-        {% else %}
-        <div class="empty-state">
-            <i class="fas fa-pen-fancy"></i>
-            <h3>No blogs yet!</h3>
-            <p>Check back soon for amazing content.</p>
-        </div>
-        {% endif %}
     </div>
 </section>
 
+<!-- YouTube Spotlight Card -->
+<section class="yt-spotlight-section">
+    <div class="container">
+        <div class="yt-spotlight-card">
+            <div class="yt-spotlight-info">
+                <div class="yt-pill-badge">
+                    <i class="fab fa-youtube"></i> OFFICIAL CHANNEL
+                </div>
+                <h3 class="yt-spotlight-title">HOW TECH WORKS</h3>
+                <p class="yt-spotlight-desc">Watch high-production technical animations and engineering breakdowns on our companion YouTube channel.</p>
+            </div>
+            <a href="https://youtube.com/@howtech_works?si=gXvodLAXQ36FVHMZ" target="_blank" class="yt-spotlight-btn">
+                <i class="fab fa-youtube"></i>
+                <span>Subscribe on YouTube</span>
+            </a>
+        </div>
+    </div>
+</section>
 
+<!-- Newsletter Section -->
+<section class="newsletter-section">
+    <div class="container">
+        <div class="newsletter-card">
+            <h2>Stay Ahead of the Tech Frontier</h2>
+            <p>Get curated weekly deep-dives into LLM architectures, quantum breakthroughs, and systems design delivered straight to your inbox.</p>
+            <form action="{{ url_for('newsletter') }}" method="post" class="newsletter-form">
+                <input type="email" name="email" placeholder="Enter your developer email..." required autocomplete="off">
+                <button type="submit">
+                    <span>Subscribe</span>
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
 {% endblock %}

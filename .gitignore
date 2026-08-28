@@ -18,9 +18,10 @@ venv/
 .DS_Store
 Thumbs.db
 
-# Database (optional - uncomment if you want to ignore it)
-# blog.db
+# Database (uncomment to keep database local only)
+blog.db
 
-# Uploaded images (keep structure but ignore actual uploads)
+# Uploaded files (keep default assets)
 static/uploads/*
+!static/uploads/*.svg
 !static/uploads/.gitkeep

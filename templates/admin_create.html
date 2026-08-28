@@ -1,241 +1,209 @@
 {% extends "base.html" %}
 
-{% block title %}{% if edit_mode %}Edit{% else %}Create{% endif %} Blog | Admin | ASI TECH{% endblock %}
-
-{% block extra_css %}
-<style>
-.admin-form-section { padding: 40px 0; }
-.admin-form-card {
-    background: linear-gradient(145deg, #0a1f15, #0d281e);
-    border: 1px solid #10b981;
-    border-radius: 16px;
-    padding: 30px;
-    max-width: 900px;
-    margin: 0 auto;
-}
-.admin-form-card h2 {
-    color: #10b981;
-    margin-bottom: 25px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-@media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
-
-.admin-form .form-group { margin-bottom: 20px; }
-.admin-form .form-group label {
-    display: block;
-    color: #34d399;
-    margin-bottom: 8px;
-    font-weight: 600;
-}
-.admin-form input[type="text"],
-.admin-form input[type="email"],
-.admin-form select,
-.admin-form textarea {
-    width: 100%;
-    padding: 12px 16px;
-    background: #064e3b;
-    border: 1px solid #059669;
-    border-radius: 10px;
-    color: #ecfdf5;
-    font-size: 15px;
-    transition: all 0.3s;
-}
-.admin-form input:focus,
-.admin-form select:focus,
-.admin-form textarea:focus {
-    outline: none;
-    border-color: #10b981;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
-}
-.admin-form input[type="file"] {
-    padding: 10px;
-    background: #064e3b;
-    border: 2px dashed #059669;
-    border-radius: 10px;
-    color: #a7f3d0;
-    cursor: pointer;
-    width: 100%;
-}
-.admin-form textarea { min-height: 300px; font-family: monospace; resize: vertical; }
-
-.inline-images-section {
-    background: rgba(6, 78, 59, 0.5);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 20px;
-}
-.inline-images-section h4 {
-    color: #34d399;
-    margin-bottom: 15px;
-}
-.inline-image-row {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 12px;
-    padding: 12px;
-    background: rgba(0,0,0,0.2);
-    border-radius: 8px;
-}
-.inline-image-row code {
-    background: #064e3b;
-    padding: 4px 10px;
-    border-radius: 6px;
-    color: #6ee7b7;
-    font-size: 13px;
-    white-space: nowrap;
-}
-.inline-image-row input[type="file"] { flex: 1; }
-
-.help-box {
-    background: rgba(16, 185, 129, 0.1);
-    border-left: 4px solid #10b981;
-    padding: 15px 20px;
-    border-radius: 0 10px 10px 0;
-    margin-bottom: 20px;
-}
-.help-box h4 { color: #10b981; margin-bottom: 8px; }
-.help-box ul { margin: 0; padding-left: 20px; color: #a7f3d0; }
-.help-box li { margin-bottom: 5px; }
-.help-box code {
-    background: #064e3b;
-    padding: 2px 8px;
-    border-radius: 4px;
-    color: #6ee7b7;
-}
-
-.admin-submit-btn {
-    background: linear-gradient(135deg, #10b981, #059669);
-    color: white;
-    border: none;
-    padding: 14px 30px;
-    border-radius: 10px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    transition: all 0.3s;
-}
-.admin-submit-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
-}
-</style>
-{% endblock %}
+{% block title %}{% if edit_mode %}Edit Article{% else %}Compose Article{% endif %} | Admin Suite | ASI TECH{% endblock %}
 
 {% block content %}
-<section class="admin-form-section">
-    <div class="container">
-        <div class="admin-form-card">
-            <h2>
-                <i class="fas fa-{% if edit_mode %}edit{% else %}plus-circle{% endif %}"></i>
-                {% if edit_mode %}Edit Blog{% else %}Create New Blog{% endif %}
-            </h2>
-
-            <div class="help-box">
-                <h4><i class="fas fa-lightbulb"></i> How to Add Images in Blog Content</h4>
-                <ul>
-                    <li>Upload images below using the file pickers</li>
-                    <li>Copy the placeholder code shown next to each image</li>
-                    <li>Paste that placeholder exactly where you want the image in your content</li>
-                    <li>The image will appear at that exact position when published!</li>
-                    <li>You can add up to 5 inline images per blog</li>
-                </ul>
+<section style="padding:40px 0 80px;">
+    <div class="container" style="max-width:960px;">
+        <!-- Header -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:28px; flex-wrap:wrap; gap:16px;">
+            <div>
+                <a href="{{ url_for('admin_dashboard') }}" style="color:var(--text-muted); font-size:0.85rem; display:inline-flex; align-items:center; gap:6px; margin-bottom:6px;">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+                <h1 style="font-size:2rem; font-weight:800; color:var(--text-highlight);">
+                    {% if edit_mode %}<i class="fas fa-pen-to-square" style="color:var(--accent-cyan);"></i> Edit Article{% else %}<i class="fas fa-feather-pointed" style="color:var(--accent-emerald);"></i> Compose Technical Article{% endif %}
+                </h1>
             </div>
+        </div>
 
-            <form action="{% if edit_mode %}{{ url_for('admin_edit', blog_id=blog.id) }}{% else %}{{ url_for('admin_create') }}{% endif %}" 
-                  method="post" enctype="multipart/form-data" class="admin-form">
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label><i class="fas fa-heading"></i> Blog Title *</label>
-                        <input type="text" name="title" placeholder="Enter blog title" 
-                               value="{% if edit_mode %}{{ blog.title }}{% endif %}" required>
+        <!-- Form Card -->
+        <div class="contact-card-box">
+            <form action="{% if edit_mode %}{{ url_for('admin_edit', blog_id=blog.id) }}{% else %}{{ url_for('admin_create') }}{% endif %}" method="post" enctype="multipart/form-data">
+                
+                <!-- Title & Slug Row -->
+                <div class="form-grid-2">
+                    <div class="input-field-group">
+                        <label><i class="fas fa-heading"></i> Article Title *</label>
+                        <input type="text" name="title" placeholder="e.g. Next-Gen Autonomous AI Multi-Agent Systems" value="{% if edit_mode %}{{ blog.title }}{% endif %}" required>
                     </div>
-                    <div class="form-group">
+
+                    <div class="input-field-group">
                         <label><i class="fas fa-link"></i> URL Slug *</label>
-                        <input type="text" name="slug" placeholder="my-awesome-blog" 
-                               value="{% if edit_mode %}{{ blog.slug }}{% endif %}" required>
+                        <input type="text" name="slug" placeholder="e.g. next-gen-autonomous-ai-multi-agents" value="{% if edit_mode %}{{ blog.slug }}{% endif %}" required>
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label><i class="fas fa-tags"></i> Category *</label>
+                <!-- Category & Cover Image Row -->
+                <div class="form-grid-2">
+                    <div class="input-field-group">
+                        <label><i class="fas fa-layer-group"></i> Discipline / Category *</label>
                         <select name="category" required>
-                            <option value="">Select Category</option>
-                            <option value="Education" {% if edit_mode and blog.category == 'Education' %}selected{% endif %}>Education</option>
-                            <option value="Technology" {% if edit_mode and blog.category == 'Technology' %}selected{% endif %}>Technology</option>
+                            <option value="">Select a Category</option>
                             <option value="Artificial Intelligence" {% if edit_mode and blog.category == 'Artificial Intelligence' %}selected{% endif %}>Artificial Intelligence</option>
-                            <option value="Science" {% if edit_mode and blog.category == 'Science' %}selected{% endif %}>Science</option>
-                            <option value="Movies" {% if edit_mode and blog.category == 'Movies' %}selected{% endif %}>Movies</option>
+                            <option value="Technology" {% if edit_mode and blog.category == 'Technology' %}selected{% endif %}>Technology</option>
+                            <option value="Science" {% if edit_mode and blog.category == 'Science' %}selected{% endif %}>Science &amp; Space</option>
+                            <option value="Education" {% if edit_mode and blog.category == 'Education' %}selected{% endif %}>Education &amp; Dev</option>
+                            <option value="Movies" {% if edit_mode and blog.category == 'Movies' %}selected{% endif %}>Movies &amp; Cinema</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-image"></i> Title Image (Cover)</label>
-                        <input type="file" name="title_image" accept="image/*">
+
+                    <div class="input-field-group">
+                        <label><i class="fas fa-image"></i> Title Cover Image</label>
+                        <input type="file" name="title_image" accept="image/*" style="padding:8px;">
                         {% if edit_mode and blog.title_image %}
-                        <small style="color:#6ee7b7;">Current: {{ blog.title_image }}</small>
+                        <small style="color:var(--accent-emerald-light); font-size:0.78rem; margin-top:4px;">Current cover: {{ blog.title_image }}</small>
                         {% endif %}
                     </div>
                 </div>
 
-                <!-- Inline Images Upload -->
-                <div class="inline-images-section">
-                    <h4><i class="fas fa-images"></i> Inline Images (Place anywhere in content)</h4>
+                <!-- Tags & Author Row -->
+                <div class="form-grid-2">
+                    <div class="input-field-group">
+                        <label><i class="fas fa-tags"></i> Tags (Comma Separated)</label>
+                        <input type="text" name="tags" placeholder="e.g. AI, Neural Networks, Quantum, Python" value="{% if edit_mode %}{{ blog.tags }}{% endif %}">
+                    </div>
 
-                    <div class="inline-image-row">
-                        <code>[inline_image_1]</code>
-                        <input type="file" name="inline_image_1" accept="image/*">
-                    </div>
-                    <div class="inline-image-row">
-                        <code>[inline_image_2]</code>
-                        <input type="file" name="inline_image_2" accept="image/*">
-                    </div>
-                    <div class="inline-image-row">
-                        <code>[inline_image_3]</code>
-                        <input type="file" name="inline_image_3" accept="image/*">
-                    </div>
-                    <div class="inline-image-row">
-                        <code>[inline_image_4]</code>
-                        <input type="file" name="inline_image_4" accept="image/*">
-                    </div>
-                    <div class="inline-image-row">
-                        <code>[inline_image_5]</code>
-                        <input type="file" name="inline_image_5" accept="image/*">
+                    <div class="input-field-group">
+                        <label><i class="fas fa-user-pen"></i> Author Name</label>
+                        <input type="text" name="author" placeholder="ASI TECH" value="{% if edit_mode %}{{ blog.author }}{% else %}ASI TECH{% endif %}">
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label><i class="fas fa-pen"></i> Blog Content *</label>
-                    <textarea name="content" placeholder="Write your blog content here...
-
-You can use HTML tags like:
-&lt;h2&gt;Heading&lt;/h2&gt;
-&lt;p&gt;Paragraph text&lt;/p&gt;
-&lt;strong&gt;Bold text&lt;/strong&gt;
-&lt;em&gt;Italic text&lt;/em&gt;
-&lt;ul&gt;&lt;li&gt;List item&lt;/li&gt;&lt;/ul&gt;
-
-Paste image placeholders where you want images:
-[inline_image_1]
-[inline_image_2]
-etc." required>{% if edit_mode %}{{ blog.content }}{% endif %}</textarea>
+                <!-- Featured Toggle -->
+                <div style="margin-bottom:24px; display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.03); padding:12px 16px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
+                    <input type="checkbox" name="is_featured" id="featuredCheck" style="width:18px; height:18px; cursor:pointer;" {% if edit_mode and blog.is_featured %}checked{% endif %}>
+                    <label for="featuredCheck" style="cursor:pointer; font-weight:600; color:var(--text-highlight); font-size:0.92rem;">
+                        <i class="fas fa-bolt" style="color:#fbbf24;"></i> Feature this story on Homepage Bento Grid
+                    </label>
                 </div>
 
-                <button type="submit" class="admin-submit-btn">
-                    <i class="fas fa-{% if edit_mode %}save{% else %}paper-plane{% endif %}"></i>
-                    {% if edit_mode %}Update Blog{% else %}Publish Blog{% endif %}
-                </button>
+                <!-- Easy Syntax Writing Guide Card -->
+                <div style="background:rgba(16, 185, 129, 0.08); border:1px solid rgba(16, 185, 129, 0.3); border-radius:var(--radius-md); padding:18px; margin-bottom:20px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <h4 style="color:var(--accent-emerald-light); font-size:0.95rem; display:flex; align-items:center; gap:8px;">
+                            <i class="fas fa-magic"></i> Easy Writing Syntax Rules (No HTML Needed!)
+                        </h4>
+                        <span style="font-size:0.75rem; color:var(--text-muted); background:rgba(255,255,255,0.06); padding:2px 8px; border-radius:4px;">Special Prefix Rules</span>
+                    </div>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px; font-size:0.82rem; color:var(--text-muted);">
+                        <div><code style="color:#38bdf8;"># Big Heading</code> &rarr; Big Heading</div>
+                        <div><code style="color:#38bdf8;">### Small Heading</code> &rarr; Subheading</div>
+                        <div><code style="color:#34d399;">**bold text**</code> &rarr; <strong>bold</strong></div>
+                        <div><code style="color:#f472b6;">_italic text_</code> &rarr; <em>italic</em></div>
+                        <div><code style="color:#fbbf24;">- Bullet item</code> &rarr; • Bullet list</div>
+                        <div><code style="color:#fbbf24;">1. Numbered item</code> &rarr; 1. Numbered list</div>
+                        <div><code style="color:#a78bfa;">&gt; Quote text</code> &rarr; Blockquote</div>
+                        <div><code style="color:#f87171;">! Key takeaway</code> &rarr; Highlight box</div>
+                    </div>
+                </div>
 
-                <a href="{{ url_for('admin_dashboard') }}" style="margin-left:15px;color:#6ee7b7;">
-                    <i class="fas fa-times"></i> Cancel
-                </a>
+                <!-- Inline Images Accordion / Dropzone -->
+                <div style="background:rgba(6, 182, 212, 0.08); border:1px solid rgba(6, 182, 212, 0.25); border-radius:var(--radius-md); padding:18px; margin-bottom:24px;">
+                    <h4 style="color:var(--accent-cyan-light); margin-bottom:8px; font-size:0.95rem;">
+                        <i class="fas fa-images"></i> Inline Images
+                    </h4>
+                    <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:12px;">
+                        Upload files below, then click any button to insert <code>[inline_image_X]</code> into your writeup!
+                    </p>
+
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px;">
+                        {% for i in range(1, 6) %}
+                        <div style="background:var(--bg-secondary); padding:8px 12px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle); display:flex; flex-direction:column; gap:6px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <button type="button" onclick="insertSyntaxTag('[inline_image_{{ i }}]', '')" style="background:rgba(6,182,212,0.15); border:1px solid rgba(6,182,212,0.4); color:var(--accent-cyan-light); border-radius:4px; padding:2px 8px; font-family:var(--font-mono); font-size:0.75rem; cursor:pointer;">
+                                    + [inline_image_{{ i }}]
+                                </button>
+                            </div>
+                            <input type="file" name="inline_image_{{ i }}" accept="image/*" style="font-size:0.75rem; padding:2px;">
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Content Editor Toolbar & Tabs -->
+                <div class="input-field-group">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <label><i class="fas fa-pen-nib"></i> Article Content *</label>
+                        <div class="editor-tab-nav">
+                            <button type="button" id="tabEditorBtn" class="editor-tab-btn active"><i class="fas fa-pen"></i> Write</button>
+                            <button type="button" id="tabPreviewBtn" class="editor-tab-btn"><i class="fas fa-eye"></i> Live Preview</button>
+                        </div>
+                    </div>
+
+                    <!-- Fast Syntax Toolbar -->
+                    <div class="editor-toolbar">
+                        <button type="button" class="tool-btn" onclick="insertSyntaxTag('# ', '')" title="Big Heading"><b># Heading</b></button>
+                        <button type="button" class="tool-btn" onclick="insertSyntaxTag('### ', '')" title="Small Heading"><b>### Subheading</b></button>
+                        <button type="button" class="tool-btn" onclick="insertSyntaxTag('**', '**')" title="Bold"><i class="fas fa-bold"></i></button>
+                        <button type="button" class="tool-btn" onclick="insertSyntaxTag('_', '_')" title="Italic"><i class="fas fa-italic"></i></button>
+                        <button type="button" class="tool-btn" onclick="insertSyntaxTag('- ', '')" title="Bullet List"><i class="fas fa-list-ul"></i> Bullet</button>
+                        <button type="button" class="tool-btn" onclick="insertSyntaxTag('1. ', '')" title="Numbered List"><i class="fas fa-list-ol"></i> Numbered</button>
+                        <button type="button" class="tool-btn" onclick="insertSyntaxTag('> ', '')" title="Quote"><i class="fas fa-quote-left"></i> Quote</button>
+                        <button type="button" class="tool-btn" onclick="insertSyntaxTag('! ', '')" title="Key Takeaway Highlight"><i class="fas fa-lightbulb"></i> Highlight</button>
+                        <button type="button" class="tool-btn" onclick="insertSyntaxTag('```\n', '\n```')" title="Code Block"><i class="fas fa-code"></i> Code</button>
+                    </div>
+
+                    <!-- Textarea Container -->
+                    <div id="editorInputWrap">
+                        <textarea name="content" id="articleContentInput" class="editor-textarea" placeholder="Write your technical writeup here using easy prefix rules:
+
+# 1. Introduction & Overview
+This is the opening lead paragraph describing the core breakthrough.
+
+### Key Innovations
+- **Neural Reasoning:** Self-correction and multi-step backtracking.
+- **Hardware Acceleration:** Zero-cost GPU kernel compilation.
+
+> 'Reasoning models reflect the dawn of deliberate cognitive computation.'
+
+! Make sure to test your benchmarks across varied distributed topologies." required>{% if edit_mode %}{{ blog.content }}{% endif %}</textarea>
+                    </div>
+
+                    <!-- Live Preview Container -->
+                    <div id="editorPreviewPane" class="preview-pane-box blog-prose"></div>
+                </div>
+
+                <!-- Explain Like I'm 5 (ELI5) Content Section -->
+                <div style="background:rgba(192, 132, 252, 0.07); border:1px solid rgba(192, 132, 252, 0.3); border-radius:var(--radius-md); padding:20px; margin-top:28px; margin-bottom:24px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+                        <div>
+                            <h4 style="color:#c084fc; font-size:1.05rem; display:flex; align-items:center; gap:8px;">
+                                <i class="fas fa-wand-magic-sparkles"></i> Explain Like I'm 5 (ELI5) Simplified Version
+                            </h4>
+                            <p style="color:var(--text-muted); font-size:0.82rem; margin-top:2px;">
+                                Readers can toggle this at the top of the article for instant high-level analogies and zero-jargon understanding.
+                            </p>
+                        </div>
+                        <button type="button" id="btnAutoGenerateEli5" class="btn-secondary" style="background:linear-gradient(135deg, rgba(168,85,247,0.25), rgba(236,72,153,0.25)); border:1px solid rgba(192,132,252,0.5); color:#f3e8ff; padding:7px 16px; border-radius:var(--radius-full); font-size:0.85rem; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
+                            <i class="fas fa-sparkles"></i> ✨ Auto-Generate ELI5 Summary
+                        </button>
+                    </div>
+
+                    <textarea name="eli5_content" id="eli5ContentInput" class="editor-textarea" rows="8" placeholder="# 👶 Explain Like I'm 5: Simple Title
+
+### 🎈 The Kid-Friendly Analogy
+Explain the core idea using an everyday metaphor (e.g. race cars, spinning coins, Lego blocks).
+
+### 💡 3 Key Things to Understand
+- **1. Point One:** Clear high-level fact.
+- **2. Point Two:** Why it matters.
+- **3. Point Three:** The real-world impact.
+
+> 'A simple, memorable quote or summary takeaway!'">{% if edit_mode %}{{ blog.eli5_content }}{% endif %}</textarea>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div style="display:flex; align-items:center; gap:16px; margin-top:24px;">
+                    <button type="submit" class="btn-primary-action" style="padding:14px 36px; font-size:1.05rem;">
+                        <i class="fas fa-{% if edit_mode %}floppy-disk{% else %}paper-plane{% endif %}"></i>
+                        {% if edit_mode %}Save &amp; Update Article{% else %}Publish Article to Live Site{% endif %}
+                    </button>
+
+                    <a href="{{ url_for('admin_dashboard') }}" style="color:var(--text-muted); font-size:0.92rem;">
+                        Cancel
+                    </a>
+                </div>
             </form>
         </div>
     </div>

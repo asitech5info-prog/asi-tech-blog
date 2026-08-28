@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19" />
+      <stop offset="50%" stop-color="#111827" />
+      <stop offset="100%" stop-color="#030712" />
+    </linearGradient>
+    <linearGradient id="neonCyan" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06b6d4" />
+      <stop offset="50%" stop-color="#8b5cf6" />
+      <stop offset="100%" stop-color="#ec4899" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="15" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGrad)" />
+  
+  <!-- Subtle Grid -->
+  <g stroke="rgba(255,255,255,0.04)" stroke-width="1">
+    <line x1="0" y1="105" x2="1200" y2="105" />
+    <line x1="0" y1="210" x2="1200" y2="210" />
+    <line x1="0" y1="315" x2="1200" y2="315" />
+    <line x1="0" y1="420" x2="1200" y2="420" />
+    <line x1="0" y1="525" x2="1200" y2="525" />
+    <line x1="200" y1="0" x2="200" y2="630" />
+    <line x1="400" y1="0" x2="400" y2="630" />
+    <line x1="600" y1="0" x2="600" y2="630" />
+    <line x1="800" y1="0" x2="800" y2="630" />
+    <line x1="1000" y1="0" x2="1000" y2="630" />
+  </g>
+
+  <!-- Glowing Orbs -->
+  <circle cx="900" cy="250" r="180" fill="#8b5cf6" opacity="0.15" filter="url(#glow)" />
+  <circle cx="350" cy="400" r="140" fill="#06b6d4" opacity="0.12" filter="url(#glow)" />
+
+  <!-- Quantum AI Lattice Art -->
+  <g transform="translate(620, 100)" stroke="url(#neonCyan)" stroke-width="2" fill="none" opacity="0.85">
+    <ellipse cx="280" cy="210" rx="200" ry="80" transform="rotate(-25 280 210)" />
+    <ellipse cx="280" cy="210" rx="200" ry="80" transform="rotate(35 280 210)" />
+    <ellipse cx="280" cy="210" rx="200" ry="80" transform="rotate(95 280 210)" />
+    <circle cx="280" cy="210" r="45" fill="#8b5cf6" opacity="0.4" filter="url(#glow)" />
+    <circle cx="280" cy="210" r="15" fill="#ffffff" />
+    
+    <!-- Nodes -->
+    <circle cx="120" cy="150" r="7" fill="#06b6d4" />
+    <circle cx="440" cy="270" r="7" fill="#ec4899" />
+    <circle cx="200" cy="310" r="6" fill="#8b5cf6" />
+    <circle cx="360" cy="110" r="6" fill="#06b6d4" />
+  </g>
+
+  <!-- Badge & Typography -->
+  <g transform="translate(100, 160)">
+    <rect x="0" y="0" width="220" height="40" rx="20" fill="rgba(139, 92, 246, 0.15)" stroke="#8b5cf6" stroke-width="1.5" />
+    <text x="110" y="25" fill="#a78bfa" font-family="'Plus Jakarta Sans', sans-serif" font-size="14" font-weight="700" text-anchor="middle" letter-spacing="1.5">QUANTUM AI &amp; LLMS</text>
+
+    <text x="0" y="110" fill="#ffffff" font-family="'Plus Jakarta Sans', sans-serif" font-size="44" font-weight="800">Quantum Computing</text>
+    <text x="0" y="170" fill="url(#neonCyan)" font-family="'Plus Jakarta Sans', sans-serif" font-size="44" font-weight="800">&amp; Neural Networks</text>
+    
+    <text x="0" y="235" fill="#94a3b8" font-family="'Inter', sans-serif" font-size="18">The frontier of algorithmic learning and quantum supremacy.</text>
+
+    <!-- Info pill -->
+    <g transform="translate(0, 280)">
+      <text x="0" y="0" fill="#10b981" font-family="'JetBrains Mono', monospace" font-size="14">● ASI TECH EDITORIAL</text>
+      <text x="210" y="0" fill="#64748b" font-family="'Inter', sans-serif" font-size="14">|  5 min read</text>
+    </g>
+  </g>
+</svg>

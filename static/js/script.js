@@ -1,188 +1,1573 @@
-// ASI TECH - Main JavaScript
+/**
+ * ASI TECH - Core JavaScript Suite
+ * Features: Day/Night Theme, User Auth (Gmail/Register), Privacy Consent, ASI AI Chatbot (Gemini)
+ */
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Mobile Menu Toggle
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const navLinks = document.getElementById('navLinks');
+  initThemeToggle();
+  initAuthModal();
+  initPrivacyConsent();
+  initAsiAIChatbot();
+  initScrollAnimations();
+  initMobileMenu();
+  initSearchModal();
+  initReadingProgressBar();
+  initTableOfContents();
+  initEli5Toggle();
+  initArticleTTS();
+  initAdminEli5Helper();
+  initClapButton();
+  initShareTools();
+  initCategoryFilters();
+  initAdminEditor();
+  initFAQAccordion();
+  initFlashMessages();
+});
 
-    if (mobileMenuBtn && navLinks) {
-        mobileMenuBtn.addEventListener('click', function() {
-            navLinks.classList.toggle('active');
-            const icon = mobileMenuBtn.querySelector('i');
-            if (navLinks.classList.contains('active')) {
-                icon.classList.remove('fa-bars');
-                icon.classList.add('fa-times');
-            } else {
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-bars');
-            }
-        });
+/* ==========================================================================
+   1. GLOBAL ASI AI CHATBOT (POWERED BY GEMINI ENGINE) ENTERPRISE SUITE
+   ========================================================================== */
+window.toggleAsiChat = function() {
+  const chatWindow = document.getElementById('asiChatWindow');
+  const chatInput = document.getElementById('asiChatInput');
+  if (!chatWindow) return;
+
+  chatWindow.classList.toggle('active');
+  if (chatWindow.classList.contains('active')) {
+    if (chatInput) {
+      setTimeout(() => chatInput.focus(), 150);
+    }
+  }
+};
+
+window.copyCodeBlock = function(btn) {
+  if (!btn) return;
+  const container = btn.closest('.asi-code-block-container');
+  if (!container) return;
+  const codeEl = container.querySelector('code');
+  if (!codeEl) return;
+  
+  const text = codeEl.innerText || codeEl.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const origHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-check" style="color:#10b981;"></i> Copied!';
+    setTimeout(() => {
+      btn.innerHTML = origHtml;
+    }, 2000);
+  }).catch(() => {});
+};
+
+window.copyBotMessage = function(btn) {
+  if (!btn) return;
+  const msgContent = btn.closest('.asi-msg-content');
+  if (!msgContent) return;
+  const bubble = msgContent.querySelector('.asi-msg-bubble');
+  if (!bubble) return;
+
+  const text = bubble.innerText || bubble.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const origHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-check" style="color:#10b981;"></i> <span>Copied!</span>';
+    setTimeout(() => {
+      btn.innerHTML = origHtml;
+    }, 2000);
+  }).catch(() => {});
+};
+
+function initAsiAIChatbot() {
+  const chatWindow = document.getElementById('asiChatWindow');
+  const clearBtn = document.getElementById('asiClearChatBtn');
+  const expandBtn = document.getElementById('asiExpandChatBtn');
+  const expandIcon = document.getElementById('asiExpandIcon');
+  const chatForm = document.getElementById('asiChatForm');
+  const chatInput = document.getElementById('asiChatInput');
+  const chatMessages = document.getElementById('asiChatMessages');
+  const typingIndicator = document.getElementById('asiTypingIndicator');
+  const quickPrompts = document.querySelectorAll('.asi-prompt-pill');
+
+  // Maximize / Expand Window Toggle
+  if (expandBtn && chatWindow) {
+    expandBtn.addEventListener('click', function() {
+      chatWindow.classList.toggle('expanded');
+      const isExpanded = chatWindow.classList.contains('expanded');
+      if (expandIcon) {
+        expandIcon.className = isExpanded ? 'fas fa-compress-alt' : 'fas fa-expand-alt';
+      }
+    });
+  }
+
+  // Clear Conversation Handler
+  if (clearBtn && chatMessages) {
+    clearBtn.addEventListener('click', function() {
+      chatMessages.innerHTML = `
+        <div class="asi-message bot">
+          <div class="asi-msg-avatar"><i class="fas fa-brain"></i></div>
+          <div class="asi-msg-content">
+            <div class="asi-msg-bubble">
+              <p>👋 Chat session refreshed. I am <strong>ASI</strong>, your enterprise AI assistant. What would you like to explore next?</p>
+            </div>
+            <div class="asi-msg-footer">
+              <span class="asi-msg-time">Just now</span>
+              <button type="button" class="asi-copy-msg-btn" onclick="copyBotMessage(this)" title="Copy response">
+                <i class="fas fa-copy"></i> <span>Copy</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      try {
+        sessionStorage.removeItem('asitech_chat_history');
+      } catch(e) {}
+      if (chatInput) chatInput.focus();
+    });
+  }
+
+  // Restore Chat from SessionStorage
+  try {
+    const savedChat = sessionStorage.getItem('asitech_chat_history');
+    if (savedChat && chatMessages) {
+      chatMessages.innerHTML = savedChat;
+    }
+  } catch(e) {}
+
+  // Quick Prompt Pills
+  quickPrompts.forEach(pill => {
+    pill.addEventListener('click', function() {
+      const promptText = this.dataset.prompt;
+      if (promptText && chatInput && chatForm) {
+        chatInput.value = promptText;
+        chatForm.dispatchEvent(new Event('submit'));
+      }
+    });
+  });
+
+  // Global Keyboard Shortcuts
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && chatWindow && chatWindow.classList.contains('active')) {
+      toggleAsiChat();
+    }
+  });
+
+  // Handle Chat Form Submit
+  if (chatForm) {
+    chatForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const userText = (chatInput.value || '').trim();
+      if (!userText) return;
+
+      // Append User message
+      appendMessage('user', userText);
+      chatInput.value = '';
+
+      // Show Typing Indicator
+      if (typingIndicator) typingIndicator.style.display = 'flex';
+      scrollToBottom();
+
+      // Send Query to Backend Gemini / ASI AI API
+      fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: userText })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (typingIndicator) typingIndicator.style.display = 'none';
+        if (data.status === 'success' && data.response) {
+          appendMessage('bot', data.response);
+        } else {
+          appendMessage('bot', "I encountered a calculation delay. Please ask your question again!");
+        }
+      })
+      .catch(() => {
+        if (typingIndicator) typingIndicator.style.display = 'none';
+        appendMessage('bot', "Unable to connect to ASI Neural Core. Please verify your connection.");
+      });
+    });
+  }
+
+  function appendMessage(sender, text) {
+    if (!chatMessages) return;
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `asi-message ${sender}`;
+
+    const avatarDiv = document.createElement('div');
+    avatarDiv.className = 'asi-msg-avatar';
+    avatarDiv.innerHTML = sender === 'bot' ? '<i class="fas fa-brain"></i>' : '<i class="fas fa-user"></i>';
+
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'asi-msg-content';
+
+    const bubbleDiv = document.createElement('div');
+    bubbleDiv.className = 'asi-msg-bubble';
+
+    if (sender === 'bot') {
+      bubbleDiv.innerHTML = formatBotMarkdown(text);
+    } else {
+      bubbleDiv.textContent = text;
     }
 
-    // Dropdown toggle for mobile
-    const dropdowns = document.querySelectorAll('.dropdown');
-    dropdowns.forEach(dropdown => {
-        const toggle = dropdown.querySelector('.dropdown-toggle');
-        if (toggle) {
-            toggle.addEventListener('click', function(e) {
-                if (window.innerWidth <= 768) {
-                    e.preventDefault();
-                    dropdown.classList.toggle('active');
-                }
-            });
+    contentDiv.appendChild(bubbleDiv);
+
+    // Add footer with time and copy button for bot messages
+    if (sender === 'bot') {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const footerDiv = document.createElement('div');
+      footerDiv.className = 'asi-msg-footer';
+      footerDiv.innerHTML = `
+        <span class="asi-msg-time">${timeStr}</span>
+        <button type="button" class="asi-copy-msg-btn" onclick="copyBotMessage(this)" title="Copy response">
+          <i class="fas fa-copy"></i> <span>Copy</span>
+        </button>
+      `;
+      contentDiv.appendChild(footerDiv);
+    }
+
+    msgDiv.appendChild(avatarDiv);
+    msgDiv.appendChild(contentDiv);
+    chatMessages.appendChild(msgDiv);
+    scrollToBottom();
+
+    // Persist in sessionStorage
+    try {
+      sessionStorage.setItem('asitech_chat_history', chatMessages.innerHTML);
+    } catch(e) {}
+  }
+
+  function scrollToBottom() {
+    if (chatMessages) {
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+  }
+
+  function formatBotMarkdown(raw) {
+    if (!raw) return '';
+    
+    // Process code blocks with ``` first
+    let codeBlocks = [];
+    let text = raw.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, function(match, lang, code) {
+      const codeIndex = codeBlocks.length;
+      lang = lang || 'code';
+      const cleanCode = escapeHtml(code.trim());
+      const blockHtml = `
+        <div class="asi-code-block-container">
+          <div class="asi-code-block-header">
+            <span><i class="fas fa-terminal" style="margin-right:4px;"></i>${escapeHtml(lang)}</span>
+            <button type="button" class="asi-copy-code-btn" onclick="copyCodeBlock(this)">
+              <i class="fas fa-copy"></i> Copy
+            </button>
+          </div>
+          <pre><code>${cleanCode}</code></pre>
+        </div>
+      `;
+      codeBlocks.push(blockHtml);
+      return `###CODE_BLOCK_${codeIndex}###`;
+    });
+
+    let formatted = escapeHtml(text);
+    
+    // Headings
+    formatted = formatted.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+    formatted = formatted.replace(/^## (.+)$/gm, '<h3>$1</h3>');
+    formatted = formatted.replace(/^# (.+)$/gm, '<h3>$1</h3>');
+
+    // Bold & Italics
+    formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    formatted = formatted.replace(/\*([^\*]+?)\*/g, '<em>$1</em>');
+    formatted = formatted.replace(/_([^_]+?)_/g, '<em>$1</em>');
+
+    // Inline Code
+    formatted = formatted.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
+
+    // Blockquotes
+    formatted = formatted.replace(/^>\s+(.+)$/gm, '<blockquote style="border-left:3px solid var(--accent-purple); padding-left:10px; margin:6px 0; color:var(--text-muted); font-style:italic;">$1</blockquote>');
+
+    // Lists (Ordered & Unordered)
+    formatted = formatted.replace(/^-\s+(.+)$/gm, '<li>$1</li>');
+    formatted = formatted.replace(/^\*\s+(.+)$/gm, '<li>$1</li>');
+    formatted = formatted.replace(/^([0-9]+)\.\s+(.+)$/gm, '<li><strong>$1.</strong> $2</li>');
+    formatted = formatted.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+
+    // Paragraphs and breaks
+    formatted = formatted.replace(/\n\n/g, '</p><p>');
+    formatted = formatted.replace(/\n/g, '<br>');
+
+    formatted = `<p>${formatted}</p>`;
+
+    // Restore Code Blocks
+    codeBlocks.forEach((block, idx) => {
+      formatted = formatted.replace(`###CODE_BLOCK_${idx}###`, block);
+    });
+
+    return formatted;
+  }
+}
+
+/* ==========================================================================
+   2. DAY / NIGHT THEME SWITCHER
+   ========================================================================== */
+function initThemeToggle() {
+  const themeBtn = document.getElementById('themeToggleBtn');
+  if (!themeBtn) return;
+
+  const currentTheme = localStorage.getItem('asitech_theme') || 'dark';
+  if (currentTheme === 'light') {
+    document.documentElement.classList.add('light-theme');
+    document.body.classList.add('light-theme');
+  }
+
+  themeBtn.addEventListener('click', function() {
+    const isLight = document.documentElement.classList.toggle('light-theme');
+    document.body.classList.toggle('light-theme', isLight);
+    localStorage.setItem('asitech_theme', isLight ? 'light' : 'dark');
+    
+    showToast(isLight ? '☀️ Switched to Light (Day) Mode' : '🌙 Switched to Dark (Night) Mode', 'info');
+  });
+}
+
+/* ==========================================================================
+   3. USER AUTHENTICATION (SIGN IN, REGISTER & GMAIL / GOOGLE)
+   ========================================================================== */
+function initAuthModal() {
+  const modal = document.getElementById('authModalOverlay');
+  const openBtn = document.getElementById('openAuthModalBtn');
+  const closeBtn = document.getElementById('authModalCloseBtn');
+  const tabSignIn = document.getElementById('tabSignInBtn');
+  const tabRegister = document.getElementById('tabRegisterBtn');
+  const signInForm = document.getElementById('signInForm');
+  const registerForm = document.getElementById('registerForm');
+  const feedbackMsg = document.getElementById('authFeedbackMsg');
+  const btnGoogle = document.getElementById('btnGoogleAuth');
+  const userMenuBtn = document.getElementById('userMenuBtn');
+  const userMenuPopover = document.getElementById('userMenuPopover');
+
+  if (userMenuBtn && userMenuPopover) {
+    userMenuBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      userMenuPopover.classList.toggle('active');
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!userMenuPopover.contains(e.target) && !userMenuBtn.contains(e.target)) {
+        userMenuPopover.classList.remove('active');
+      }
+    });
+  }
+
+  if (!modal) return;
+
+  function openAuth(tab = 'signin') {
+    modal.classList.add('active');
+    if (tab === 'register') {
+      if (tabRegister) tabRegister.click();
+    } else {
+      if (tabSignIn) tabSignIn.click();
+    }
+  }
+
+  function closeAuth() {
+    modal.classList.remove('active');
+    if (feedbackMsg) {
+      feedbackMsg.className = 'auth-feedback-msg';
+      feedbackMsg.textContent = '';
+    }
+  }
+
+  if (openBtn) openBtn.addEventListener('click', () => openAuth('signin'));
+  if (closeBtn) closeBtn.addEventListener('click', closeAuth);
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeAuth();
+  });
+
+  if (tabSignIn && tabRegister) {
+    tabSignIn.addEventListener('click', () => {
+      tabSignIn.classList.add('active');
+      tabRegister.classList.remove('active');
+      if (signInForm) signInForm.style.display = 'block';
+      if (registerForm) registerForm.style.display = 'none';
+      if (feedbackMsg) feedbackMsg.className = 'auth-feedback-msg';
+    });
+
+    tabRegister.addEventListener('click', () => {
+      tabRegister.classList.add('active');
+      tabSignIn.classList.remove('active');
+      if (signInForm) signInForm.style.display = 'none';
+      if (registerForm) registerForm.style.display = 'block';
+      if (feedbackMsg) feedbackMsg.className = 'auth-feedback-msg';
+    });
+  }
+
+  // Handle Email Login
+  if (signInForm) {
+    signInForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+      const submitBtn = document.getElementById('submitLoginBtn');
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+
+      fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      })
+      .then(res => res.json())
+      .then(data => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-right-to-bracket"></i> Sign In';
+
+        if (data.status === 'success') {
+          showToast(data.message, 'success');
+          setTimeout(() => window.location.reload(), 500);
+        } else {
+          feedbackMsg.className = 'auth-feedback-msg error';
+          feedbackMsg.textContent = data.message || 'Login failed.';
         }
+      })
+      .catch(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-right-to-bracket"></i> Sign In';
+        feedbackMsg.className = 'auth-feedback-msg error';
+        feedbackMsg.textContent = 'Server connection error. Please try again.';
+      });
+    });
+  }
+
+  // Handle Email Registration
+  if (registerForm) {
+    registerForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value.trim();
+      const submitBtn = document.getElementById('submitRegisterBtn');
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
+
+      fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      })
+      .then(res => res.json())
+      .then(data => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Create Free Account';
+
+        if (data.status === 'success') {
+          showToast(data.message, 'success');
+          setTimeout(() => window.location.reload(), 500);
+        } else {
+          feedbackMsg.className = 'auth-feedback-msg error';
+          feedbackMsg.textContent = data.message || 'Registration failed.';
+        }
+      })
+      .catch(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Create Free Account';
+        feedbackMsg.className = 'auth-feedback-msg error';
+        feedbackMsg.textContent = 'Server connection error. Please try again.';
+      });
+    });
+  }
+
+  // Handle Google / Gmail One-Click Sign In
+  if (btnGoogle) {
+    btnGoogle.addEventListener('click', function() {
+      btnGoogle.disabled = true;
+      btnGoogle.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+
+      const promptEmail = prompt('Enter your Gmail address to sign in (or click OK for demo account):', 'developer@gmail.com');
+      const email = promptEmail ? promptEmail.trim() : 'developer@gmail.com';
+      const name = email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+
+      fetch('/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, name })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success') {
+          showToast(data.message, 'success');
+          setTimeout(() => window.location.reload(), 500);
+        } else {
+          btnGoogle.disabled = false;
+          btnGoogle.innerHTML = '<span>Continue with Google / Gmail</span>';
+          feedbackMsg.className = 'auth-feedback-msg error';
+          feedbackMsg.textContent = data.message || 'Google authentication failed.';
+        }
+      })
+      .catch(() => {
+        btnGoogle.disabled = false;
+        btnGoogle.innerHTML = '<span>Continue with Google / Gmail</span>';
+        feedbackMsg.className = 'auth-feedback-msg error';
+        feedbackMsg.textContent = 'Unable to connect to Google Auth service.';
+      });
+    });
+  }
+}
+
+/* ==========================================================================
+   4. PRIVACY POLICY CONSENT BANNER & MODAL
+   ========================================================================== */
+function initPrivacyConsent() {
+  const consentBar = document.getElementById('privacyConsentBar');
+  const acceptBtn = document.getElementById('btnAcceptPrivacy');
+
+  const hasConsent = localStorage.getItem('asitech_privacy_consent');
+  if (!hasConsent && consentBar) {
+    setTimeout(() => {
+      consentBar.classList.add('active');
+    }, 1200);
+  }
+
+  if (acceptBtn && consentBar) {
+    acceptBtn.addEventListener('click', function() {
+      localStorage.setItem('asitech_privacy_consent', 'accepted');
+      consentBar.classList.remove('active');
+      showToast('🛡️ Privacy preferences saved.', 'info');
+    });
+  }
+
+  window.openPrivacyModal = function() {
+    const modal = document.getElementById('privacyModalOverlay');
+    if (modal) modal.classList.add('active');
+  };
+
+  window.closePrivacyModal = function() {
+    const modal = document.getElementById('privacyModalOverlay');
+    if (modal) modal.classList.remove('active');
+  };
+}
+
+/* ==========================================================================
+   5. SCROLL REVEAL ANIMATIONS
+   ========================================================================== */
+function initScrollAnimations() {
+  const animatedElements = document.querySelectorAll(
+    '.blog-card-modern, .category-card-modern, .bento-main-card, .bento-mini-card, .stat-pill, .newsletter-card, .yt-spotlight-card, .contact-card-box, .contact-direct-card'
+  );
+
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach((entry, idx) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('reveal-visible');
+          }, idx * 40);
+          obs.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.05,
+      rootMargin: '0px 0px -20px 0px'
     });
 
-    // Auto-hide flash messages after 5 seconds
-    const flashMessages = document.querySelectorAll('.flash');
-    flashMessages.forEach(flash => {
-        setTimeout(() => {
-            flash.style.opacity = '0';
-            flash.style.transform = 'translateX(100%)';
-            setTimeout(() => flash.remove(), 400);
-        }, 5000);
+    animatedElements.forEach(el => {
+      el.classList.add('reveal-init');
+      observer.observe(el);
+    });
+  } else {
+    animatedElements.forEach(el => el.classList.add('reveal-visible'));
+  }
+}
+
+/* ==========================================================================
+   6. MOBILE MENU TOGGLE
+   ========================================================================== */
+function initMobileMenu() {
+  const mobileBtn = document.getElementById('mobileMenuBtn');
+  const navLinks = document.getElementById('navLinks');
+
+  if (mobileBtn && navLinks) {
+    mobileBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      navLinks.classList.toggle('active');
+      const icon = mobileBtn.querySelector('i');
+      if (icon) {
+        if (navLinks.classList.contains('active')) {
+          icon.className = 'fas fa-times';
+        } else {
+          icon.className = 'fas fa-bars';
+        }
+      }
     });
 
-    // Smooth scroll for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            const targetId = this.getAttribute('href');
-            if (targetId !== '#') {
-                const target = document.querySelector(targetId);
-                if (target) {
-                    e.preventDefault();
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            }
+    document.addEventListener('click', function(e) {
+      if (!navLinks.contains(e.target) && !mobileBtn.contains(e.target)) {
+        navLinks.classList.remove('active');
+        const icon = mobileBtn.querySelector('i');
+        if (icon) icon.className = 'fas fa-bars';
+      }
+    });
+  }
+}
+
+/* ==========================================================================
+   7. GLOBAL SEARCH MODAL & INSTANT LIVE SEARCH
+   ========================================================================== */
+function initSearchModal() {
+  const overlay = document.getElementById('searchModalOverlay');
+  const searchInput = document.getElementById('searchModalInput');
+  const resultsContainer = document.getElementById('searchResultsList');
+  const closeBtn = document.getElementById('searchCloseBtn');
+  const triggers = document.querySelectorAll('.quick-search-trigger');
+
+  if (!overlay || !searchInput) return;
+
+  function openSearch() {
+    overlay.classList.add('active');
+    setTimeout(() => searchInput.focus(), 50);
+  }
+
+  function closeSearch() {
+    overlay.classList.remove('active');
+    searchInput.value = '';
+    if (resultsContainer) {
+      resultsContainer.innerHTML = '<div class="search-empty-hint">Type at least 2 characters to search articles...</div>';
+    }
+  }
+
+  triggers.forEach(t => t.addEventListener('click', openSearch));
+  if (closeBtn) closeBtn.addEventListener('click', closeSearch);
+
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) closeSearch();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      if (overlay.classList.contains('active')) closeSearch();
+      else openSearch();
+    } else if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+      e.preventDefault();
+      openSearch();
+    } else if (e.key === 'Escape' && overlay.classList.contains('active')) {
+      closeSearch();
+    }
+  });
+
+  let searchTimer;
+  searchInput.addEventListener('input', function() {
+    clearTimeout(searchTimer);
+    const query = this.value.trim();
+
+    if (query.length < 2) {
+      if (resultsContainer) {
+        resultsContainer.innerHTML = '<div class="search-empty-hint">Type at least 2 characters to search articles...</div>';
+      }
+      return;
+    }
+
+    searchTimer = setTimeout(() => {
+      fetch(`/api/search?q=${encodeURIComponent(query)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!resultsContainer) return;
+          if (data.results && data.results.length > 0) {
+            resultsContainer.innerHTML = data.results.map(r => `
+              <a href="/blog/${r.slug}" class="search-result-item">
+                <div class="search-res-info">
+                  <h4>${escapeHtml(r.title)}</h4>
+                  <p>${escapeHtml(r.snippet)}</p>
+                </div>
+                <span class="search-res-badge">${escapeHtml(r.category)}</span>
+              </a>
+            `).join('');
+          } else {
+            resultsContainer.innerHTML = `
+              <div class="search-empty-hint">
+                <i class="fas fa-search" style="font-size: 1.4rem; margin-bottom: 8px; display: block; opacity: 0.5;"></i>
+                No articles matching "<strong>${escapeHtml(query)}</strong>"
+              </div>
+            `;
+          }
+        })
+        .catch(() => {
+          if (resultsContainer) {
+            resultsContainer.innerHTML = '<div class="search-empty-hint">Unable to load search results. Please try again.</div>';
+          }
         });
+    }, 220);
+  });
+}
+
+/* ==========================================================================
+   8. READING PROGRESS BAR
+   ========================================================================== */
+function initReadingProgressBar() {
+  // Reading progress bar disabled
+}
+
+/* ==========================================================================
+   9. AUTOMATIC TABLE OF CONTENTS (TOC)
+   ========================================================================== */
+window.refreshTableOfContents = function(activeContainer) {
+  const tocList = document.getElementById('tocList');
+  const content = activeContainer || document.querySelector('.blog-prose-view.active') || document.querySelector('.blog-prose');
+
+  if (!tocList || !content) return;
+
+  const headings = content.querySelectorAll('h2, h3');
+  const parentBox = tocList.closest('.sidebar-widget-box');
+  if (headings.length === 0) {
+    if (parentBox) parentBox.style.display = 'none';
+    return;
+  }
+  if (parentBox) parentBox.style.display = 'block';
+
+  tocList.innerHTML = '';
+  headings.forEach((heading, idx) => {
+    if (!heading.id) {
+      heading.id = 'heading-sec-' + idx;
+    }
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = '#' + heading.id;
+    a.className = 'toc-link';
+    if (heading.tagName.toLowerCase() === 'h3') {
+      a.style.paddingLeft = '16px';
+      a.style.fontSize = '0.8rem';
+    }
+    a.textContent = heading.textContent.trim();
+    li.appendChild(a);
+    tocList.appendChild(li);
+  });
+
+  const links = tocList.querySelectorAll('.toc-link');
+  const onScroll = function() {
+    let currentId = '';
+    headings.forEach(h => {
+      const top = h.getBoundingClientRect().top;
+      if (top <= 150) {
+        currentId = h.id;
+      }
     });
 
-    // Add animation on scroll
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
+    links.forEach(l => {
+      if (l.getAttribute('href') === '#' + currentId) {
+        l.classList.add('active');
+      } else {
+        l.classList.remove('active');
+      }
+    });
+  };
+  window.removeEventListener('scroll', window._tocScrollHandler);
+  window._tocScrollHandler = onScroll;
+  window.addEventListener('scroll', onScroll, { passive: true });
+};
+
+function initTableOfContents() {
+  window.refreshTableOfContents();
+}
+
+/* ==========================================================================
+   10. INTERACTIVE CLAP / LIKE BUTTON
+   ========================================================================== */
+function initClapButton() {
+  const clapBtn = document.getElementById('clapBtn');
+  if (!clapBtn) return;
+
+  const slug = clapBtn.dataset.slug;
+  const countSpan = clapBtn.querySelector('.clap-count');
+  const isLiked = localStorage.getItem('liked_' + slug);
+
+  if (isLiked) {
+    clapBtn.classList.add('clapped');
+  }
+
+  clapBtn.addEventListener('click', function() {
+    fetch(`/api/blog/${encodeURIComponent(slug)}/like`, { method: 'POST' })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success') {
+          countSpan.textContent = data.likes;
+          clapBtn.classList.add('clapped');
+          localStorage.setItem('liked_' + slug, 'true');
+          showToast('👏 Thanks for your appreciation!', 'success');
+        }
+      })
+      .catch(() => showToast('Error sending clap', 'error'));
+  });
+}
+
+/* ==========================================================================
+   11. SHARE TOOLS
+   ========================================================================== */
+function initShareTools() {
+  window.copyArticleLink = function() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      showToast('📋 Article link copied to clipboard!', 'success');
+    }).catch(() => {
+      showToast('Could not copy link.', 'error');
+    });
+  };
+}
+
+/* ==========================================================================
+   12. CATEGORY FILTER TABS
+   ========================================================================== */
+function initCategoryFilters() {
+  const tabs = document.querySelectorAll('.filter-tab');
+  const cards = document.querySelectorAll('.blog-card-modern[data-category]');
+
+  if (tabs.length === 0 || cards.length === 0) return;
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', function() {
+      tabs.forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+
+      const selected = this.dataset.category;
+
+      cards.forEach(card => {
+        if (selected === 'all' || card.dataset.category === selected) {
+          card.style.display = 'flex';
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(10px)';
+          setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+          }, 30);
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
+}
+
+/* ==========================================================================
+   13. ADMIN POST EDITOR
+   ========================================================================== */
+function parseClientSideSyntax(content) {
+  if (!content) return '<p style="color:#a1a1aa;">No content entered yet.</p>';
+  
+  const lines = content.split('\n');
+  const output = [];
+  let inCode = false;
+  let inUl = false;
+  let inOl = false;
+  let codeLines = [];
+  let isFirstP = true;
+
+  function formatInline(text) {
+    if (!text) return '';
+    text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+    text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    text = text.replace(/\*(.+?)\*/g, '<strong>$1</strong>');
+    text = text.replace(/_(.+?)_/g, '<em>$1</em>');
+    text = text.replace(/\/\/(.+?)\/\//g, '<em>$1</em>');
+    return text;
+  }
+
+  for (let raw of lines) {
+    const stripped = raw.trim();
+
+    if (stripped.startsWith('```')) {
+      if (inCode) {
+        inCode = false;
+        output.push(`<pre><code>${codeLines.join('\n')}</code></pre>`);
+        codeLines = [];
+      } else {
+        if (inUl) { output.push('</ul>'); inUl = false; }
+        if (inOl) { output.push('</ol>'); inOl = false; }
+        inCode = true;
+      }
+      continue;
+    }
+
+    if (inCode) {
+      codeLines.push(escapeHtml(raw));
+      continue;
+    }
+
+    const isUl = stripped.startsWith('- ') || stripped.startsWith('* ');
+    const isOl = /^\d+\.\s/.test(stripped);
+
+    if (!isUl && inUl) { output.push('</ul>'); inUl = false; }
+    if (!isOl && inOl) { output.push('</ol>'); inOl = false; }
+
+    if (!stripped) continue;
+
+    if (stripped.startsWith('### ')) {
+      output.push(`<h3>${formatInline(stripped.slice(4))}</h3>`);
+    } else if (stripped.startsWith('#### ')) {
+      output.push(`<h4>${formatInline(stripped.slice(5))}</h4>`);
+    } else if (stripped.startsWith('## ')) {
+      output.push(`<h2>${formatInline(stripped.slice(3))}</h2>`);
+    } else if (stripped.startsWith('# ')) {
+      output.push(`<h2>${formatInline(stripped.slice(2))}</h2>`);
+    } else if (stripped.startsWith('> ')) {
+      output.push(`<blockquote>${formatInline(stripped.slice(2))}</blockquote>`);
+    } else if (stripped.startsWith('! ')) {
+      output.push(`<div class="tech-highlight-box"><h4>💡 Key Takeaway</h4><p>${formatInline(stripped.slice(2))}</p></div>`);
+    } else if (isUl) {
+      if (!inUl) { output.push('<ul>'); inUl = true; }
+      output.push(`<li>${formatInline(stripped.slice(2))}</li>`);
+    } else if (isOl) {
+      if (!inOl) { output.push('<ol>'); inOl = true; }
+      output.push(`<li>${formatInline(stripped.replace(/^\d+\.\s*/, ''))}</li>`);
+    } else if (stripped.startsWith('<') && stripped.endsWith('>')) {
+      output.push(raw);
+    } else {
+      const pClass = isFirstP ? ' class="lead-paragraph"' : '';
+      output.push(`<p${pClass}>${formatInline(stripped)}</p>`);
+      isFirstP = false;
+    }
+  }
+
+  if (inCode) output.push(`<pre><code>${codeLines.join('\n')}</code></pre>`);
+  if (inUl) output.push('</ul>');
+  if (inOl) output.push('</ol>');
+
+  return output.join('\n');
+}
+
+function initAdminEditor() {
+  const titleInput = document.querySelector('input[name="title"]');
+  const slugInput = document.querySelector('input[name="slug"]');
+  const contentTextarea = document.getElementById('articleContentInput') || document.querySelector('textarea[name="content"]');
+  const previewPane = document.getElementById('editorPreviewPane');
+  const editorTab = document.getElementById('tabEditorBtn');
+  const previewTab = document.getElementById('tabPreviewBtn');
+  const editorWrap = document.getElementById('editorInputWrap');
+
+  if (titleInput && slugInput && !slugInput.value) {
+    titleInput.addEventListener('input', function() {
+      slugInput.value = this.value
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim();
+    });
+  }
+
+  if (editorTab && previewTab && editorWrap && previewPane && contentTextarea) {
+    editorTab.addEventListener('click', () => {
+      editorTab.classList.add('active');
+      previewTab.classList.remove('active');
+      editorWrap.style.display = 'block';
+      previewPane.classList.remove('active');
+    });
+
+    previewTab.addEventListener('click', () => {
+      previewTab.classList.add('active');
+      editorTab.classList.remove('active');
+      editorWrap.style.display = 'none';
+      previewPane.classList.add('active');
+      previewPane.innerHTML = parseClientSideSyntax(contentTextarea.value);
+    });
+  }
+
+  window.insertSyntaxTag = function(openTag, closeTag) {
+    if (!contentTextarea) return;
+    const start = contentTextarea.selectionStart;
+    const end = contentTextarea.selectionEnd;
+    const text = contentTextarea.value;
+    const selected = text.substring(start, end) || (openTag.startsWith('#') ? 'Heading Title' : 'text');
+    const replacement = openTag + selected + (closeTag || '');
+    contentTextarea.value = text.substring(0, start) + replacement + text.substring(end);
+    contentTextarea.focus();
+    contentTextarea.setSelectionRange(start + openTag.length, start + openTag.length + selected.length);
+  };
+}
+
+/* ==========================================================================
+   14. FAQ ACCORDION
+   ========================================================================== */
+function initFAQAccordion() {
+  const faqItems = document.querySelectorAll('.faq-item');
+  faqItems.forEach(item => {
+    const q = item.querySelector('.faq-question');
+    if (q) {
+      q.addEventListener('click', () => {
+        const isActive = item.classList.contains('active');
+        faqItems.forEach(i => i.classList.remove('active'));
+        if (!isActive) item.classList.add('active');
+      });
+    }
+  });
+}
+
+/* ==========================================================================
+   15. FLASH MESSAGES & TOASTS
+   ========================================================================== */
+function initFlashMessages() {
+  const flashes = document.querySelectorAll('.flash');
+  flashes.forEach(f => {
+    setTimeout(() => {
+      f.style.opacity = '0';
+      f.style.transform = 'translateX(50px)';
+      setTimeout(() => f.remove(), 400);
+    }, 4500);
+  });
+}
+
+function showToast(msg, type = 'success') {
+  let container = document.querySelector('.flash-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.className = 'flash-container';
+    document.body.appendChild(container);
+  }
+
+  const toast = document.createElement('div');
+  toast.className = `flash flash-${type}`;
+  toast.innerHTML = `
+    <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+    <span>${escapeHtml(msg)}</span>
+    <span class="flash-close" onclick="this.parentElement.remove()">&times;</span>
+  `;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(50px)';
+    setTimeout(() => toast.remove(), 400);
+  }, 4000);
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+/* ==========================================================================
+   16. EXPLAIN LIKE I'M 5 (ELI5) IN-PLACE TOGGLE CONTROLLER
+   ========================================================================== */
+function initEli5Toggle() {
+  const techBtn = document.getElementById('btnModeTechnical');
+  const eli5Btn = document.getElementById('btnModeEli5');
+  const techProse = document.getElementById('blogProseTechnical');
+  const eli5Prose = document.getElementById('blogProseEli5');
+  const ttsModeTag = document.getElementById('ttsModeTag');
+  const ttsStatusText = document.getElementById('ttsStatusText');
+  const ttsDockMeta = document.getElementById('ttsDockMeta');
+
+  if (!techBtn || !eli5Btn || !techProse || !eli5Prose) return;
+
+  window.switchReadingMode = function(mode) {
+    if (mode === 'eli5') {
+      techBtn.classList.remove('active');
+      techBtn.setAttribute('aria-selected', 'false');
+      eli5Btn.classList.add('active');
+      eli5Btn.setAttribute('aria-selected', 'true');
+
+      techProse.style.display = 'none';
+      techProse.classList.remove('active');
+      eli5Prose.style.display = 'block';
+      eli5Prose.classList.add('active');
+
+      if (ttsModeTag) {
+        ttsModeTag.textContent = 'ELI5 Mode';
+        ttsModeTag.style.background = 'rgba(168, 85, 247, 0.2)';
+        ttsModeTag.style.color = '#c084fc';
+        ttsModeTag.style.borderColor = 'rgba(168, 85, 247, 0.4)';
+      }
+      if (ttsStatusText) {
+        ttsStatusText.textContent = 'Narrating simplified ELI5 summary with real-world analogies';
+      }
+      if (ttsDockMeta) {
+        ttsDockMeta.textContent = 'Narrating: ELI5 Simplified Summary';
+      }
+
+      window.refreshTableOfContents(eli5Prose);
+
+      // Notify TTS engine of mode change
+      if (window._ttsEngine && window._ttsEngine.onModeSwitched) {
+        window._ttsEngine.onModeSwitched('eli5');
+      }
+    } else {
+      eli5Btn.classList.remove('active');
+      eli5Btn.setAttribute('aria-selected', 'false');
+      techBtn.classList.add('active');
+      techBtn.setAttribute('aria-selected', 'true');
+
+      eli5Prose.style.display = 'none';
+      eli5Prose.classList.remove('active');
+      techProse.style.display = 'block';
+      techProse.classList.add('active');
+
+      if (ttsModeTag) {
+        ttsModeTag.textContent = 'Technical Mode';
+        ttsModeTag.style.background = 'rgba(16, 185, 129, 0.16)';
+        ttsModeTag.style.color = 'var(--accent-emerald-light)';
+        ttsModeTag.style.borderColor = 'rgba(16, 185, 129, 0.35)';
+      }
+      if (ttsStatusText) {
+        ttsStatusText.textContent = 'Listen to AI audio narration with live read-along tracking';
+      }
+      if (ttsDockMeta) {
+        ttsDockMeta.textContent = 'Narrating: Technical Deep Dive';
+      }
+
+      window.refreshTableOfContents(techProse);
+
+      // Notify TTS engine of mode change
+      if (window._ttsEngine && window._ttsEngine.onModeSwitched) {
+        window._ttsEngine.onModeSwitched('technical');
+      }
+    }
+  };
+}
+
+/* ==========================================================================
+   17. TEXT-TO-SPEECH (TTS) ENTERPRISE NARRATION SUITE
+   ========================================================================== */
+function initArticleTTS() {
+  const card = document.getElementById('ttsNarrationCard');
+  if (!card) return;
+
+  const playPauseBtn = document.getElementById('ttsPlayPauseBtn');
+  const playIcon = document.getElementById('ttsPlayIcon');
+  const rewindBtn = document.getElementById('ttsRewindBtn');
+  const forwardBtn = document.getElementById('ttsForwardBtn');
+  const stopBtn = document.getElementById('ttsStopBtn');
+  const voiceSelect = document.getElementById('ttsVoiceSelect');
+  const speedBtns = document.querySelectorAll('.tts-speed-btn');
+  const highlightToggle = document.getElementById('ttsHighlightToggle');
+  const equalizer = document.getElementById('ttsEqualizer');
+  const progressTrack = document.getElementById('ttsProgressTrack');
+  const progressFill = document.getElementById('ttsProgressFill');
+  const currentTimeEl = document.getElementById('ttsCurrentTime');
+  const totalTimeEl = document.getElementById('ttsTotalTime');
+
+  // Floating Mini Dock
+  const floatingDock = document.getElementById('ttsFloatingDock');
+  const dockPlayBtn = document.getElementById('ttsDockPlayBtn');
+  const dockPlayIcon = document.getElementById('ttsDockPlayIcon');
+  const dockProgressBar = document.getElementById('ttsDockProgressBar');
+  const dockProgressWrap = document.getElementById('ttsDockProgressWrap');
+  const dockCloseBtn = document.getElementById('ttsDockCloseBtn');
+
+  if (!('speechSynthesis' in window)) {
+    card.style.display = 'none';
+    return;
+  }
+
+  const synth = window.speechSynthesis;
+  let voices = [];
+  let selectedVoice = null;
+  let isPlaying = false;
+  let isPaused = false;
+  let currentMode = 'technical';
+  let chunks = [];
+  let currentChunkIdx = 0;
+  let playbackRate = 1.0;
+  let highlightEnabled = true;
+  let timerInterval = null;
+  let totalEstimatedSeconds = 180;
+
+  // 1. Populate Natural Voices
+  function loadVoices() {
+    const allVoices = synth.getVoices();
+    voices = allVoices.filter(v => v.lang && v.lang.startsWith('en'));
+    if (voices.length === 0) {
+      voices = allVoices;
+    }
+    if (voiceSelect) {
+      voiceSelect.innerHTML = '';
+      voices.forEach((v, i) => {
+        const opt = document.createElement('option');
+        opt.value = i;
+        const isDefault = v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Neural') || v.default;
+        opt.textContent = `${v.name.replace(/Microsoft|Google|Apple|Desktop/g, '').trim()} (${v.lang})`;
+        if (isDefault && !selectedVoice) {
+          opt.selected = true;
+          selectedVoice = v;
+        }
+        voiceSelect.appendChild(opt);
+      });
+      if (!selectedVoice && voices.length > 0) {
+        selectedVoice = voices[0];
+      }
+    }
+  }
+
+  loadVoices();
+  if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = loadVoices;
+  }
+
+  if (voiceSelect) {
+    voiceSelect.addEventListener('change', function() {
+      const idx = parseInt(this.value, 10);
+      selectedVoice = voices[idx] || null;
+      if (isPlaying && !isPaused) {
+        restartCurrentChunk();
+      }
+    });
+  }
+
+  // 2. Speed Selection
+  speedBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      speedBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      playbackRate = parseFloat(this.dataset.speed) || 1.0;
+      if (isPlaying && !isPaused) {
+        restartCurrentChunk();
+      }
+    });
+  });
+
+  // 3. Highlight Toggle
+  if (highlightToggle) {
+    highlightEnabled = highlightToggle.checked;
+    highlightToggle.addEventListener('change', function() {
+      highlightEnabled = this.checked;
+      if (!highlightEnabled) {
+        clearHighlights();
+      }
+    });
+  }
+
+  // 4. Build Speech Chunks from DOM
+  function buildChunks() {
+    chunks = [];
+    const containerId = currentMode === 'eli5' ? 'blogProseEli5' : 'blogProseTechnical';
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    // Grab readable block elements
+    const elements = container.querySelectorAll('p, h2, h3, h4, li, blockquote, .tech-highlight-box');
+    elements.forEach((el) => {
+      let rawText = el.innerText || el.textContent || '';
+      rawText = rawText.replace(/\s+/g, ' ').trim();
+      if (!rawText || rawText.length < 2) return;
+
+      // If text is very long, split on sentence boundaries
+      if (rawText.length > 180) {
+        const sentences = rawText.match(/[^.!?]+[.!?]+(\s+|$)|[^.!?]+$/g) || [rawText];
+        sentences.forEach(s => {
+          const sTrim = s.trim();
+          if (sTrim.length > 0) {
+            chunks.push({ text: sTrim, element: el });
+          }
+        });
+      } else {
+        chunks.push({ text: rawText, element: el });
+      }
+    });
+
+    // Estimate total seconds
+    const totalWords = chunks.reduce((acc, c) => acc + c.text.split(' ').length, 0);
+    totalEstimatedSeconds = Math.max(30, Math.round((totalWords / 150) * 60));
+    if (totalTimeEl) {
+      totalTimeEl.textContent = formatTime(totalEstimatedSeconds);
+    }
+  }
+
+  function formatTime(sec) {
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  }
+
+  function clearHighlights() {
+    document.querySelectorAll('.tts-highlight-active').forEach(el => {
+      el.classList.remove('tts-highlight-active');
+    });
+  }
+
+  function highlightElement(el) {
+    clearHighlights();
+    if (!el || !highlightEnabled) return;
+    el.classList.add('tts-highlight-active');
+    
+    // Auto-scroll into view smoothly
+    const rect = el.getBoundingClientRect();
+    if (rect.top < 100 || rect.bottom > window.innerHeight - 100) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  function updateTimeline() {
+    if (chunks.length === 0) return;
+    const progress = Math.min(100, Math.max(0, (currentChunkIdx / chunks.length) * 100));
+    if (progressFill) progressFill.style.width = progress + '%';
+    if (dockProgressBar) dockProgressBar.style.width = progress + '%';
+    
+    const curSec = Math.min(totalEstimatedSeconds, Math.round((currentChunkIdx / chunks.length) * totalEstimatedSeconds));
+    if (currentTimeEl) currentTimeEl.textContent = formatTime(curSec);
+  }
+
+  // 5. Speech Playback Core
+  function speakChunk(idx) {
+    if (idx >= chunks.length) {
+      stop();
+      showToast('Finished audio narration!', 'success');
+      return;
+    }
+
+    currentChunkIdx = idx;
+    const chunk = chunks[idx];
+    updateTimeline();
+    highlightElement(chunk.element);
+
+    const utterance = new SpeechSynthesisUtterance(chunk.text);
+    if (selectedVoice) utterance.voice = selectedVoice;
+    utterance.rate = playbackRate;
+    utterance.pitch = 1.0;
+
+    utterance.onstart = function() {
+      // Speech started
     };
 
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
-        });
-    }, observerOptions);
+    utterance.onend = function() {
+      if (isPlaying && !isPaused) {
+        speakChunk(idx + 1);
+      }
+    };
 
-    // Observe blog cards and category cards
-    document.querySelectorAll('.blog-card, .category-card, .stat-card').forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(20px)';
-        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        observer.observe(el);
+    utterance.onerror = function(e) {
+      if (e.error === 'interrupted' || e.error === 'canceled') return;
+      if (isPlaying && !isPaused) {
+        speakChunk(idx + 1);
+      }
+    };
+
+    synth.speak(utterance);
+  }
+
+  function restartCurrentChunk() {
+    synth.cancel();
+    if (isPlaying && !isPaused) {
+      speakChunk(currentChunkIdx);
+    }
+  }
+
+  function play() {
+    if (chunks.length === 0) {
+      buildChunks();
+    }
+    if (chunks.length === 0) return;
+
+    if (isPaused) {
+      synth.resume();
+      isPaused = false;
+      isPlaying = true;
+    } else {
+      synth.cancel();
+      isPlaying = true;
+      isPaused = false;
+      speakChunk(currentChunkIdx);
+    }
+
+    setPlayingUI(true);
+    startTimer();
+  }
+
+  function pause() {
+    if (!isPlaying) return;
+    synth.pause();
+    isPaused = true;
+    setPlayingUI(false);
+    stopTimer();
+  }
+
+  function stop() {
+    synth.cancel();
+    isPlaying = false;
+    isPaused = false;
+    currentChunkIdx = 0;
+    clearHighlights();
+    setPlayingUI(false);
+    updateTimeline();
+    stopTimer();
+    if (currentTimeEl) currentTimeEl.textContent = '0:00';
+    if (floatingDock) floatingDock.style.display = 'none';
+  }
+
+  function setPlayingUI(playing) {
+    if (playIcon) {
+      playIcon.className = playing ? 'fas fa-pause' : 'fas fa-play';
+    }
+    if (dockPlayIcon) {
+      dockPlayIcon.className = playing ? 'fas fa-pause' : 'fas fa-play';
+    }
+    if (playPauseBtn) {
+      if (playing) playPauseBtn.classList.add('playing');
+      else playPauseBtn.classList.remove('playing');
+    }
+    if (equalizer) {
+      if (playing) equalizer.classList.add('playing');
+      else equalizer.classList.remove('playing');
+    }
+  }
+
+  function startTimer() {
+    stopTimer();
+    timerInterval = setInterval(() => {
+      // Keep browser synth alive (prevents Chrome 15s pause bug)
+      if (synth.speaking && !synth.paused) {
+        synth.pause();
+        synth.resume();
+      }
+    }, 10000);
+  }
+
+  function stopTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+  }
+
+  // 6. Button Listeners
+  if (playPauseBtn) {
+    playPauseBtn.addEventListener('click', function() {
+      if (isPlaying && !isPaused) {
+        pause();
+      } else {
+        play();
+      }
     });
+  }
 
-    // Search input focus effect
-    const searchInputs = document.querySelectorAll('.search-form input, .search-big input');
-    searchInputs.forEach(input => {
-        input.addEventListener('focus', function() {
-            this.parentElement.style.transform = 'scale(1.02)';
-        });
-        input.addEventListener('blur', function() {
-            this.parentElement.style.transform = 'scale(1)';
-        });
+  if (dockPlayBtn) {
+    dockPlayBtn.addEventListener('click', function() {
+      if (isPlaying && !isPaused) {
+        pause();
+      } else {
+        play();
+      }
     });
+  }
 
-    // Logo hover effect
-    const logo = document.querySelector('.logo');
-    if (logo) {
-        logo.addEventListener('mouseenter', function() {
-            this.querySelector('.logo-icon').style.boxShadow = '0 0 30px rgba(16, 185, 129, 0.6)';
-        });
-        logo.addEventListener('mouseleave', function() {
-            this.querySelector('.logo-icon').style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.4)';
-        });
-    }
+  if (stopBtn) {
+    stopBtn.addEventListener('click', stop);
+  }
 
-    // Review form character counter
-    const reviewTextarea = document.querySelector('.review-form textarea[name="comment"]');
-    if (reviewTextarea) {
-        const maxLength = 1000;
-        const counter = document.createElement('div');
-        counter.style.cssText = 'text-align:right;color:#6ee7b7;font-size:12px;margin-top:5px;';
-        counter.textContent = '0 / ' + maxLength + ' characters';
-        reviewTextarea.parentElement.appendChild(counter);
+  if (dockCloseBtn) {
+    dockCloseBtn.addEventListener('click', stop);
+  }
 
-        reviewTextarea.addEventListener('input', function() {
-            const current = this.value.length;
-            counter.textContent = current + ' / ' + maxLength + ' characters';
-            if (current > maxLength) {
-                counter.style.color = '#ef4444';
-            } else {
-                counter.style.color = '#6ee7b7';
-            }
-        });
-    }
-
-    // Admin form - Auto-generate slug from title
-    const titleInput = document.querySelector('input[name="title"]');
-    const slugInput = document.querySelector('input[name="slug"]');
-
-    if (titleInput && slugInput && !slugInput.value) {
-        titleInput.addEventListener('input', function() {
-            const slug = this.value
-                .toLowerCase()
-                .replace(/[^a-z0-9\s-]/g, '')
-                .replace(/\s+/g, '-')
-                .replace(/-+/g, '-')
-                .trim();
-            slugInput.value = slug;
-        });
-    }
-
-    // Image preview for admin form
-    const fileInputs = document.querySelectorAll('input[type="file"]');
-    fileInputs.forEach(input => {
-        input.addEventListener('change', function() {
-            if (this.files && this.files[0]) {
-                const fileName = this.files[0].name;
-                const label = document.createElement('span');
-                label.style.cssText = 'color:#34d399;font-size:12px;margin-left:10px;';
-                label.textContent = '✓ ' + fileName;
-
-                // Remove existing label
-                const existing = this.parentElement.querySelector('span');
-                if (existing) existing.remove();
-
-                this.parentElement.appendChild(label);
-            }
-        });
+  if (rewindBtn) {
+    rewindBtn.addEventListener('click', function() {
+      if (chunks.length === 0) return;
+      const jumpChunks = Math.max(1, Math.round(chunks.length * (10 / totalEstimatedSeconds)));
+      currentChunkIdx = Math.max(0, currentChunkIdx - jumpChunks);
+      restartCurrentChunk();
     });
+  }
 
-    // Parallax effect for hero
-    const hero = document.querySelector('.hero');
-    if (hero) {
-        window.addEventListener('scroll', function() {
-            const scrolled = window.pageYOffset;
-            const heroContent = hero.querySelector('.hero-content');
-            if (heroContent && scrolled < 600) {
-                heroContent.style.transform = 'translateY(' + (scrolled * 0.3) + 'px)';
-                heroContent.style.opacity = 1 - (scrolled / 600);
-            }
-        });
+  if (forwardBtn) {
+    forwardBtn.addEventListener('click', function() {
+      if (chunks.length === 0) return;
+      const jumpChunks = Math.max(1, Math.round(chunks.length * (10 / totalEstimatedSeconds)));
+      currentChunkIdx = Math.min(chunks.length - 1, currentChunkIdx + jumpChunks);
+      restartCurrentChunk();
+    });
+  }
+
+  // 7. Timeline Click / Seeking
+  function handleTimelineClick(e, trackEl) {
+    if (chunks.length === 0) buildChunks();
+    if (chunks.length === 0) return;
+    const rect = trackEl.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const percent = Math.max(0, Math.min(1, clickX / rect.width));
+    currentChunkIdx = Math.floor(percent * chunks.length);
+    if (currentChunkIdx >= chunks.length) currentChunkIdx = chunks.length - 1;
+    
+    if (isPlaying) {
+      restartCurrentChunk();
+    } else {
+      updateTimeline();
+      highlightElement(chunks[currentChunkIdx].element);
+    }
+  }
+
+  if (progressTrack) {
+    progressTrack.addEventListener('click', function(e) {
+      handleTimelineClick(e, this);
+    });
+  }
+
+  if (dockProgressWrap) {
+    dockProgressWrap.addEventListener('click', function(e) {
+      handleTimelineClick(e, this);
+    });
+  }
+
+  // 8. Sticky Floating Dock Scroll Trigger
+  window.addEventListener('scroll', function() {
+    if (!floatingDock) return;
+    const cardRect = card.getBoundingClientRect();
+    if (isPlaying && cardRect.bottom < 0) {
+      floatingDock.style.display = 'block';
+    } else {
+      floatingDock.style.display = 'none';
+    }
+  }, { passive: true });
+
+  // 9. Mode Switch Notification
+  window._ttsEngine = {
+    onModeSwitched: function(newMode) {
+      currentMode = newMode;
+      const wasSpeaking = isPlaying && !isPaused;
+      stop();
+      buildChunks();
+      if (wasSpeaking) {
+        play();
+      }
+    }
+  };
+
+  buildChunks();
+}
+
+/* ==========================================================================
+   18. ADMIN AUTO-GENERATE ELI5 HELPER
+   ========================================================================== */
+function initAdminEli5Helper() {
+  const btn = document.getElementById('btnAutoGenerateEli5');
+  const eli5Input = document.getElementById('eli5ContentInput');
+  const contentInput = document.getElementById('articleContentInput');
+  const titleInput = document.querySelector('input[name="title"]');
+
+  if (!btn || !eli5Input || !contentInput) return;
+
+  btn.addEventListener('click', async function() {
+    const title = titleInput ? titleInput.value.trim() : '';
+    const content = contentInput.value.trim();
+
+    if (!content) {
+      showToast('Please write the article content first before generating an ELI5 summary!', 'error');
+      return;
     }
 
-    // Active nav link highlighting based on scroll
-    const sections = document.querySelectorAll('section[id]');
-    if (sections.length > 0) {
-        window.addEventListener('scroll', function() {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                if (scrollY >= sectionTop - 200) {
-                    current = section.getAttribute('id');
-                }
-            });
-        });
-    }
+    const origHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating with AI...';
+    btn.disabled = true;
 
-    console.log('🚀 ASI TECH website loaded successfully!');
-});
+    try {
+      const res = await fetch('/api/ai/generate-eli5', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, content })
+      });
+      const data = await res.json();
+      if (data.status === 'success' && data.eli5_content) {
+        eli5Input.value = data.eli5_content;
+        showToast('✨ ELI5 summary generated successfully!', 'success');
+        eli5Input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        showToast(data.message || 'Failed to generate ELI5 summary.', 'error');
+      }
+    } catch (err) {
+      showToast('Error connecting to AI service.', 'error');
+    } finally {
+      btn.innerHTML = origHtml;
+      btn.disabled = false;
+    }
+  });
+}

@@ -1,56 +1,97 @@
 {% extends "base.html" %}
 
-{% block title %}{{ current_category }} | ASI TECH{% endblock %}
+{% block title %}{{ current_category }} Insights | ASI TECH{% endblock %}
+{% block meta_description %}{{ cat_info.desc }}{% endblock %}
 
 {% block content %}
-<section class="category-page">
+<!-- Category Themed Hero Header -->
+<header class="category-hero-header">
     <div class="container">
-        <div class="category-header">
-            <h1>
-                {% if current_category == 'Education' %}<i class="fas fa-graduation-cap"></i>{% endif %}
-                {% if current_category == 'Technology' %}<i class="fas fa-laptop-code"></i>{% endif %}
-                {% if current_category == 'Artificial Intelligence' %}<i class="fas fa-brain"></i>{% endif %}
-                {% if current_category == 'Science' %}<i class="fas fa-atom"></i>{% endif %}
-                {% if current_category == 'Movies' %}<i class="fas fa-film"></i>{% endif %}
-                {{ current_category }}
-            </h1>
-            <p>{{ blogs|length }} blog(s) in this category</p>
+        <div class="cat-hero-icon" style="color:{{ cat_info.color }}; box-shadow:0 0 25px {{ cat_info.color }}40;">
+            <i class="fas {{ cat_info.icon }}"></i>
+        </div>
+        <h1 class="cat-hero-title">{{ current_category }}</h1>
+        <p class="cat-hero-desc">{{ cat_info.desc }}</p>
+        <span class="card-badge" style="background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:var(--text-highlight);">
+            <i class="fas fa-file-lines" style="color:{{ cat_info.color }};"></i> {{ blogs|length }} Published Articles
+        </span>
+    </div>
+</header>
+
+<!-- Main Category Content -->
+<section class="blogs-section">
+    <div class="container">
+        <!-- Toolbar (Sort Selector) -->
+        <div class="category-toolbar">
+            <div style="font-size:0.95rem; color:var(--text-muted);">
+                Showing <strong>{{ blogs|length }}</strong> articles in <strong>{{ current_category }}</strong>
+            </div>
+
+            <form action="{{ url_for('category_page', category=current_category) }}" method="get" id="sortForm" style="display:flex; align-items:center; gap:8px;">
+                <label for="sortSelect" style="font-size:0.85rem; color:var(--text-muted);"><i class="fas fa-sort-amount-down"></i> Sort by:</label>
+                <select name="sort" id="sortSelect" class="sort-select-box" onchange="document.getElementById('sortForm').submit()">
+                    <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Latest Releases</option>
+                    <option value="views" {% if sort == 'views' %}selected{% endif %}>Most Viewed</option>
+                    <option value="likes" {% if sort == 'likes' %}selected{% endif %}>Most Applauded</option>
+                </select>
+            </form>
         </div>
 
         {% if blogs %}
-        <div class="blogs-grid">
+        <div class="blogs-grid-modern">
             {% for blog in blogs %}
-            <article class="blog-card">
-                <div class="blog-image">
+            <article class="blog-card-modern" data-category="{{ blog.category }}">
+                <div class="blog-thumb-wrap">
                     {% if blog.title_image %}
-                        <img src="{{ url_for('static', filename='uploads/' + blog.title_image) }}" alt="{{ blog.title }}">
+                        <img src="{{ url_for('static', filename='uploads/' + blog.title_image) }}" alt="{{ blog.title }}" class="blog-thumb-img" loading="lazy">
                     {% else %}
-                        <div class="blog-image-placeholder">
+                        <div class="blog-thumb-placeholder">
                             <i class="fas fa-image"></i>
                         </div>
                     {% endif %}
-                    <span class="blog-category">{{ blog.category }}</span>
-                </div>
-                <div class="blog-content">
-                    <h3 class="blog-title">{{ blog.title }}</h3>
-                    <p class="blog-excerpt">{{ blog.content[:120] | striptags }}...</p>
-                    <div class="blog-meta">
-                        <span><i class="fas fa-calendar"></i> {{ blog.created_at[:10] }}</span>
-                        <span><i class="fas fa-eye"></i> {{ blog.views }} views</span>
+                    <div class="card-top-badges">
+                        <span class="card-badge {% if blog.category == 'Artificial Intelligence' %}badge-ai{% elif blog.category == 'Technology' %}badge-tech{% elif blog.category == 'Science' %}badge-sci{% elif blog.category == 'Education' %}badge-edu{% else %}badge-mov{% endif %}">
+                            {{ blog.category }}
+                        </span>
+                        <span class="read-time-tag"><i class="far fa-clock"></i> {{ blog.read_time or 3 }} min</span>
                     </div>
-                    <a href="{{ url_for('blog_detail', slug=blog.slug) }}" class="read-more">
-                        Read More <i class="fas fa-arrow-right"></i>
-                    </a>
+                </div>
+
+                <div class="blog-card-body">
+                    <div class="blog-meta-top">
+                        <span><i class="far fa-calendar-alt"></i> {{ blog.created_at[:10] }}</span>
+                        <span><i class="far fa-eye"></i> {{ blog.views }} views</span>
+                    </div>
+
+                    <h3 class="blog-card-title">
+                        <a href="{{ url_for('blog_detail', slug=blog.slug) }}">{{ blog.title }}</a>
+                    </h3>
+
+                    <p class="blog-card-excerpt">
+                        {{ blog.content[:130] | striptags }}...
+                    </p>
+
+                    <div class="blog-card-footer">
+                        <div class="author-chip">
+                            <div class="author-avatar-sm">{{ blog.author[:1] }}</div>
+                            <span>{{ blog.author }}</span>
+                        </div>
+                        <a href="{{ url_for('blog_detail', slug=blog.slug) }}" class="read-article-link">
+                            <span>Read</span> <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
                 </div>
             </article>
             {% endfor %}
         </div>
         {% else %}
-        <div class="empty-state">
-            <i class="fas fa-folder-open"></i>
-            <h3>No blogs in this category yet</h3>
-            <p>Check back soon for new content!</p>
-            <a href="{{ url_for('home') }}" class="btn-primary"><i class="fas fa-home"></i> Go Home</a>
+        <div class="empty-state-modern">
+            <i class="fas fa-folder-open" style="color:{{ cat_info.color }};"></i>
+            <h3>No articles in {{ current_category }} yet</h3>
+            <p>Our authors are drafting new content for this discipline. Check back shortly!</p>
+            <a href="{{ url_for('home') }}" class="btn-primary-action" style="text-decoration:none; margin-top:12px;">
+                <i class="fas fa-home"></i> Return Home
+            </a>
         </div>
         {% endif %}
     </div>

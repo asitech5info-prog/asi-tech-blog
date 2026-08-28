@@ -2,62 +2,257 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}ASI TECH{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="{% block meta_description %}ASI TECH - Exploring the frontiers of Technology, Artificial Intelligence, Science, Education, and Movies.{% endblock %}">
+    <meta name="keywords" content="technology, AI, artificial intelligence, science, quantum computing, programming, education, cinema, tech blog">
+    <meta name="author" content="ASI TECH">
+    
+    <!-- OpenGraph / Social Meta -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{% block og_title %}ASI TECH | Modern Tech & AI Journal{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Discover cutting-edge insights into Artificial Intelligence, Deep Tech, Science, and Modern Engineering.{% endblock %}">
+    
+    <title>{% block title %}ASI TECH - Tech, AI, Science & Innovation{% endblock %}</title>
+
+    <!-- Theme Preference Initialization (Prevents FOUC) -->
+    <script>
+        (function() {
+            try {
+                const savedTheme = localStorage.getItem('asitech_theme');
+                if (savedTheme === 'light') {
+                    document.documentElement.classList.add('light-theme');
+                }
+            } catch(e) {}
+        })();
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom Style System with Cache Busting -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=5.0">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
+
+    <!-- Sticky Glassmorphic Navbar -->
+    <header class="navbar">
         <div class="nav-container">
+            <!-- Brand Logo -->
             <a href="{{ url_for('home') }}" class="logo">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="ASI TECH Logo" class="logo-img">
+                <div class="logo-badge">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <div class="logo-text-wrap">
+                    <div class="logo-title">
+                        <span>ASI TECH</span>
+                        <span class="tech-tag">AI</span>
+                    </div>
+                    <span class="logo-sub">JOURNAL &amp; LABS</span>
+                </div>
             </a>
 
-            <div class="nav-links" id="navLinks">
+            <!-- Public Navigation Links -->
+            <nav class="nav-links" id="navLinks">
                 <a href="{{ url_for('home') }}" class="nav-link {% if request.endpoint == 'home' %}active{% endif %}">
                     <i class="fas fa-home"></i> Home
                 </a>
+                
                 <div class="dropdown">
-                    <a href="#" class="nav-link dropdown-toggle">
-                        <i class="fas fa-th-large"></i> Categories <i class="fas fa-chevron-down"></i>
+                    <a href="javascript:void(0)" class="nav-link dropdown-toggle">
+                        <i class="fas fa-layer-group"></i> Categories <i class="fas fa-chevron-down"></i>
                     </a>
                     <div class="dropdown-menu">
-                        <a href="{{ url_for('category_page', category='Education') }}"><i class="fas fa-graduation-cap"></i> Education</a>
-                        <a href="{{ url_for('category_page', category='Technology') }}"><i class="fas fa-laptop-code"></i> Technology</a>
-                        <a href="{{ url_for('category_page', category='Artificial Intelligence') }}"><i class="fas fa-brain"></i> Artificial Intelligence</a>
-                        <a href="{{ url_for('category_page', category='Science') }}"><i class="fas fa-atom"></i> Science</a>
-                        <a href="{{ url_for('category_page', category='Movies') }}"><i class="fas fa-film"></i> Movies</a>
+                        <a href="{{ url_for('category_page', category='Artificial Intelligence') }}" class="dropdown-item ai">
+                            <i class="fas fa-brain"></i>
+                            <div>
+                                <div>Artificial Intelligence</div>
+                            </div>
+                        </a>
+                        <a href="{{ url_for('category_page', category='Technology') }}" class="dropdown-item tech">
+                            <i class="fas fa-laptop-code"></i>
+                            <div>
+                                <div>Technology</div>
+                            </div>
+                        </a>
+                        <a href="{{ url_for('category_page', category='Science') }}" class="dropdown-item sci">
+                            <i class="fas fa-atom"></i>
+                            <div>
+                                <div>Science &amp; Space</div>
+                            </div>
+                        </a>
+                        <a href="{{ url_for('category_page', category='Education') }}" class="dropdown-item edu">
+                            <i class="fas fa-graduation-cap"></i>
+                            <div>
+                                <div>Education &amp; Dev</div>
+                            </div>
+                        </a>
+                        <a href="{{ url_for('category_page', category='Movies') }}" class="dropdown-item mov">
+                            <i class="fas fa-film"></i>
+                            <div>
+                                <div>Movies &amp; Cinema</div>
+                            </div>
+                        </a>
                     </div>
                 </div>
-                <a href="{{ url_for('contact') }}" class="nav-link {% if request.endpoint == 'contact' %}active{% endif %}">
-                    <i class="fas fa-envelope"></i> Contact
-                </a>
-            </div>
 
+                <a href="{{ url_for('contact') }}" class="nav-link {% if request.endpoint == 'contact' %}active{% endif %}">
+                    <i class="fas fa-paper-plane"></i> Contact
+                </a>
+            </nav>
+
+            <!-- Actions: Day/Night Toggle, Search, User Auth & Mobile Toggle -->
             <div class="nav-right">
-                <form action="{{ url_for('search') }}" method="get" class="search-form">
-                    <input type="text" name="q" placeholder="Search blogs..." value="{{ request.args.get('q', '') }}">
-                    <button type="submit"><i class="fas fa-search"></i></button>
-                </form>
-                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <!-- Day / Night Toggle -->
+                <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Day / Night Theme" title="Toggle Day / Night Mode">
+                    <i class="fas fa-sun theme-icon-sun"></i>
+                    <i class="fas fa-moon theme-icon-moon"></i>
+                </button>
+
+                <!-- Search Button -->
+                <button type="button" class="quick-search-btn quick-search-trigger" title="Quick Search">
+                    <i class="fas fa-search"></i>
+                    <span class="search-label-txt">Search</span>
+                </button>
+
+                <!-- User Auth Area -->
+                {% if current_user.is_authenticated %}
+                <div class="user-profile-dropdown" id="userProfileDropdown">
+                    <button type="button" class="user-avatar-btn" id="userMenuBtn">
+                        <span class="user-avatar-circle">{{ current_user.avatar }}</span>
+                        <span class="user-name-label">{{ current_user.name.split()[0] }}</span>
+                        <i class="fas fa-chevron-down" style="font-size:0.7rem;"></i>
+                    </button>
+                    <div class="user-menu-popover" id="userMenuPopover">
+                        <div class="user-menu-header">
+                            <strong>{{ current_user.name }}</strong>
+                            <small>{{ current_user.email }}</small>
+                        </div>
+                        <hr style="border:none; border-top:1px solid var(--border-subtle); margin:8px 0;">
+                        <a href="{{ url_for('auth_logout') }}" class="user-menu-item logout">
+                            <i class="fas fa-sign-out-alt"></i> Sign Out
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <button type="button" class="auth-modal-btn" id="openAuthModalBtn" title="Sign In or Register">
+                    <i class="fas fa-user-circle"></i>
+                    <span class="auth-btn-txt">Sign In</span>
+                </button>
+                {% endif %}
+
+                <!-- Mobile Menu Button -->
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation">
                     <i class="fas fa-bars"></i>
                 </button>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <!-- Flash Messages -->
+    <!-- Global Instant Search Modal -->
+    <div class="search-modal-overlay" id="searchModalOverlay">
+        <div class="search-modal-box">
+            <div class="search-input-header">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchModalInput" class="search-modal-input" placeholder="Search articles, AI, quantum, tech topics..." autocomplete="off">
+                <button type="button" class="search-close-btn" id="searchCloseBtn" title="Close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="search-results-list" id="searchResultsList">
+                <div class="search-empty-hint">
+                    Type at least 2 characters to search articles...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Sign In / Register / Gmail Modal -->
+    <div class="auth-modal-overlay" id="authModalOverlay">
+        <div class="auth-modal-box">
+            <div class="auth-modal-header">
+                <div class="auth-brand-badge">
+                    <i class="fas fa-shield-halved"></i>
+                </div>
+                <h3>Welcome to ASI TECH</h3>
+                <p>Sign in with Gmail or create your developer account</p>
+                <button type="button" class="auth-modal-close" id="authModalCloseBtn"><i class="fas fa-times"></i></button>
+            </div>
+
+            <!-- Google One-Click OAuth Button -->
+            <div style="padding: 0 24px 14px;">
+                <button type="button" class="btn-google-auth" id="btnGoogleAuth">
+                    <svg width="18" height="18" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                    </svg>
+                    <span>Continue with Google / Gmail</span>
+                </button>
+
+                <div class="auth-divider">
+                    <span>or use email</span>
+                </div>
+            </div>
+
+            <!-- Tabs: Sign In / Register -->
+            <div class="auth-tabs-row">
+                <button type="button" class="auth-tab-btn active" id="tabSignInBtn">Sign In</button>
+                <button type="button" class="auth-tab-btn" id="tabRegisterBtn">Create Account</button>
+            </div>
+
+            <div class="auth-modal-body">
+                <div class="auth-feedback-msg" id="authFeedbackMsg"></div>
+
+                <!-- Sign In Form -->
+                <form id="signInForm" class="auth-form-content">
+                    <div class="input-field-group">
+                        <label><i class="fas fa-envelope"></i> Email Address</label>
+                        <input type="email" id="loginEmail" placeholder="yourname@gmail.com" required>
+                    </div>
+                    <div class="input-field-group">
+                        <label><i class="fas fa-lock"></i> Password</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn-primary-action auth-submit-btn" id="submitLoginBtn">
+                        <i class="fas fa-right-to-bracket"></i> Sign In
+                    </button>
+                </form>
+
+                <!-- Register Form -->
+                <form id="registerForm" class="auth-form-content" style="display:none;">
+                    <div class="input-field-group">
+                        <label><i class="fas fa-user"></i> Full Name</label>
+                        <input type="text" id="regName" placeholder="Alex Morgan" required>
+                    </div>
+                    <div class="input-field-group">
+                        <label><i class="fas fa-envelope"></i> Email Address</label>
+                        <input type="email" id="regEmail" placeholder="alex@gmail.com" required>
+                    </div>
+                    <div class="input-field-group">
+                        <label><i class="fas fa-lock"></i> Password (min. 6 chars)</label>
+                        <input type="password" id="regPassword" placeholder="Create strong password" required minlength="6">
+                    </div>
+                    <button type="submit" class="btn-primary-action auth-submit-btn" id="submitRegisterBtn">
+                        <i class="fas fa-user-plus"></i> Create Free Account
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flash Message Notification Center -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <div class="flash-container">
                 {% for category, message in messages %}
                     <div class="flash flash-{{ category }}">
-                        <i class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-circle{% endif %}"></i>
-                        {{ message }}
+                        <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'info' %}info-circle{% else %}exclamation-circle{% endif %}"></i>
+                        <span>{{ message }}</span>
                         <span class="flash-close" onclick="this.parentElement.remove()">&times;</span>
                     </div>
                 {% endfor %}
@@ -65,71 +260,226 @@
         {% endif %}
     {% endwith %}
 
-    <!-- Main Content -->
-    <main>
+    <!-- Main Page Content -->
+    <main class="main-page-wrapper">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-section">
-                <div class="footer-logo">
-                    <i class="fas fa-microchip"></i>
-                    <span>ASI TECH</span>
+    <!-- Modern Clean Footer -->
+    <footer class="footer-modern">
+        <div class="container">
+            <div class="footer-grid">
+                <!-- Col 1: Brand & Socials -->
+                <div class="footer-brand-col">
+                    <div class="logo">
+                        <div class="logo-badge">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="logo-text-wrap">
+                            <div class="logo-title">
+                                <span>ASI TECH</span>
+                                <span class="tech-tag">AI</span>
+                            </div>
+                            <span class="logo-sub">JOURNAL &amp; LABS</span>
+                        </div>
+                    </div>
+                    <p>Your premier destination for deep dives into Artificial Intelligence, Next-Gen Web, Space Exploration, and Cinematic Innovation.</p>
+                    <div class="footer-social-row">
+                        <a href="mailto:asitech5info@gmail.com" class="footer-social-btn" title="Email ASI TECH">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                        <a href="https://youtube.com/@howtech_works?si=gXvodLAXQ36FVHMZ" target="_blank" class="footer-social-btn" title="HOW TECH WORKS YouTube Channel">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
                 </div>
-                <p class="footer-desc">Your ultimate destination for technology, education, AI, science, and movie insights. Stay updated with the latest trends.</p>
-                <div class="social-links">
-                    <a href="mailto:asitech5info@gmail.com" class="social-link gmail" title="Gmail">
-                        <i class="fas fa-envelope"></i>
-                    </a>
-                    <a href="https://youtube.com/@howtech_works?si=gXvodLAXQ36FVHMZ" target="_blank" class="social-link youtube" title="HOW TECH WORKS">
-                        <i class="fab fa-youtube"></i>
-                    </a>
+
+                <!-- Col 2: Categories -->
+                <div class="footer-col">
+                    <h4>Categories</h4>
+                    <ul class="footer-link-list">
+                        <li><a href="{{ url_for('category_page', category='Artificial Intelligence') }}"><i class="fas fa-brain" style="color:var(--accent-violet);"></i> Artificial Intelligence</a></li>
+                        <li><a href="{{ url_for('category_page', category='Technology') }}"><i class="fas fa-laptop-code" style="color:var(--accent-cyan);"></i> Technology</a></li>
+                        <li><a href="{{ url_for('category_page', category='Science') }}"><i class="fas fa-atom" style="color:var(--accent-emerald);"></i> Science &amp; Space</a></li>
+                        <li><a href="{{ url_for('category_page', category='Education') }}"><i class="fas fa-graduation-cap" style="color:var(--accent-amber);"></i> Education &amp; Dev</a></li>
+                        <li><a href="{{ url_for('category_page', category='Movies') }}"><i class="fas fa-film" style="color:var(--accent-pink);"></i> Movies &amp; Cinema</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Navigation -->
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-link-list">
+                        <li><a href="{{ url_for('home') }}"><i class="fas fa-chevron-right"></i> Home Page</a></li>
+                        <li><a href="{{ url_for('search') }}"><i class="fas fa-chevron-right"></i> Search Archive</a></li>
+                        <li><a href="{{ url_for('contact') }}"><i class="fas fa-chevron-right"></i> Contact Us</a></li>
+                        <li><a href="javascript:void(0)" onclick="openPrivacyModal()"><i class="fas fa-shield-halved"></i> Privacy Policy</a></li>
+                    </ul>
                 </div>
             </div>
 
-            <div class="footer-section">
-                <h3>Categories</h3>
-                <ul class="footer-links">
-                    <li><a href="{{ url_for('category_page', category='Education') }}"><i class="fas fa-graduation-cap"></i> Education</a></li>
-                    <li><a href="{{ url_for('category_page', category='Technology') }}"><i class="fas fa-laptop-code"></i> Technology</a></li>
-                    <li><a href="{{ url_for('category_page', category='Artificial Intelligence') }}"><i class="fas fa-brain"></i> Artificial Intelligence</a></li>
-                    <li><a href="{{ url_for('category_page', category='Science') }}"><i class="fas fa-atom"></i> Science</a></li>
-                    <li><a href="{{ url_for('category_page', category='Movies') }}"><i class="fas fa-film"></i> Movies</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-section">
-                <h3>Quick Links</h3>
-                <ul class="footer-links">
-                    <li><a href="{{ url_for('home') }}"><i class="fas fa-home"></i> Home</a></li>
-                    <li><a href="{{ url_for('search') }}"><i class="fas fa-search"></i> Search</a></li>
-                    <li><a href="{{ url_for('contact') }}"><i class="fas fa-envelope"></i> Contact Us</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-section">
-                <h3>Contact Admin</h3>
-                <div class="contact-info">
-                    <p><i class="fas fa-envelope"></i> <a href="mailto:asitech5info@gmail.com">asitech5info@gmail.com</a></p>
-                    <p><i class="fab fa-youtube"></i> <a href="https://youtube.com/@howtech_works?si=gXvodLAXQ36FVHMZ" target="_blank">HOW TECH WORKS</a></p>
-                </div>
-                <div class="yt-promo">
-                    <a href="https://youtube.com/@howtech_works?si=gXvodLAXQ36FVHMZ" target="_blank" class="yt-btn">
-                        <i class="fab fa-youtube"></i>
-                        <span>HOW TECH WORKS</span>
-                    </a>
+            <!-- Bottom Copyright (No Admin links) -->
+            <div class="footer-bottom-row">
+                <p>&copy; {{ now_year }} <strong>ASI TECH</strong>. Engineered with precision for the global tech community.</p>
+                <div style="display:flex; gap:16px;">
+                    <a href="javascript:void(0)" onclick="openPrivacyModal()" style="color:var(--text-dim); font-size:0.82rem;">Privacy &amp; Terms</a>
                 </div>
             </div>
-        </div>
-
-        <div class="footer-bottom">
-            <p>&copy; 2024 ASI TECH. All rights reserved. | Built with <i class="fas fa-heart"></i> for tech enthusiasts</p>
         </div>
     </footer>
 
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <!-- ======================================================================
+         PRIVACY POLICY CONSENT POPUP BANNER & DIALOG MODAL
+         ====================================================================== -->
+    <div class="privacy-consent-bar" id="privacyConsentBar">
+        <div class="privacy-consent-content">
+            <div class="privacy-icon-box">
+                <i class="fas fa-cookie-bite"></i>
+            </div>
+            <div class="privacy-text-box">
+                <h4>Privacy &amp; Preferences</h4>
+                <p>We use analytical tokens to optimize tech insights and security. Read our <a href="javascript:void(0)" onclick="openPrivacyModal()">Privacy Policy</a>.</p>
+            </div>
+            <div class="privacy-actions-box">
+                <button type="button" class="btn-privacy-accept" id="btnAcceptPrivacy">
+                    <i class="fas fa-check"></i> Accept
+                </button>
+                <button type="button" class="btn-privacy-info" onclick="openPrivacyModal()">
+                    Details
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Full Modal -->
+    <div class="privacy-modal-overlay" id="privacyModalOverlay">
+        <div class="privacy-modal-box">
+            <div class="privacy-modal-header">
+                <h3><i class="fas fa-shield-halved" style="color:var(--accent-purple);"></i> ASI TECH Privacy Policy</h3>
+                <button type="button" class="privacy-close-btn" onclick="closePrivacyModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="privacy-modal-body">
+                <h4>1. Information We Collect</h4>
+                <p>ASI TECH collects minimal information required to deliver high-quality technical editorial services. When creating an account or signing in via Google/Gmail, we receive your name and email address to manage your profile and reviews.</p>
+
+                <h4>2. AI Assistant (ASI) Data Processing</h4>
+                <p>Interactions with our AI assistant <strong>ASI</strong> (powered by Gemini AI Engine) are processed in real-time to generate responses. Query history is not sold or shared with third parties.</p>
+
+                <h4>3. Cookies and Local Preferences</h4>
+                <p>We use local browser storage for your Day/Night theme choices, article claps/likes, and privacy consent status. You have complete control over this data through your browser settings.</p>
+
+                <h4>4. Data Protection &amp; Security</h4>
+                <p>We implement industry-standard cryptographic practices including salted password hashing and secure token transport to protect user credentials.</p>
+            </div>
+            <div class="privacy-modal-footer">
+                <button type="button" class="btn-primary-action" onclick="closePrivacyModal()" style="padding:10px 24px;">Understood</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================================================================
+         ASI AI CHATBOT (POWERED BY GEMINI ENGINE) ENTERPRISE SUITE
+         ====================================================================== -->
+    <div class="asi-ai-widget-wrapper" id="asiAiWidgetWrapper">
+        <!-- Floating Trigger Button -->
+        <button type="button" class="asi-ai-launcher" id="asiAiLauncher" onclick="toggleAsiChat()" aria-label="Open ASI AI Assistant" title="Open ASI AI Neural Assistant">
+            <div class="launcher-aura"></div>
+            <div class="launcher-icon-wrap">
+                <i class="fas fa-brain launcher-icon"></i>
+            </div>
+            <span class="launcher-badge">ASI AI</span>
+        </button>
+
+        <!-- Floating Chat Window -->
+        <div class="asi-chat-window" id="asiChatWindow" role="dialog" aria-label="ASI AI Assistant">
+            <!-- Window Header -->
+            <div class="asi-chat-header">
+                <div class="asi-bot-identity">
+                    <div class="asi-bot-avatar">
+                        <i class="fas fa-brain"></i>
+                        <span class="asi-online-pulse" title="System Active & Online"></span>
+                    </div>
+                    <div class="asi-bot-info">
+                        <div class="asi-bot-title-row">
+                            <h4>ASI Intelligence</h4>
+                            <span class="ai-model-badge">GEMINI CORE</span>
+                        </div>
+                        <span class="asi-bot-status"><i class="fas fa-circle status-dot"></i> Neural Engine Ready</span>
+                    </div>
+                </div>
+                <div class="asi-header-actions">
+                    <button type="button" class="asi-action-icon-btn" id="asiExpandChatBtn" title="Expand / Minimize Window" aria-label="Toggle Expand Window">
+                        <i class="fas fa-expand-alt" id="asiExpandIcon"></i>
+                    </button>
+                    <button type="button" class="asi-action-icon-btn" id="asiClearChatBtn" title="Clear Conversation" aria-label="Clear Conversation">
+                        <i class="fas fa-trash-can"></i>
+                    </button>
+                    <button type="button" class="asi-action-icon-btn" id="asiCloseChatBtn" onclick="toggleAsiChat()" title="Close Assistant" aria-label="Close Assistant">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Starter Prompts -->
+            <div class="asi-quick-prompts-container">
+                <div class="asi-prompts-label">Quick topics:</div>
+                <div class="asi-quick-prompts" id="asiQuickPrompts">
+                    <button type="button" class="asi-prompt-pill" data-prompt="Explain DeepSeek-R1 and test-time reasoning models">🧠 DeepSeek-R1</button>
+                    <button type="button" class="asi-prompt-pill" data-prompt="What is Quantum AI and how does it work?">⚛️ Quantum AI</button>
+                    <button type="button" class="asi-prompt-pill" data-prompt="Give me the 2026 AI Engineer Roadmap">🚀 AI Roadmap</button>
+                    <button type="button" class="asi-prompt-pill" data-prompt="Compare Rust vs Zig vs Mojo with code snippets">🦀 Rust vs Mojo</button>
+                    <button type="button" class="asi-prompt-pill" data-prompt="Explain 800V Solid-State EV battery breakthroughs">⚡ Solid-State EV</button>
+                    <button type="button" class="asi-prompt-pill" data-prompt="How does Sora generative cinema work?">🎬 Sora & Cinema</button>
+                </div>
+            </div>
+
+            <!-- Messages Stream Body -->
+            <div class="asi-chat-messages" id="asiChatMessages">
+                <div class="asi-message bot">
+                    <div class="asi-msg-avatar"><i class="fas fa-brain"></i></div>
+                    <div class="asi-msg-content">
+                        <div class="asi-msg-bubble">
+                            <p>👋 Hello! I am <strong>ASI</strong>, your enterprise AI research assistant powered by the Gemini engine.</p>
+                            <p>I specialize in <strong>Artificial Intelligence, Quantum Computing, Systems Engineering, Deep Tech, and Cinema VFX</strong>.</p>
+                            <p>Ask a question or select a topic above to begin!</p>
+                        </div>
+                        <div class="asi-msg-footer">
+                            <span class="asi-msg-time">Just now</span>
+                            <button type="button" class="asi-copy-msg-btn" onclick="copyBotMessage(this)" title="Copy response">
+                                <i class="fas fa-copy"></i> <span>Copy</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Typing Indicator -->
+            <div class="asi-typing-indicator" id="asiTypingIndicator" style="display:none;">
+                <div class="typing-bubble">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+                <span>ASI Neural Core is generating response...</span>
+            </div>
+
+            <!-- Chat Footer & Input Form -->
+            <div class="asi-chat-footer-wrap">
+                <form class="asi-chat-input-row" id="asiChatForm">
+                    <input type="text" id="asiChatInput" placeholder="Ask ASI about AI, Quantum, Code, Architectures..." autocomplete="off" maxlength="1000">
+                    <button type="submit" id="asiSendBtn" aria-label="Send message" title="Send (Enter)">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+                <div class="asi-disclaimer-row">
+                    <span>Powered by Gemini AI • Enterprise Intelligence</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Scripts with Cache Busting -->
+    <script src="{{ url_for('static', filename='js/script.js') }}?v=4.3"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgSys" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1c0f05" />
+      <stop offset="50%" stop-color="#2d1507" />
+      <stop offset="100%" stop-color="#070a12" />
+    </linearGradient>
+    <linearGradient id="sysGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f97316" />
+      <stop offset="50%" stop-color="#fbbf24" />
+      <stop offset="100%" stop-color="#ef4444" />
+    </linearGradient>
+    <filter id="sysGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="15" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bgSys)" />
+
+  <g transform="translate(680, 140)">
+    <circle cx="200" cy="180" r="150" fill="#f97316" opacity="0.12" filter="url(#sysGlow)" />
+    
+    <!-- Code Window -->
+    <rect x="20" y="40" width="360" height="260" rx="14" fill="rgba(15, 23, 42, 0.9)" stroke="#f97316" stroke-width="2" />
+    <text x="40" y="80" fill="#f97316" font-family="'JetBrains Mono', monospace" font-size="14">// Memory Safety without GC</text>
+    <text x="40" y="115" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="13">fn</text>
+    <text x="65" y="115" fill="#ffffff" font-family="'JetBrains Mono', monospace" font-size="13">execute_kernel&lt;'a&gt;(</text>
+    <text x="60" y="145" fill="#fed7aa" font-family="'JetBrains Mono', monospace" font-size="13">buf: &amp;'a mut [f32]</text>
+    <text x="40" y="175" fill="#ffffff" font-family="'JetBrains Mono', monospace" font-size="13">) -&gt; Result&lt;(), Err&gt; { ... }</text>
+    
+    <rect x="40" y="210" width="320" height="35" rx="8" fill="rgba(249, 115, 22, 0.15)" stroke="#f97316" stroke-width="1" />
+    <text x="200" y="233" fill="#fbbf24" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="bold" text-anchor="middle">RUST • ZIG • MOJO LLVM</text>
+  </g>
+
+  <g transform="translate(100, 150)">
+    <rect x="0" y="0" width="220" height="40" rx="20" fill="rgba(249, 115, 22, 0.18)" stroke="#f97316" stroke-width="1.5" />
+    <text x="110" y="25" fill="#fb923c" font-family="'Plus Jakarta Sans', sans-serif" font-size="14" font-weight="700" text-anchor="middle" letter-spacing="1.5">SYSTEMS &amp; PERFORMANCE</text>
+
+    <text x="0" y="105" fill="#ffffff" font-family="'Plus Jakarta Sans', sans-serif" font-size="42" font-weight="800">Rust vs Zig vs Mojo</text>
+    <text x="0" y="160" fill="url(#sysGrad)" font-family="'Plus Jakarta Sans', sans-serif" font-size="42" font-weight="800">Next-Gen Systems</text>
+    
+    <text x="0" y="225" fill="#94a3b8" font-family="'Inter', sans-serif" font-size="17">Zero-cost abstractions and GPU-accelerated computing.</text>
+
+    <g transform="translate(0, 275)">
+      <text x="0" y="0" fill="#f97316" font-family="'JetBrains Mono', monospace" font-size="14">● ARCHITECTURE</text>
+      <text x="160" y="0" fill="#64748b" font-family="'Inter', sans-serif" font-size="14">|  6 min read</text>
+    </g>
+  </g>
+</svg>
