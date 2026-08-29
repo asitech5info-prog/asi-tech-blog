@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgFold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#070a14" />
+      <stop offset="50%" stop-color="#0d1424" />
+      <stop offset="100%" stop-color="#03050a" />
+    </linearGradient>
+    <linearGradient id="foldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="40%" stop-color="#818cf8" />
+      <stop offset="80%" stop-color="#34d399" />
+      <stop offset="100%" stop-color="#a7f3d0" />
+    </linearGradient>
+    <filter id="glowFold" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="16" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgFold)" />
+
+  <!-- Grid -->
+  <g stroke="rgba(56,189,248,0.04)" stroke-width="1">
+    <line x1="0" y1="150" x2="1200" y2="150" />
+    <line x1="0" y1="300" x2="1200" y2="300" />
+    <line x1="0" y1="450" x2="1200" y2="450" />
+    <line x1="300" y1="0" x2="300" y2="630" />
+    <line x1="600" y1="0" x2="600" y2="630" />
+    <line x1="900" y1="0" x2="900" y2="630" />
+  </g>
+
+  <!-- Right Visual: Tri-Fold Screen 3-Panel Isometric Projection -->
+  <g transform="translate(680, 110)">
+    <circle cx="220" cy="200" r="180" fill="#38bdf8" opacity="0.1" filter="url(#glowFold)" />
+
+    <!-- Panel 1 (Left Fold) -->
+    <path d="M 40 100 L 130 50 L 130 330 L 40 380 Z" fill="#1e293b" stroke="#38bdf8" stroke-width="2" />
+    <text x="85" y="220" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="bold" text-anchor="middle" transform="rotate(-15, 85, 220)">PANEL 1</text>
+
+    <!-- Hinge 1 Line -->
+    <line x1="130" y1="50" x2="130" y2="330" stroke="#818cf8" stroke-width="4" stroke-dasharray="4 2" />
+
+    <!-- Panel 2 (Center Main) -->
+    <path d="M 130 50 L 290 50 L 290 330 L 130 330 Z" fill="#0f172a" stroke="#818cf8" stroke-width="2.5" />
+    <text x="210" y="180" fill="#ffffff" font-family="'Plus Jakarta Sans', sans-serif" font-size="14" font-weight="800" text-anchor="middle">10.2" FLEXIBLE</text>
+    <text x="210" y="205" fill="#34d399" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="bold" text-anchor="middle">DYNAMIC AMOLED 2X</text>
+    <text x="210" y="230" fill="#94a3b8" font-family="'Inter', sans-serif" font-size="11" text-anchor="middle">UTG 3.0 Zero Crease</text>
+
+    <!-- Hinge 2 Line -->
+    <line x1="290" y1="50" x2="290" y2="330" stroke="#818cf8" stroke-width="4" stroke-dasharray="4 2" />
+
+    <!-- Panel 3 (Right Fold) -->
+    <path d="M 290 50 L 380 100 L 380 380 L 290 330 Z" fill="#1e293b" stroke="#34d399" stroke-width="2" />
+    <text x="335" y="220" fill="#34d399" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="bold" text-anchor="middle" transform="rotate(15, 335, 220)">PANEL 3</text>
+
+    <!-- Specs Callouts Bottom -->
+    <rect x="50" y="370" width="330" height="40" rx="12" fill="rgba(15,23,42,0.9)" stroke="#38bdf8" stroke-width="1.2" />
+    <text x="215" y="395" fill="#bae6fd" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="600" text-anchor="middle">🔄 DUAL WATERDROP HINGE • 500,000 FOLDS</text>
+  </g>
+
+  <!-- Left Content Info -->
+  <g transform="translate(100, 140)">
+    <!-- Badge -->
+    <rect x="0" y="0" width="240" height="38" rx="19" fill="rgba(56, 189, 248, 0.12)" stroke="#38bdf8" stroke-width="1.5" />
+    <text x="120" y="24" fill="#38bdf8" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="700" text-anchor="middle" letter-spacing="1.5">SAMSUNG DISPLAY LABS</text>
+
+    <!-- Main Title -->
+    <text x="0" y="95" fill="#ffffff" font-family="'Plus Jakarta Sans', sans-serif" font-size="44" font-weight="800">Samsung Tri-Fold &amp;</text>
+    <text x="0" y="150" fill="url(#foldGrad)" font-family="'Plus Jakarta Sans', sans-serif" font-size="44" font-weight="800">Flexible Display Tech</text>
+    
+    <!-- Description -->
+    <text x="0" y="215" fill="#94a3b8" font-family="'Inter', sans-serif" font-size="17">Dual-hinge mechanics, Ultra-Thin Glass (UTG) &amp; multi-screen productivity.</text>
+
+    <!-- Metadata -->
+    <g transform="translate(0, 275)">
+      <text x="0" y="0" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="14" font-weight="bold">● SAMSUNG HARDWARE</text>
+      <text x="220" y="0" fill="#64748b" font-family="'Inter', sans-serif" font-size="14">|  4 min read</text>
+      <text x="330" y="0" fill="#34d399" font-family="'Inter', sans-serif" font-size="14">|  DISPLAY TECH</text>
+    </g>
+  </g>
+</svg>

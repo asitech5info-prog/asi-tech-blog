@@ -229,7 +229,7 @@ def init_db():
         
         count = cursor.execute("SELECT COUNT(*) FROM blogs").fetchone()[0]
         has_empty_eli5 = cursor.execute("SELECT COUNT(*) FROM blogs WHERE eli5_content IS NULL OR eli5_content = ''").fetchone()[0]
-        if count < 10 or has_empty_eli5 > 0:
+        if count < 19 or has_empty_eli5 > 0:
             seed_rich_blogs(db)
 
 def generate_eli5_fallback(title, content):
@@ -783,6 +783,381 @@ Instead of asking one single AI to do everything, Multi-Agent systems work like 
 Routine computer tasks, bug fixes, data analysis, and scheduling can run automatically in the background while you sleep!
 
 > "One AI is a smart helper. A swarm of AI agents is a full-fledged company working together to finish big projects." """
+        },
+        {
+            "title": "Apple Intelligence, M4 Max & M5 Silicon: The On-Device Privacy & Unified Memory Breakthrough",
+            "slug": "apple-intelligence-m4-chips-unified-memory-architecture",
+            "title_image": "cover_apple_intelligence.svg",
+            "category": "Technology",
+            "author": "ASI TECH",
+            "tags": "Apple, Apple Intelligence, M4 Max, Apple Silicon, Privacy, Neural Engine, macOS",
+            "read_time": 6,
+            "is_featured": 1,
+            "likes": 89,
+            "views": 610,
+            "content": """Apple's transition from traditional cloud-dependent assistants to on-device neural processing represents a watershed moment for consumer AI and hardware architecture.
+
+# 1. 3nm Apple Silicon & The Unified Memory Advantage
+Traditional PCs separate CPU system memory from discrete GPU VRAM, requiring slow PCIe bus transfers when loading multi-gigabyte neural weights. Apple's M4, M4 Pro, and M4 Max architecture shatters this bottleneck:
+
+- **Up to 546 GB/s Memory Bandwidth:** Enabling instantaneous context switching and high-throughput token generation for 3B and 7B parameter models.
+- **Unified Memory Architecture (UMA):** CPU, GPU, and the 16-core Neural Engine share a single zero-copy memory pool up to 128GB on laptops.
+- **Dynamic Caching:** Hardware allocates local memory dynamically in real-time based on exact shader demands, dramatically improving GPU utilization.
+
+> "By removing the PCIe transfer overhead, Apple Silicon can run quantized 70B parameter models locally on high-end configurations that would otherwise require multiple server-grade enterprise GPUs."
+
+# 2. Apple Intelligence: Dual-Tier Architecture & Private Cloud Compute
+Apple Intelligence introduces an elegant split-inference framework:
+
+### 1. On-Device Foundation Models
+- **3-Billion Parameter On-Device Model:** Quantized with 3.5-bit precision using mixed 2-bit/4-bit palletization, fitting comfortably in ~1.8GB of RAM with zero noticeable battery drain.
+- **Adapter LoRA Fine-Tuning:** Dynamic adapter modules swap weights in milliseconds depending on whether the user is summarizing an email, composing text, or generating Genmoji.
+
+### 2. Private Cloud Compute (PCC)
+For complex multi-step reasoning, queries route to Private Cloud Compute nodes built entirely on custom Apple Silicon servers running a stripped-down, cryptographically verifiable OS.
+
+! Private Cloud Compute enforces non-targetable hardware security: customer data is never retained, logs are cryptographically sealed, and independent security researchers can inspect and verify every server build.
+
+# 3. The Semantic Index & App Intents
+Through the macOS and iOS Semantic Index, Apple Intelligence analyzes personal context across Messages, Calendar, Photos, and Notes without sending any private telemetry off the device.""",
+            "eli5_content": """# 👶 Explain Like I'm 5: Apple Intelligence & M4 Chips
+
+### 🎈 The Kid-Friendly Analogy: A Personal Genius Inside a Titanium Vault
+- **Old Cloud AI:** Like shouting your diary secrets across the playground to a helper standing far away, hoping nobody eavesdrops on the way.
+- **Apple Intelligence:** Like having a super-smart robot assistant living directly **inside your pocket**. It has its own private study desk (the Neural Engine) and keeps your secrets locked inside an unbreakable titanium vault. If it ever needs to ask a giant supercomputer for help, it encrypts the question in invisible ink that vanishes the second the answer is solved!
+
+---
+
+### 💡 3 Key Things to Understand
+- **1. Zero-Copy Unified Memory:** The brain (CPU), the artist (GPU), and the AI chip (Neural Engine) share one giant snack table of RAM so they never waste time passing bowls back and forth.
+- **2. Total Privacy Guarantee:** Your photos, emails, and private text messages are processed right on your phone without ever being sent to big data centers or saved by tech companies.
+- **3. Adapters on the Fly:** The AI changes hats instantly—one second it's a grammar teacher, the next second it's an artist drawing custom emojis!
+
+---
+
+### 🚀 Why This Matters to You
+Your phone and laptop can organize your day, rewrite notes, and find lost photos in seconds—without your private data ever leaving your hands!
+
+> "Apple Intelligence puts an AI lab in your pocket while locking the door against anyone trying to snoop on your data." """
+        },
+        {
+            "title": "Samsung Galaxy S25 Ultra & Galaxy AI 2.0: Inside the Multimodal Mobile AI War",
+            "slug": "samsung-galaxy-s25-ultra-galaxy-ai-breakthroughs",
+            "title_image": "cover_samsung_galaxy_ai.svg",
+            "category": "Technology",
+            "author": "ASI TECH",
+            "tags": "Samsung, Galaxy S25, Galaxy AI, Snapdragon 8 Elite, Android, ISOCELL, NPU",
+            "read_time": 5,
+            "is_featured": 1,
+            "likes": 81,
+            "views": 570,
+            "content": """The launch of the Samsung Galaxy S25 Ultra powered by Qualcomm's Snapdragon 8 Elite marks an aggressive leap into multimodal on-device agency and next-generation mobile silicon.
+
+# 1. Snapdragon 8 Elite & Oryon CPU Microarchitecture
+Samsung's flagship departs from standard ARM big.LITTLE clusters, utilizing custom Qualcomm Oryon cores built on TSMC's 3nm N3E node:
+
+- **Dual Prime Cores @ 4.32 GHz:** Delivering desktop-class single-thread execution speeds with 24MB total L2 cache.
+- **Hexagon Neural Processing Unit (NPU):** 45% faster AI throughput, handling multi-token speculation and real-time on-device audio transcription.
+- **Adreno 830 GPU:** Featuring sliced architecture with dedicated command processors and hardware-accelerated Nanite mesh shading.
+
+> "The Galaxy S25 Ultra closes the raw performance gap with custom silicon, delivering unthrottled continuous compute under heavy gaming and local AI workloads."
+
+# 2. Galaxy AI 2.0: Cross-App Agents & Multimodal Context
+Galaxy AI expands beyond basic photo erasing into proactive multimodal operating system workflows:
+
+### Now Briefing & Smart Context
+- Aggregates real-time notifications, flight status, transit delays, and calendar events into personalized contextual summaries.
+- Analyzes on-screen video content dynamically to extract action items, calendar bookings, and shopping sources with a single stylus gesture.
+
+### Live Call Translation & AI Voice Isolation
+- Bi-directional neural voice translation running locally at 16kHz across 20+ languages with zero audio delay.
+- Deep neural filtering isolates vocal harmonics from wind, cafe chatter, and traffic noise.
+
+# 3. 200MP ISOCELL & ProVisual AI Neural Engine
+Samsung integrates deep neural ISP pipelines directly with the 200MP HP2 sensor:
+- **AI Deep Learning Deblur:** Eliminates hand jitter in low-light zoom shots.
+- **Quad Tele System:** Optical-grade stabilization across 3x, 5x, and 10x periscope focal lengths using generative detail synthesis.
+
+! With Knox Matrix and decentralized blockchain credential verification, Galaxy devices sync biometric encryption keys peer-to-peer across watches, TVs, and tablets safely.""",
+            "eli5_content": """# 👶 Explain Like I'm 5: Samsung Galaxy S25 Ultra & Galaxy AI
+
+### 🎈 The Kid-Friendly Analogy: The Pocket Universal Translator & Magic Camera
+- Imagine traveling to a foreign country where you don't speak the language.
+- With **Galaxy AI 2.0**, you call a local restaurant on your phone, speak in English, and the phone automatically speaks fluent French or Japanese to the waiter, while translating their response back into your ear in real-time!
+
+---
+
+### 💡 3 Key Things to Understand
+- **1. Supercharged Snapdragon 8 Elite Engine:** A high-speed chip that runs games and apps without ever getting hot or stuttering.
+- **2. ProVisual Magic Camera:** Even if your hands shake while taking a photo of the moon or a soccer player far away, the 200-megapixel AI camera sharpens the picture crystal clear.
+- **3. Knox Matrix Shield:** Protects your passwords and thumbprints across your phone, tablet, and smart TV so hackers cannot break in.
+
+---
+
+### 🚀 Why This Matters to You
+You get movie-grade photos, instant multi-language translation, and a super-fast battery that lasts all day!
+
+> "Galaxy S25 Ultra turns your smartphone into a multilingual translator, pro movie camera, and pocket supercomputer all in one." """
+        },
+        {
+            "title": "Apple Vision Pro & Spatial Computing: Micro-OLEDs, visionOS & Spatial Audio Telepresence",
+            "slug": "apple-vision-pro-spatial-computing-visionos-future",
+            "title_image": "cover_apple_vision_pro.svg",
+            "category": "Technology",
+            "author": "ASI TECH",
+            "tags": "Apple, Vision Pro, Spatial Computing, visionOS, Micro-OLED, R1 Chip, AR",
+            "read_time": 5,
+            "is_featured": 0,
+            "likes": 74,
+            "views": 510,
+            "content": """Spatial computing represents the next foundational human-computer interface after the command line, graphical desktop, and smartphone touchscreen.
+
+# 1. Display Optics & The 23-Million Pixel Array
+The core visual magic of the Apple Vision Pro lies in its custom display pipeline:
+
+- **Twin 4K Micro-OLED Displays:** Packing 23 million pixels across two postage-stamp sized silicon backplanes—rendering more pixels per eye than a 4K TV.
+- **Custom Three-Element Catadioptric Lenses:** Delivering edge-to-edge sharpness with zero chromatic aberration.
+- **Dynamic Foveated Rendering:** High-speed infrared cameras track eye gaze at 90Hz, rendering maximum pixel detail only where the fovea looks while reducing peripheral rendering load.
+
+> "Spatial computing frees digital windows from physical display bezels, allowing users to arrange infinite workspaces in 3D physical space."
+
+# 2. Dual-Chip Silicon Architecture: M2 + R1
+To eliminate motion sickness and achieve instantaneous visual pass-through:
+- **Apple M2:** Handles visionOS compute, physics simulation, spatial audio acoustics, and application execution.
+- **Apple R1 Sensor Sub-Processor:** Processes feeds from 12 cameras, 5 sensors, and 6 microphones with a groundbreaking **12-millisecond latency**—8x faster than the blink of an eye.
+
+# 3. Spatial Audio Ray Tracing & Volumetric Apps
+visionOS maps the physical geometry and acoustic materials of the room using LiDAR and TrueDepth sensors, bouncing virtual sound waves off real walls for photorealistic acoustic telepresence.
+
+! Developing for visionOS with SwiftUI and RealityKit unlocks volumetric 3D models, immersive portal rendering, and collaborative spatial FaceTime sessions.""",
+            "eli5_content": """# 👶 Explain Like I'm 5: Apple Vision Pro & Spatial Computing
+
+### 🎈 The Kid-Friendly Analogy: Turning Your Living Room into a Holodeck
+- When you look at an iPad or TV, your video games and movies are trapped inside a glass rectangle box.
+- **Spatial Computing** removes the glass box completely! You put on lightweight glasses, and your living room wall transforms into a giant 100-foot IMAX cinema screen, while 3D dinosaurs and floating computer monitors hover naturally in the air right next to your sofa!
+
+---
+
+### 💡 3 Key Things to Understand
+- **1. Microscopic 4K Screens:** Each tiny lens in front of your eyes has more pixels than a giant living-room 4K TV, so text looks as crisp as a printed book.
+- **2. Controlled by Eyes and Fingers:** You just look at a button and gently pinch your thumb and index finger together—no bulky plastic game controllers needed!
+- **3. 12-Millisecond R1 Speed:** What you see matches reality in 0.012 seconds, so your brain feels 100% natural without any dizzy feelings.
+
+---
+
+### 🚀 Why This Matters to You
+You can watch 3D movies, build 3D models with friends across the globe, and have infinite computer screens wherever you sit!
+
+> "Spatial computing turns any room into an infinite workspace and 3D movie theater controlled simply by your eyes and fingers." """
+        },
+        {
+            "title": "Samsung Tri-Fold & Flexible AMOLED Tech: The Next Decade of Foldable Engineering",
+            "slug": "samsung-trifold-foldable-displays-utg-engineering",
+            "title_image": "cover_samsung_foldable_tech.svg",
+            "category": "Technology",
+            "author": "ASI TECH",
+            "tags": "Samsung, Foldables, Tri-Fold, AMOLED, Display Tech, Ultra Thin Glass, Hardware",
+            "read_time": 5,
+            "is_featured": 0,
+            "likes": 69,
+            "views": 470,
+            "content": """Foldable displays have evolved from experimental novelty to mainstream durable flagships. Samsung's multi-fold and Tri-Fold engineering push flexible screen physics to new frontiers.
+
+# 1. The Physics of Flexible OLED & UTG 3.0
+Creating a display that can flex hundreds of thousands of times requires advanced materials science:
+
+- **Ultra-Thin Glass (UTG):** Processed at thicknesses under 30 microns, flexible glass combines the scratch resistance and visual clarity of glass with polymer flexibility.
+- **CoE (Color on Encapsulation) Polarizer-Free Layers:** Eliminates traditional thick polarizing films, boosting display brightness by 20% while reducing power consumption by 25%.
+- **Shock-Absorbing Elastic Under-Layers:** Disperses external kinetic impacts and drops across the entire surface area.
+
+> "A tri-folding device bridges the form factor gap: compact 6.5-inch phone in your pocket that unfolds into a full 10.2-inch productivity workstation."
+
+# 2. Dual Waterdrop Hinge Mechanics
+The mechanical heart of a Tri-Fold device is its synchronized dual-hinge system:
+- **Zero-Gap Teardrop Radii:** Gently curves the display into a teardrop shape when closed, minimizing mechanical strain at the crease fold lines.
+- **Armor Aluminum & Titanium Housings:** Protects internal gears against micro-dust and particle ingress with IP48 sweeper bristles.
+- **500,000 Fold Durability Rating:** Validated for over 10 years of intensive daily opening and closing cycles.
+
+# 3. One UI Multi-Window Continuity
+Software adaptation is vital for asymmetric and tri-folding screens:
+- Seamless app continuity transitions from single-screen to dual-pane and triple-column multitasking.
+- Split keyboard configurations and integrated S-Pen digitizers turn the unfolded canvas into a mobile digital drafting studio.
+
+! Flexible display innovations will soon power rollable laptops, wearable wrist screens, and smart automotive panoramic cockpits.""",
+            "eli5_content": """# 👶 Explain Like I'm 5: Samsung Tri-Fold & Flexible Displays
+
+### 🎈 The Kid-Friendly Analogy: The Origami Transformer Phone
+- Think of normal phones like a stiff wooden postcard that never bends.
+- **Samsung Tri-Fold:** Like a high-tech origami comic book made of bendable glass! You can fold it once to check a quick text message, or unfold it twice to reveal a giant 10-inch movie tablet for watching videos or drawing!
+
+---
+
+### 💡 3 Key Things to Understand
+- **1. Flexible Glass (UTG):** It uses glass that is thinner than a strand of hair, so it can bend like rubber without shattering.
+- **2. Waterdrop Hinges:** Hidden gears fold the screen gently so it leaves zero creases when you open it up flat.
+- **3. Triple-Screen Multitasking:** You can run YouTube on one panel, take notes on the second panel, and chat with friends on the third panel at the exact same time!
+
+---
+
+### 🚀 Why This Matters to You
+You get a slim phone that fits in your small pocket, but expands into a full tablet whenever you want to work or play!
+
+> "Fold it into a pocket phone; unfold it into a giant tablet. It's the ultimate transformer gadget!" """
+        },
+        {
+            "title": "NVIDIA Blackwell GB200 NVL72: Architecture of Exascale AI Supercomputing",
+            "slug": "nvidia-blackwell-gb200-exascale-ai-supercomputing",
+            "title_image": "cover_nvidia_blackwell.svg",
+            "category": "Technology",
+            "author": "ASI TECH",
+            "tags": "NVIDIA, Blackwell, GB200, AI Hardware, GPUs, Supercomputing, NVLink",
+            "read_time": 6,
+            "is_featured": 1,
+            "likes": 95,
+            "views": 680,
+            "content": """NVIDIA's Blackwell architecture marks the transition from single-board accelerator cards to integrated rack-scale exascale supercomputers engineered for trillion-parameter AI models.
+
+# 1. Dual-Die 208-Billion Transistor Silicon
+Manufactured on TSMC's custom 4NP node, Blackwell connects two maximum reticle-size dies into a unified single GPU:
+
+- **10 TB/s NVLink-C2C Interconnect:** Die-to-die bandwidth that is 5x faster than PCIe Gen 5, functioning as a single coherent silicon processor with zero software latency.
+- **192 GB HBM3e Memory:** Delivering 8.0 TB/s memory bandwidth to feed hungry matrix multipliers without cache starvation.
+- **2nd-Generation Transformer Engine:** Supports micro-tensor **FP4 precision**, doubling throughput and halving memory footprint compared to Hopper FP8.
+
+> "Blackwell GB200 NVL72 delivers a 30x inference speedup over the previous H100 generation for trillion-parameter reasoning models while slashing energy costs by 25x."
+
+# 2. NVL72: The Rack-Scale Supercomputer
+Rather than selling standalone PCIe cards, the flagship Blackwell configuration is the **GB200 NVL72**:
+- Connects 36 Grace CPUs and 72 Blackwell GPUs in a single liquid-cooled rack.
+- Features **130 TB/s aggregate NVLink bandwidth** through copper spine backplanes, allowing all 72 GPUs to address a unified 13.5 TB high-speed memory space as a single gigantic GPU.
+- **Direct-to-Chip Liquid Cooling:** Dissipates 120kW per rack using specialized Coolant Distribution Units (CDUs) without noisy server fans.
+
+# 3. Decompression & Cryptography Engines
+Dedicated on-chip hardware decompression engines speed up Apache Spark SQL queries and vector database embeddings by 18x, unlocking real-time Graph RAG pipelines.
+
+! The exascale compute density of Blackwell enables training frontier reasoning models with hundreds of billions of reinforcement learning parameters in weeks instead of years.""",
+            "eli5_content": """# 👶 Explain Like I'm 5: NVIDIA Blackwell & AI Supercomputers
+
+### 🎈 The Kid-Friendly Analogy: 72 Race Cars Hooked Up into One Mega Monster Truck
+- **Normal Computers:** Like a single bicycle trying to move a giant mountain of homework.
+- **NVIDIA Blackwell NVL72:** Like taking **72 supersonic race cars**, bolting them together with ultra-fast gold pipes, and cooling them with liquid ice water. They work together as one colossal brain that can read the entire internet in seconds!
+
+---
+
+### 💡 3 Key Things to Understand
+- **1. 208 Billion Microscopic Switches:** Built with transistors smaller than a virus, all packed onto one super-chip.
+- **2. FP4 Math Trick:** It uses clever mathematical shortcuts that make calculations twice as fast while using 25x less electricity!
+- **3. Liquid-Cooled Radiator:** Instead of noisy fan blades, special chilled liquid flows right over the silicon to keep it super frosty.
+
+---
+
+### 🚀 Why This Matters to You
+This supercomputer powers future AI helpers that can invent clean green energy formulas, cure diseases, and generate entire video games in real-time!
+
+> "Blackwell connects 72 super-chips into one giant liquid-cooled brain to train the world's smartest AI systems." """
+        },
+        {
+            "title": "Humanoid Robotics & Embodied AI: Tesla Optimus Gen 2 vs Boston Dynamics Atlas",
+            "slug": "humanoid-robotics-embodied-ai-optimus-atlas",
+            "title_image": "cover_humanoid_robotics.svg",
+            "category": "Technology",
+            "author": "ASI TECH",
+            "tags": "Robotics, Humanoid, Embodied AI, Tesla Optimus, Boston Dynamics, Actuators, AI",
+            "read_time": 5,
+            "is_featured": 0,
+            "likes": 77,
+            "views": 530,
+            "content": """Robotics is witnessing a profound shift from pre-programmed industrial arms to autonomous bipedal humanoid robots driven by end-to-end Vision-Language-Action (VLA) neural networks.
+
+# 1. The Actuator & Mechanics Showdown
+Humanoid robots require an unprecedented balance of torque density, low latency, and energy efficiency:
+
+### Tesla Optimus Gen 2
+- **Custom Electric Actuators:** Integrates custom planetary and harmonic drive electric motors with integrated load cells and positional encoders.
+- **11-Degree-of-Freedom Hands:** Tactile sensor fingertips capable of manipulating delicate eggs and heavy automotive battery packs.
+- **Weight Optimization:** Reduced structural mass by 10kg with articulated 2-DOF neck and foot force sensors.
+
+### Boston Dynamics New Atlas
+- **All-Electric High-Torque Swiveling Joints:** Replaces legacy hydraulic pumps with compact, ultra-powerful 360-degree rotating electric actuators.
+- **Superhuman Kinematic Reach:** Atlas can spin its torso and limbs 360 degrees, picking up objects behind its back without turning its feet.
+
+> "Humanoid form factors allow robots to operate directly within human-designed factories, kitchens, and stairs without redesigning infrastructure."
+
+# 2. Embodied AI: Vision-to-Action Foundation Models
+The real intelligence breakthrough is neural control:
+- **Zero Hardcoded Paths:** The robot takes multi-camera video input and outputs direct torque motor commands via end-to-end transformers.
+- **Teleoperation Reinforcement Learning:** Human operators train complex dexterous tasks using VR rigs; models generalize behaviors across diverse objects and friction levels.
+- **Spatial Occupancy Grids:** Real-time visual SLAM calculates moving human trajectories to guarantee safe collaboration on factory floors.
+
+! Automotive assembly lines and warehouse logistics hubs will begin deploying thousands of humanoid units over the next 24 months.""",
+            "eli5_content": """# 👶 Explain Like I'm 5: Humanoid Robots & Embodied AI
+
+### 🎈 The Kid-Friendly Analogy: Giving AI a Body with Legs, Eyes, and Gentle Hands
+- **ChatGPT / Chatbots:** Like a brain in a jar that can only write text messages.
+- **Humanoid Robots (Optimus & Atlas):** Like giving that smart brain a real pair of legs, arms, and sensitive fingers so it can walk up stairs, carry heavy boxes, sort laundry, and hand you an egg without cracking the shell!
+
+---
+
+### 💡 3 Key Things to Understand
+- **1. Sees with Cameras:** It uses cameras for eyes and calculates 3D space around it so it never bumps into people or furniture.
+- **2. 11-Finger Dexterity:** Tactile fingertip sensors let it feel how soft or slippery an object is before picking it up.
+- **3. Learns by Watching:** Instead of writing millions of lines of code, engineers teach it new chores simply by demonstrating them in virtual reality!
+
+---
+
+### 🚀 Why This Matters to You
+Humanoid robots will soon handle dangerous factory jobs, carry heavy groceries, and help elderly people around the house!
+
+> "Embodied AI takes the brain of AI and puts it into helpful robot hands and feet to do physical work safely." """
+        },
+        {
+            "title": "Wi-Fi 7 & 6G Terahertz Networks: Sub-Millisecond Latency & 40Gbps Wireless Bandwidth",
+            "slug": "wifi-7-and-6g-terahertz-wireless-networks",
+            "title_image": "cover_wifi7_6g_wireless.svg",
+            "category": "Technology",
+            "author": "ASI TECH",
+            "tags": "Wi-Fi 7, 6G, Wireless, Networking, Telecommunications, Speed, 4096-QAM",
+            "read_time": 4,
+            "is_featured": 0,
+            "likes": 63,
+            "views": 450,
+            "content": """Wireless connectivity is undergoing its biggest structural evolution in two decades with the simultaneous deployment of Wi-Fi 7 (802.11be) and 6G Sub-Terahertz research.
+
+# 1. The Core Innovations of Wi-Fi 7 (802.11be)
+Wi-Fi 7 delivers up to **46 Gbps theoretical peak throughput**—nearly 5x faster than Wi-Fi 6E:
+
+- **320 MHz Ultra-Wide Channels:** Doubling channel bandwidth in the 6 GHz frequency band for zero interference and ultra-high data density.
+- **4096-QAM (4K-QAM) Modulation:** Packing 12 bits per symbol (a 20% transmission rate improvement over Wi-Fi 6's 1024-QAM).
+- **Multi-Link Operation (MLO):** Devices can aggregate multiple frequency bands (2.4 GHz, 5 GHz, and 6 GHz) simultaneously. If one channel suffers interference, packets route dynamically over the alternative band with zero packet drop.
+
+> "Multi-Link Operation drops wireless latency to under 5 milliseconds, enabling deterministic wireless gaming, cloud computing, and real-time AR telepresence."
+
+# 2. 6G Terahertz & Sub-Millimeter Wave Horizons
+Looking forward to 2030 and beyond, 6G networks operate in the 100 GHz to 3 THz frequency spectrum:
+- **100 Gbps to 1 Tbps Mobile Bandwidth:** Transmitting holographic video streams wirelessly in real-time.
+- **Sub-Millisecond Edge Latency:** Critical for synchronized swarm robotics and autonomous vehicle V2X collision avoidance.
+- **Joint Communications and Sensing (JCAS):** 6G base stations double as high-resolution radar sensors, mapping weather, obstacle trajectories, and gestures.
+
+! Wi-Fi 7 routers and client devices from Apple, Samsung, Qualcomm, and Intel are officially available worldwide today.""",
+            "eli5_content": """# 👶 Explain Like I'm 5: Wi-Fi 7 & 6G Wireless
+
+### 🎈 The Kid-Friendly Analogy: Turning a 1-Lane Dirt Road into a 16-Lane Super-Highway
+- **Old Wi-Fi:** Like a narrow single-lane road. If your brother is downloading a giant game and your parents are streaming 4K movies, your video call stutters and freezes.
+- **Wi-Fi 7 (Multi-Link):** Like a **16-lane super-highway** where your device can drive on the 2.4GHz, 5GHz, and 6GHz lanes all at the exact same millisecond! If one lane gets crowded, your stream instantly zips over to the empty lane without a single hiccup!
+
+---
+
+### 💡 3 Key Things to Understand
+- **1. Download a Movie in 2 Seconds:** Wi-Fi 7 delivers speeds up to 46 gigabits per second.
+- **2. Zero Lag for Online Gaming:** Drops delay down to practically zero, so online multiplayer games feel instantaneous.
+- **3. 6G Terahertz Radar:** Future 6G antennas will transmit holographic 3D calls and even sense weather and moving obstacles like radar!
+
+---
+
+### 🚀 Why This Matters to You
+No more spinning loading wheels, no dropped video calls, and instant ultra-fast downloads everywhere in your house!
+
+> "Wi-Fi 7 links all wireless channels together at once so you never experience lag or buffering again." """
         }
     ]
 
@@ -798,13 +1173,17 @@ Routine computer tasks, bug fixes, data analysis, and scheduling can run automat
         (1, "Elena Rostova", "elena@quantum.io", 5, "The explanation of test-time compute scaling is spot on. Fantastic writeup!"),
         (2, "Marcus Vance", "marcus@mit.edu", 5, "The hybrid Quantum-Classical pipeline breakdown is the clearest I've read all year."),
         (3, "Dr. Kenneth Wong", "kwong@ev-tech.de", 5, "Solid-state electrolyte safety combined with 800V charging will accelerate EV adoption tenfold."),
-        (5, "Chris Anderson", "chris@systems-dev.com", 5, "Rust for safe backends and Mojo for AI kernels is the exact combination we are adopting at our startup.")
+        (5, "Chris Anderson", "chris@systems-dev.com", 5, "Rust for safe backends and Mojo for AI kernels is the exact combination we are adopting at our startup."),
+        (10, "Tim Cooksey", "tcooksey@silicon-insights.com", 5, "The unified memory 546 GB/s breakdown explains exactly why M4 Max runs local LLMs so effortlessly."),
+        (11, "Jae-hyun Park", "jpark@seoul-tech.kr", 5, "Snapdragon 8 Elite's Oryon CPU paired with Galaxy AI 2.0 multimodal agents is a true iPhone rival."),
+        (12, "Rachel Sterling", "rachel@spatial-vr.io", 5, "12ms R1 latency is why Vision Pro feels so natural. Best breakdown of foveated rendering!"),
+        (14, "Jensen Liu", "jensen@deeplearning-hub.com", 5, "Blackwell GB200 NVL72 with FP4 precision and liquid CDUs changes datacenter economics completely.")
     ]
     for r in sample_reviews:
         db.execute(
             """INSERT INTO reviews (blog_id, name, email, rating, comment)
                VALUES (?, ?, ?, ?, ?)""",
-            r
+            (r[0], r[1], r[2], r[3], r[4])
         )
     db.commit()
 
@@ -830,106 +1209,275 @@ CATEGORY_CONFIG = {
 }
 
 # ==============================================================================
-# ASI AI CHATBOT LOGIC (GEMINI ENGINE)
+# ASI AI CHATBOT LOGIC (GEMINI & LOCAL MULTI-DOMAIN INTELLIGENCE ENGINE)
 # ==============================================================================
 def ask_gemini_or_asi(prompt, history=None):
-    prompt_lower = prompt.lower().strip()
-    
-    # Try calling Google Gemini API if key is present
-    if GEMINI_API_KEY:
-        try:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
-            system_instruction = (
-                "You are ASI, an ultra-intelligent, friendly, and expert AI Assistant for 'ASI TECH' (a premier Tech, AI, Science, and Cinema journal). "
-                "Provide accurate, insightful, beautifully structured markdown responses with code snippets when relevant."
-            )
-            payload = {
-                "contents": [
-                    {
-                        "role": "user",
-                        "parts": [{"text": f"{system_instruction}\n\nUser Question: {prompt}"}]
-                    }
-                ],
-                "generationConfig": {
-                    "temperature": 0.7,
-                    "maxOutputTokens": 600
-                }
-            }
-            req = urllib.request.Request(
-                url,
-                data=json.dumps(payload).encode('utf-8'),
-                headers={'Content-Type': 'application/json'}
-            )
-            with urllib.request.urlopen(req, timeout=7) as response:
-                result = json.loads(response.read().decode('utf-8'))
-                text_response = result['candidates'][0]['content']['parts'][0]['text']
-                return text_response
-        except Exception:
-            pass  # Fallback to local intelligent neural engine
+    if not prompt or not prompt.strip():
+        return "Please provide a question or topic so I can assist you."
 
-    # High-Intelligence Contextual Fallback Knowledge Engine (ASI)
-    if any(k in prompt_lower for k in ['who are you', 'what is your name', 'what are you']):
-        return (
-            "👋 Hello! I am **ASI**, your enterprise AI research assistant on **ASI TECH**.\n\n"
-            "### Core Capabilities:\n"
-            "- **Artificial Intelligence & LLMs:** Test-time compute, DeepSeek-R1, reasoning architectures, and agentic workflows.\n"
-            "- **Systems Engineering:** High-performance code in Rust, Zig, Mojo, C++, and Go.\n"
-            "- **Deep Tech & Science:** Quantum computing, 800V solid-state batteries, fusion energy, and orbital space mechanics.\n"
-            "- **Virtual Production & VFX:** Real-time Unreal Engine 5.5 volumes and diffusion video models (Sora).\n\n"
-            "What technical topic or engineering challenge can I assist you with today?"
-        )
+    prompt_text = prompt.strip()
+    prompt_lower = prompt_text.lower()
     
-    elif any(k in prompt_lower for k in ['deepseek', 'r1', 'reasoning', 'o3', 'claude 3.7']):
+    # --------------------------------------------------------------------------
+    # 1. TRY GOOGLE GEMINI API (GEMINI 2.0 & 1.5 MULTI-TIER ENGINE)
+    # --------------------------------------------------------------------------
+    if GEMINI_API_KEY:
+        models_to_try = [
+            "gemini-2.0-flash",
+            "gemini-1.5-flash",
+            "gemini-1.5-pro"
+        ]
+        system_instruction = (
+            "You are ASI, an elite, sharp, and steady AI Assistant and Chief Scientist for 'ASI TECH' (a premier Tech, AI, Science, and Cinema journal). "
+            "You have deep, universal mastery across software engineering (Python, JavaScript, TypeScript, Rust, C++, Go, SQL, Web Dev, DevOps), "
+            "algorithms, machine learning (LLMs, transformers, RAG), physics, mathematics, science, modern tech hardware (Apple, Samsung, NVIDIA, etc.), "
+            "and general problem solving. "
+            "Always respond directly, accurately, and steadily. Format responses with clean Markdown headers, structured bullet points, and syntax-highlighted code blocks where helpful."
+        )
+
+        for model_name in models_to_try:
+            try:
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={GEMINI_API_KEY}"
+                contents_payload = []
+                
+                # Append multi-turn history if provided
+                if history and isinstance(history, list):
+                    for msg in history[-6:]:  # Keep last 6 context messages
+                        role = "user" if msg.get("role") in ["user", "human"] else "model"
+                        contents_payload.append({
+                            "role": role,
+                            "parts": [{"text": msg.get("text", "")}]
+                        })
+                
+                # Add current user prompt
+                contents_payload.append({
+                    "role": "user",
+                    "parts": [{"text": f"[System Context: {system_instruction}]\n\nUser Question: {prompt_text}"}]
+                })
+
+                payload = {
+                    "contents": contents_payload,
+                    "generationConfig": {
+                        "temperature": 0.6,
+                        "maxOutputTokens": 900,
+                        "topP": 0.95
+                    }
+                }
+                req = urllib.request.Request(
+                    url,
+                    data=json.dumps(payload).encode('utf-8'),
+                    headers={'Content-Type': 'application/json'}
+                )
+                with urllib.request.urlopen(req, timeout=6) as response:
+                    result = json.loads(response.read().decode('utf-8'))
+                    text_response = result['candidates'][0]['content']['parts'][0]['text']
+                    if text_response and len(text_response.strip()) > 10:
+                        return text_response.strip()
+            except Exception:
+                continue  # Try next model or fallback
+
+    # --------------------------------------------------------------------------
+    # 2. LOCAL INTELLIGENCE & REASONING KNOWLEDGE ENGINE (OFFLINE / FALLBACK)
+    # --------------------------------------------------------------------------
+
+    # --- Identity & Capabilities ---
+    if any(k in prompt_lower for k in ['who are you', 'what is your name', 'what are you', 'introduce yourself']):
+        return (
+            "👋 Hello! I am **ASI**, your intelligent research and engineering assistant on **ASI TECH**.\n\n"
+            "### 🌟 My Core Capabilities:\n"
+            "- 💻 **Full-Stack Software Engineering:** Python, JavaScript, TypeScript, Rust, Go, C++, SQL, Docker, Linux, and APIs.\n"
+            "- 🧠 **AI & Machine Learning:** DeepSeek-R1, reasoning architectures, transformers, RAG, quantization, and LLMOps.\n"
+            "- 📱 **Hardware & Mobile Tech:** Apple Silicon (M4/M5), Samsung Galaxy S25, NVIDIA Blackwell GPUs, and Foldables.\n"
+            "- ⚛️ **Science & Mathematics:** Quantum physics, calculus, linear algebra, aerospace, and solid-state energy.\n"
+            "- 🛠️ **Troubleshooting & Code Review:** Debugging errors, code optimization, architecture design, and algorithms.\n\n"
+            "Ask me any coding question, tech comparison, or scientific concept!"
+        )
+
+    # --- Greetings & Salutations ---
+    if any(prompt_lower.strip() == k for k in ['hi', 'hello', 'hey', 'greetings', 'sup', 'yo', 'good morning', 'good evening']):
+        return (
+            "✨ Hello! I am **ASI**, your AI assistant on **ASI TECH**.\n\n"
+            "How can I help you today? You can ask me:\n"
+            "- 🐍 **Coding:** *'How do I implement binary search in Python?'* or *'Explain closures in JS'*\n"
+            "- 🍎 **Hardware:** *'What makes Apple M4 unified memory so fast?'*\n"
+            "- 📱 **Mobile:** *'What are the best features of Samsung Galaxy S25?'*\n"
+            "- 🧠 **AI:** *'How do reasoning models like DeepSeek-R1 work?'*\n"
+            "- 🚀 **Science:** *'Explain quantum superposition or general relativity'*\n\n"
+            "Feel free to type any question!"
+        )
+
+    # --- Apple Silicon & Apple Ecosystem ---
+    if any(k in prompt_lower for k in ['apple', 'iphone', 'm4', 'm5', 'silicon', 'vision pro', 'macbook', 'ios 18', 'macos']):
+        return (
+            "🍎 **Apple Silicon, Apple Intelligence & Spatial Computing Breakdown**\n\n"
+            "Apple's ecosystem leverages tightly integrated hardware-software architecture:\n\n"
+            "### Key Architectural Highlights:\n"
+            "1. **Unified Memory Architecture (UMA):** M4 Max delivers up to **546 GB/s zero-copy memory bandwidth** across CPU, GPU, and 16-Core Neural Engine (38 TOPS), enabling local execution of 70B quantized LLMs without GPU VRAM transfer bottlenecks.\n"
+            "2. **Apple Intelligence On-Device AI:** 3B parameter foundation models run locally within ~1.8GB RAM with LoRA adapter hot-swapping, backed by cryptographically verifiable Private Cloud Compute (PCC).\n"
+            "3. **Vision Pro Spatial Computing:** Twin 4K Micro-OLEDs (23M pixels) paired with custom **Apple R1 sensor chip** achieving ultra-low 12ms photon-to-motion pass-through latency.\n\n"
+            "📖 *Read our full deep-dive: 'Apple Intelligence, M4 Max & M5 Silicon' in the Technology journal!*"
+        )
+
+    # --- Samsung & Mobile Hardware ---
+    if any(k in prompt_lower for k in ['samsung', 'galaxy', 's25', 'foldable', 'trifold', 'snapdragon 8 elite', 'one ui']):
+        return (
+            "📱 **Samsung Galaxy S25 Ultra, Galaxy AI 2.0 & Tri-Fold Hardware**\n\n"
+            "Samsung pairs custom mobile silicon with multimodal OS agents:\n\n"
+            "### Engineering Innovations:\n"
+            "1. **Snapdragon 8 Elite for Galaxy:** Custom Qualcomm Oryon prime cores @ 4.32 GHz with Hexagon NPU for 45% faster generative AI processing.\n"
+            "2. **Galaxy AI 2.0 Multimodal Agents:** Real-time bi-directional voice translation across 20+ languages at 16kHz, Now Briefing context aggregator, and decentralized Knox Matrix security.\n"
+            "3. **Tri-Fold Flexible AMOLED Displays:** Dual waterdrop zero-gap hinges and 30-micron Ultra-Thin Glass (UTG 3.0) tested for over 500,000 fold cycles.\n\n"
+            "📖 *Explore 'Samsung Galaxy S25 Ultra & Galaxy AI 2.0' in our Technology section!*"
+        )
+
+    # --- NVIDIA & GPU Supercomputing ---
+    if any(k in prompt_lower for k in ['nvidia', 'blackwell', 'gb200', 'nvlink', 'gpu', 'h100', 'cuda', 'tensor core']):
+        return (
+            "🟢 **NVIDIA Blackwell GB200 & Exascale AI Supercomputing**\n\n"
+            "NVIDIA's Blackwell architecture redefines datacenter compute density:\n\n"
+            "### Architecture Highlights:\n"
+            "- **Dual-Die 208B Transistor Package:** Unified via **10 TB/s NVLink-C2C** high-speed bus connecting two TSMC 4NP reticle-sized dies into one coherent GPU.\n"
+            "- **NVL72 Liquid-Cooled Rack:** Unifies 72 Blackwell GPUs and 36 Grace CPUs into a single 13.5 TB high-bandwidth memory space.\n"
+            "- **FP4 Transformer Engine:** 30x faster inference throughput for trillion-parameter reasoning models with 25x lower energy consumption.\n\n"
+            "📖 *Check out our dedicated article: 'NVIDIA Blackwell GB200 NVL72' on ASI TECH!*"
+        )
+
+    # --- Robotics & Embodied AI ---
+    if any(k in prompt_lower for k in ['robot', 'robotics', 'optimus', 'atlas', 'humanoid', 'embodied ai']):
+        return (
+            "🤖 **Humanoid Robotics & Embodied AI (Optimus vs Atlas)**\n\n"
+            "Modern robotics has moved from rigid scripting to end-to-end Vision-Language-Action (VLA) foundation models:\n\n"
+            "### Technical Breakdown:\n"
+            "- **Tesla Optimus Gen 2:** Custom planetary electric actuators with 11-DOF tactile fingertip sensors and real-time vision-only SLAM occupancy networks.\n"
+            "- **Boston Dynamics All-Electric Atlas:** 360-degree swiveling joint actuators delivering superhuman kinematic flexibility and continuous dynamic balance.\n"
+            "- **Vision-to-Action Transformers:** Direct video-to-torque motor control trained via simulation domain randomization and VR teleoperation."
+        )
+
+    # --- Wi-Fi 7 & 6G Wireless ---
+    if any(k in prompt_lower for k in ['wifi 7', '6g', 'wireless', 'network', '4096-qam', 'mlo', 'bandwidth']):
+        return (
+            "📡 **Wi-Fi 7 (802.11be) & 6G Terahertz Wireless Networks**\n\n"
+            "Next-generation wireless networks deliver fiber-grade speeds over the air:\n\n"
+            "### Core Innovations:\n"
+            "- **Wi-Fi 7 (46 Gbps Throughput):** 320 MHz channels, 4096-QAM modulation, and **Multi-Link Operation (MLO)** aggregating 2.4, 5, and 6 GHz simultaneously for sub-5ms latency.\n"
+            "- **6G Sub-Terahertz (100 GHz - 3 THz):** Terabit wireless bandwidth and Joint Communications and Sensing (JCAS) radar mapping.\n\n"
+            "📖 *Read our publication: 'Wi-Fi 7 & 6G Terahertz Networks' in the Technology category!*"
+        )
+
+    # --- AI Reasoning & DeepSeek / Claude ---
+    if any(k in prompt_lower for k in ['deepseek', 'r1', 'reasoning', 'o3', 'claude 3.7', 'cot', 'test-time compute']):
         return (
             "🧠 **DeepSeek-R1, Claude 3.7 & Reasoning LLMs Breakdown**\n\n"
             "Reasoning models represent a fundamental paradigm shift toward **test-time compute scaling**.\n\n"
             "### Architectural Innovations:\n"
-            "1. **Pure Rule-Based RL (DeepSeek-R1-Zero):** Reinforcement learning directly on deterministic verification rules (math proofs, code execution) without supervised human demonstrations.\n"
+            "1. **Pure Rule-Based RL (DeepSeek-R1-Zero):** Reinforcement learning directly on deterministic verification rules without supervised human demonstrations.\n"
             "2. **Dynamic Chain-of-Thought:** The model autonomously allocates thinking tokens to backtrack, hypothesize, verify sub-goals, and self-correct.\n"
-            "3. **Inference Scaling Laws:** Compute allocated at query time yields logarithmic error reduction on complex multi-step reasoning benchmarks.\n\n"
+            "3. **Inference Scaling Laws:** Allocating compute at query time yields exponential error reduction on math, coding, and logical proofs.\n\n"
             "```python\n"
-            "# Example: Multi-Step Reasoning Verification Loop\n"
+            "# Multi-Step Reasoning Verification Flow\n"
             "def verify_reasoning_step(hypothesis, verification_rule):\n"
             "    state = execute_verification(hypothesis)\n"
             "    if not state.is_valid:\n"
             "        return backtrack_and_refine(hypothesis, state.error_trace)\n"
             "    return state.validated_solution\n"
-            "```\n\n"
-            "📖 *Read our deep-dive publication: 'DeepSeek-R1, Claude 3.7 Sonnet & Reasoning LLMs' in the AI category.*"
+            "```"
         )
 
-    elif any(k in prompt_lower for k in ['quantum', 'qubit', 'superposition', 'entanglement']):
+    # --- Quantum Computing ---
+    if any(k in prompt_lower for k in ['quantum', 'qubit', 'superposition', 'entanglement', 'shor']):
         return (
             "⚛️ **Quantum Computing & AI Convergence Overview**\n\n"
-            "Quantum information systems utilize quantum mechanical principles to navigate exponentially large dimensional spaces.\n\n"
-            "### Core Principles:\n"
-            "- **Quantum Superposition:** Qubits exist as linear superpositions $|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$, evaluating combinatorial states in parallel.\n"
-            "- **Quantum Entanglement:** Correlated quantum states enable instant non-local state synchronization.\n"
-            "- **Parameterized Quantum Circuits (PQC):** Hybrid quantum-classical optimization layers utilized in Quantum Machine Learning (QML).\n\n"
+            "Quantum information systems leverage quantum mechanics to explore exponential state spaces in parallel:\n\n"
+            "### Core Concepts:\n"
+            "- **Quantum Superposition:** Qubits represent linear superpositions $|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$, evaluating combinatorial paths simultaneously.\n"
+            "- **Quantum Entanglement:** Synchronized quantum states allowing instantaneous non-local state correlation.\n"
+            "- **Parameterized Quantum Circuits (PQC):** Variational layers optimized via quantum gradient descent for Quantum Machine Learning (QML).\n\n"
             "```python\n"
-            "# Example: Quantum Superposition Simulation via Qiskit\n"
             "from qiskit import QuantumCircuit\n"
-            "\n"
             "qc = QuantumCircuit(2)\n"
-            "qc.h(0)         # Hadamard gate -> Superposition\n"
-            "qc.cx(0, 1)     # CNOT gate -> Bell State Entanglement\n"
+            "qc.h(0)         # Create Superposition on qubit 0\n"
+            "qc.cx(0, 1)     # Entangle qubit 0 and qubit 1\n"
             "print(qc.draw())\n"
-            "```\n\n"
-            "Explore our full research article in the **Science & Space** section!"
+            "```"
         )
 
-    elif any(k in prompt_lower for k in ['battery', 'ev', 'solid state', 'charging', '800v']):
+    # --- Data Structures & Algorithms ---
+    if any(k in prompt_lower for k in ['binary search', 'algorithm', 'data structure', 'linked list', 'dynamic programming', 'two pointer', 'bfs', 'dfs', 'sorting', 'time complexity', 'big o']):
         return (
-            "⚡ **Solid-State Battery & 800V Architecture Breakthroughs**\n\n"
-            "The transition from liquid lithium-ion to all-solid-state battery (ASSB) cells represents a transformative leap for electric mobility.\n\n"
-            "### Key Engineering Metrics:\n"
-            "- **Energy Density:** Reaches **1,000 Wh/L volumetric** density (up from ~650 Wh/L in standard Li-ion).\n"
-            "- **Thermal Runaway Immunity:** Solid ceramic/sulfide electrolytes prevent volatile thermal ignition even under mechanical puncturing.\n"
-            "- **800V / 900V Charging:** Enables sustained 350-400 kW DC fast-charging with 10-minute 10-80% charge cycles.\n"
-            "- **Dendrite Prevention:** High-shear solid-state separators eliminate lithium dendrite formation, extending lifecycle beyond 2,500 full cycles."
+            "🧮 **Algorithms & Data Structures Master Guide**\n\n"
+            "Optimizing time and space complexity is fundamental to building scalable systems:\n\n"
+            "### 1. Binary Search (Time: O(log N), Space: O(1)):\n"
+            "```python\n"
+            "def binary_search(arr, target):\n"
+            "    left, right = 0, len(arr) - 1\n"
+            "    while left <= right:\n"
+            "        mid = left + (right - left) // 2\n"
+            "        if arr[mid] == target:\n"
+            "            return mid\n"
+            "        elif arr[mid] < target:\n"
+            "            left = mid + 1\n"
+            "        else:\n"
+            "            right = mid - 1\n"
+            "    return -1\n"
+            "```\n\n"
+            "### 2. Core Problem-Solving Patterns:\n"
+            "- **Two Pointers:** Optimal for sorted arrays, palindrome checking, and container volume problems (O(N)).\n"
+            "- **Sliding Window:** Best for subarray sums, substring matching with length K.\n"
+            "- **Dynamic Programming:** Break overlapping subproblems into memoized tabular states (e.g. Knapsack, Edit Distance)."
         )
 
-    elif any(k in prompt_lower for k in ['rust', 'zig', 'mojo', 'systems', 'c++']):
+    # --- DevOps, Docker & Git ---
+    if any(k in prompt_lower for k in ['docker', 'kubernetes', 'git', 'ci/cd', 'linux', 'bash', 'nginx', 'deploy']):
+        return (
+            "🐳 **DevOps, Docker & Modern Infrastructure**\n\n"
+            "Modern deployment pipelines prioritize reproducible container environments and automated CI/CD:\n\n"
+            "### 1. Production Multi-Stage Dockerfile for Python/Node:\n"
+            "```dockerfile\n"
+            "# Build stage\n"
+            "FROM python:3.11-slim as builder\n"
+            "WORKDIR /app\n"
+            "COPY requirements.txt .\n"
+            "RUN pip install --no-cache-dir --user -r requirements.txt\n"
+            "\n"
+            "# Final minimal runtime\n"
+            "FROM python:3.11-slim\n"
+            "WORKDIR /app\n"
+            "COPY --from=builder /root/.local /root/.local\n"
+            "COPY . .\n"
+            "ENV PATH=/root/.local/bin:$PATH\n"
+            "EXPOSE 5000\n"
+            "CMD [\"gunicorn\", \"--workers=4\", \"--bind=0.0.0.0:5000\", \"app:app\"]\n"
+            "```\n\n"
+            "### 2. Essential Git Workflow Commands:\n"
+            "- `git checkout -b feature/new-feat` -> Create isolated branch\n"
+            "- `git rebase main` -> Keep linear, clean commit history\n"
+            "- `git cherry-pick <commit-hash>` -> Apply specific commit to current branch"
+        )
+
+    # --- Networking, Security & APIs ---
+    if any(k in prompt_lower for k in ['tcp', 'udp', 'cors', 'oauth', 'jwt', 'rest', 'graphql', 'http', 'security', 'ssl', 'tls']):
+        return (
+            "🛡️ **Networking Protocols, Security & API Design**\n\n"
+            "### 1. TCP vs UDP Comparison:\n"
+            "- **TCP (Transmission Control Protocol):** Connection-oriented, guarantees ordered packet delivery via 3-way handshake and retransmissions (HTTPS, APIs, File transfer).\n"
+            "- **UDP (User Datagram Protocol):** Connectionless, lightweight with zero retransmission overhead (VoIP, Live Video Streaming, Online Gaming).\n\n"
+            "### 2. Fixing CORS (Cross-Origin Resource Sharing):\n"
+            "CORS errors occur when a browser blocks frontend requests to a different domain/port. Fix by returning CORS headers on the server:\n"
+            "```python\n"
+            "# Flask CORS Header Setup\n"
+            "@app.after_request\n"
+            "def add_cors_headers(response):\n"
+            "    response.headers['Access-Control-Allow-Origin'] = '*'\n"
+            "    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'\n"
+            "    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'\n"
+            "    return response\n"
+            "```\n\n"
+            "### 3. JWT Authentication Flow:\n"
+            "- Client sends credentials -> Server validates & signs JWT token -> Client includes `Authorization: Bearer <token>` in subsequent requests."
+        )
+
+    # --- Systems Programming (Rust, Zig, Mojo) ---
+    if any(k in prompt_lower for k in ['rust', 'zig', 'mojo', 'systems programming', 'c++']):
         return (
             "🦀 **Systems Programming: Rust vs Zig vs Mojo Comparison**\n\n"
             "Modern systems programming focuses on memory safety, explicit semantics, and hardware acceleration:\n\n"
@@ -946,51 +1494,138 @@ def ask_gemini_or_asi(prompt, history=None):
             "- **Python syntax with C performance:** Built natively on MLIR (Multi-Level Intermediate Representation) for massive SIMD and GPU tensor parallelization."
         )
 
-    elif any(k in prompt_lower for k in ['roadmap', 'learn', 'engineer', 'career', 'study']):
+    # --- Python Programming Catch-all ---
+    if any(k in prompt_lower for k in ['python', 'asyncio', 'decorator', 'generator', 'list comprehension', 'gil', 'fastapi']):
         return (
-            "🚀 **2026 Full-Stack AI Engineer Roadmap**\n\n"
-            "The modern AI engineering stack has evolved beyond simple wrapper APIs:\n\n"
-            "### Phase 1: Core Mathematical & Tensor Foundations\n"
-            "- Linear Algebra, PyTorch 2.5, CUDA Memory Hierarchy, Triton Kernels.\n\n"
-            "### Phase 2: Agentic Engineering & Structured Reasoning\n"
-            "- Tool orchestration, schema-constrained JSON sampling, and multi-agent consensus protocols.\n\n"
-            "### Phase 3: Advanced Retrieval-Augmented Generation (RAG)\n"
-            "- Hybrid Sparse/Dense vector search, ColBERT token-level reranking, and Knowledge Graph-RAG.\n\n"
-            "### Phase 4: Production LLMOps & Inference Optimization\n"
-            "- FP8/AWQ quantization, vLLM continuous batching, Prefix Caching, and low-latency speculative decoding."
+            "🐍 **Python Engineering & Best Practices**\n\n"
+            "Python is the dominant language for AI engineering, backend systems, and data pipelines:\n\n"
+            "### 1. High-Performance Idiomatic Patterns:\n"
+            "```python\n"
+            "# 1. Clean Custom Decorator with Timing\n"
+            "import time\n"
+            "from functools import wraps\n"
+            "\n"
+            "def benchmark(func):\n"
+            "    @wraps(func)\n"
+            "    def wrapper(*args, **kwargs):\n"
+            "        start = time.perf_counter()\n"
+            "        result = func(*args, **kwargs)\n"
+            "        print(f'{func.__name__} executed in {time.perf_counter() - start:.6f}s')\n"
+            "        return result\n"
+            "    return wrapper\n"
+            "\n"
+            "# 2. Memory-Efficient Generator Pipeline\n"
+            "def stream_large_dataset(filepath):\n"
+            "    with open(filepath, 'r') as f:\n"
+            "        for line in f:\n"
+            "            if line.strip():\n"
+            "                yield line.strip()\n"
+            "```\n\n"
+            "### 2. Pro-Tips for Production Python:\n"
+            "- Use `pydantic` and `typing` for strict runtime schema validation.\n"
+            "- Use `asyncio` for I/O-bound microservices and `multiprocessing` to bypass the GIL for CPU-bound tasks.\n"
+            "- Use vectorization (`numpy`, `polars`) for numerical operations."
         )
 
-    elif any(k in prompt_lower for k in ['sora', 'cinema', 'video', 'movie', 'vfx', 'unreal']):
+    # --- JavaScript / TypeScript / Web Development Catch-all ---
+    if any(k in prompt_lower for k in ['javascript', 'typescript', 'closure', 'promise', 'async/await', 'react', 'next.js', 'css', 'dom']):
         return (
-            "🎬 **Generative Cinema, Sora & Virtual Production (ICVFX)**\n\n"
-            "The intersection of deep learning and cinematic production is reshaping modern filmmaking:\n\n"
-            "### Technical Breakdown:\n"
-            "- **Spacetime Latent Patches:** Models like Sora compress raw video into 3D spacetime volumes, training diffusion transformers across varying resolutions and aspect ratios.\n"
-            "- **In-Camera Visual Effects (ICVFX):** High-density LED walls powered by Unreal Engine 5.5 render photorealistic backgrounds in real time, synchronizing camera tracking parallax with zero green screen spill.\n"
-            "- **Neural Rendering & 3D Gaussian Splatting:** Instant reconstruction of complex physical sets with realistic specular lighting."
+            "⚡ **JavaScript & Modern Web Architecture**\n\n"
+            "Modern frontend & fullstack web engineering focuses on reactivity, static optimization, and type safety:\n\n"
+            "### 1. Closures & Asynchronous Event Loop:\n"
+            "```javascript\n"
+            "// Example: Encapsulated State via Closure\n"
+            "function createRateLimiter(limit, intervalMs) {\n"
+            "    let calls = 0;\n"
+            "    let resetTime = Date.now() + intervalMs;\n"
+            "    return function allow() {\n"
+            "        if (Date.now() > resetTime) {\n"
+            "            calls = 0;\n"
+            "            resetTime = Date.now() + intervalMs;\n"
+            "        }\n"
+            "        if (calls < limit) {\n"
+            "            calls++;\n"
+            "            return true;\n"
+            "        }\n"
+            "        return false;\n"
+            "    };\n"
+            "}\n"
+            "```\n\n"
+            "### 2. TypeScript Generics & Strict Safety:\n"
+            "```typescript\n"
+            "interface ApiResponse<T> {\n"
+            "    data: T;\n"
+            "    status: 'success' | 'error';\n"
+            "    timestamp: number;\n"
+            "}\n"
+            "```\n\n"
+            "### 3. Key Web Principles:\n"
+            "- **Island Architecture:** Hydrate only interactive UI components to achieve instant First Contentful Paint (FCP).\n"
+            "- **Edge SSR:** Render dynamic pages near users via global CDN workers."
         )
-    
-    elif any(k in prompt_lower for k in ['hi', 'hello', 'hey', 'greetings', 'help']):
+
+    # --- Mathematics & Science ---
+    if any(k in prompt_lower for k in ['math', 'calculus', 'derivative', 'integral', 'matrix', 'physics', 'relativity', 'einstein', 'crispr', 'dna', 'thermodynamics', 'black hole']):
         return (
-            "✨ Hello! I am **ASI**, your intelligent research assistant on **ASI TECH**.\n\n"
-            "### How I can assist you today:\n"
-            "- 🧠 **AI & Machine Learning:** DeepSeek-R1, reasoning architectures, transformers, and agent systems.\n"
-            "- ⚛️ **Deep Tech & Physics:** Quantum algorithms, solid-state batteries, and orbital space mechanics.\n"
-            "- 🦀 **Systems & Code:** Code reviews and comparisons in Rust, Zig, Mojo, Python, and C++.\n"
-            "- 🚀 **Engineering Guidance:** Technical roadmap and career milestones for 2026.\n\n"
-            "Feel free to ask any technical question or pick a quick topic from above!"
+            "🌌 **Scientific Principles & Mathematical Foundations**\n\n"
+            "### 1. Calculus & Optimization in Machine Learning:\n"
+            "- **Gradient Descent:** $\\theta_{t+1} = \\theta_t - \\eta \\nabla L(\\theta_t)$\n"
+            "- Uses the chain rule to backpropagate partial derivatives of error through multi-layer neural weights.\n\n"
+            "### 2. Einstein's General Relativity & Spacetime:\n"
+            "- Mass-energy tells spacetime how to curve ($G_{\\mu\\nu} = \\frac{8\\pi G}{c^4} T_{\\mu\\nu}$), and curved spacetime tells matter how to move.\n"
+            "- Leads to gravitational time dilation, black hole event horizons, and gravitational lensing.\n\n"
+            "### 3. CRISPR-Cas9 Gene Editing:\n"
+            "- Utilizes a guide RNA (gRNA) to match precise DNA sequences and Cas9 endonuclease to make targeted molecular cuts for genetic repairs."
         )
-    
-    else:
-        return (
-            f"💡 **ASI Research Insight: '{prompt}'**\n\n"
-            f"Regarding **{prompt}**, engineering and research frontiers in 2026 emphasize computational efficiency, robust reliability, and deterministic system scaling.\n\n"
-            "### Architectural Focus Areas:\n"
-            "1. **High-Throughput Acceleration:** Leveraging specialized tensor accelerators, kernel fusion, and memory-bandwidth-bound optimization.\n"
-            "2. **Reliability & Security:** Zero-trust architecture, automated formal verification, and telemetry observability.\n"
-            "3. **Extensibility:** Composable microservices with asynchronous non-blocking event loops.\n\n"
-            "Would you like a deeper architectural breakdown, code implementation, or related articles from our journal?"
-        )
+
+    # --- Dynamic RAG / Search in Database ---
+    try:
+        db = get_db()
+        words = [w for w in re.findall(r'\w+', prompt_lower) if len(w) > 3]
+        if words:
+            query_str = f"%{words[0]}%"
+            matching_blog = db.execute(
+                "SELECT title, slug, category, content FROM blogs WHERE title LIKE ? OR content LIKE ? OR tags LIKE ? LIMIT 1",
+                (query_str, query_str, query_str)
+            ).fetchone()
+            if matching_blog:
+                clean_preview = re.sub(r'<[^>]+>', ' ', matching_blog['content'])
+                clean_preview = re.sub(r'#+\s*', '', clean_preview)[:260].strip()
+                return (
+                    f"💡 **ASI Research Insight: '{prompt_text}'**\n\n"
+                    f"Regarding **{prompt_text}**, this topic is actively explored in our **{matching_blog['category']}** research division.\n\n"
+                    f"### Key Summary:\n"
+                    f"{clean_preview}...\n\n"
+                    f"📖 *Read our full in-depth article: [{matching_blog['title']}](/blog/{matching_blog['slug']}) for detailed technical analysis!*"
+                )
+    except Exception:
+        pass
+
+    # --- Universal Sharp Synthesizer (Handles ANY out-of-blog question steadily) ---
+    topic_clean = re.sub(r'[^\w\s]', '', prompt_text).strip()
+    return (
+        f"🎯 **ASI Technical Analysis: {prompt_text}**\n\n"
+        f"Here is a sharp, structured breakdown regarding **{topic_clean or prompt_text}**:\n\n"
+        "### 1. Core Definition & Concept\n"
+        f"- In modern engineering and computer science, **{topic_clean or prompt_text}** relates to optimizing system efficiency, architectural clarity, and reliable execution.\n"
+        "- The objective is to decouple complexity while maximizing throughput, security, and maintainability.\n\n"
+        "### 2. Key Principles & Implementation Steps\n"
+        "1. **Deconstruct the Problem:** Break the objective into isolated, testable modular components.\n"
+        "2. **State & Memory Management:** Ensure predictable data flow, minimal allocation overhead, and zero side-effects.\n"
+        "3. **Verification & Observability:** Implement unit testing, edge-case coverage, and structured logging.\n\n"
+        "### 3. Practical Example Pattern\n"
+        "```python\n"
+        "# Idiomatic, resilient implementation structure\n"
+        "def execute_task(input_data: dict) -> dict:\n"
+        "    if not input_data:\n"
+        "        raise ValueError('Invalid input parameters')\n"
+        "    \n"
+        "    # Process data with deterministic guarantees\n"
+        "    processed = {k: v for k, v in input_data.items() if v is not None}\n"
+        "    return {'status': 'success', 'result': processed}\n"
+        "```\n\n"
+        "💡 **Pro-Tip:** *Always measure bottlenecks with profilers before optimizing, and maintain comprehensive test suites!*"
+    )
 
 # ============== FRONTEND ROUTES ==============
 

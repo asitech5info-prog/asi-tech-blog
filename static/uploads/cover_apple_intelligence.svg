@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgApple" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#05070e" />
+      <stop offset="50%" stop-color="#0b1120" />
+      <stop offset="100%" stop-color="#02040a" />
+    </linearGradient>
+    <linearGradient id="appleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="30%" stop-color="#818cf8" />
+      <stop offset="70%" stop-color="#c084fc" />
+      <stop offset="100%" stop-color="#f472b6" />
+    </linearGradient>
+    <linearGradient id="chipGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1b4b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <filter id="glowApple" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="18" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgApple)" />
+
+  <!-- Subtle Blueprint Grid -->
+  <g stroke="rgba(255,255,255,0.03)" stroke-width="1">
+    <line x1="0" y1="150" x2="1200" y2="150" />
+    <line x1="0" y1="300" x2="1200" y2="300" />
+    <line x1="0" y1="450" x2="1200" y2="450" />
+    <line x1="300" y1="0" x2="300" y2="630" />
+    <line x1="600" y1="0" x2="600" y2="630" />
+    <line x1="900" y1="0" x2="900" y2="630" />
+  </g>
+
+  <!-- Right Visual: Apple Silicon M4 Neural Engine Chip Schematic -->
+  <g transform="translate(700, 110)">
+    <!-- Ambient Glow -->
+    <circle cx="210" cy="200" r="180" fill="#818cf8" opacity="0.12" filter="url(#glowApple)" />
+    
+    <!-- Outer Chip Die -->
+    <rect x="30" y="20" width="360" height="360" rx="32" fill="url(#chipGrad)" stroke="#6366f1" stroke-width="2.5" />
+    
+    <!-- Chip Pins / Traces -->
+    <g stroke="#38bdf8" stroke-width="2" opacity="0.4">
+      <line x1="90" y1="0" x2="90" y2="20" />
+      <line x1="150" y1="0" x2="150" y2="20" />
+      <line x1="210" y1="0" x2="210" y2="20" />
+      <line x1="270" y1="0" x2="270" y2="20" />
+      <line x1="330" y1="0" x2="330" y2="20" />
+      <line x1="90" y1="380" x2="90" y2="400" />
+      <line x1="150" y1="380" x2="150" y2="400" />
+      <line x1="210" y1="380" x2="210" y2="400" />
+      <line x1="270" y1="380" x2="270" y2="400" />
+      <line x1="330" y1="380" x2="330" y2="400" />
+    </g>
+
+    <!-- Unified Memory Cores -->
+    <rect x="60" y="50" width="140" height="130" rx="16" fill="rgba(56, 189, 248, 0.08)" stroke="#38bdf8" stroke-width="1.5" />
+    <text x="130" y="105" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="bold" text-anchor="middle">UNIFIED RAM</text>
+    <text x="130" y="130" fill="#94a3b8" font-family="'JetBrains Mono', monospace" font-size="11" text-anchor="middle">546 GB/s Bandwidth</text>
+
+    <!-- 16-Core Neural Engine -->
+    <rect x="220" y="50" width="140" height="130" rx="16" fill="rgba(192, 132, 252, 0.08)" stroke="#c084fc" stroke-width="1.5" />
+    <text x="290" y="105" fill="#c084fc" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="bold" text-anchor="middle">NEURAL ENGINE</text>
+    <text x="290" y="130" fill="#e9d5ff" font-family="'JetBrains Mono', monospace" font-size="11" text-anchor="middle">38 TOPS On-Device</text>
+
+    <!-- Secure Enclave & Private Cloud Compute -->
+    <rect x="60" y="200" width="300" height="145" rx="18" fill="rgba(99, 102, 241, 0.12)" stroke="#818cf8" stroke-width="2" />
+    <text x="210" y="250" fill="#ffffff" font-family="'Plus Jakarta Sans', sans-serif" font-size="18" font-weight="800" text-anchor="middle">APPLE SILICON M4 MAX</text>
+    <text x="210" y="280" fill="#a5b4fc" font-family="'Inter', sans-serif" font-size="13" text-anchor="middle">3nm TSMC Architecture • Private Cloud Compute</text>
+    <text x="210" y="310" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="600" text-anchor="middle">🛡️ End-to-End Cryptographic Isolation</text>
+  </g>
+
+  <!-- Left Content Info -->
+  <g transform="translate(100, 140)">
+    <!-- Badge -->
+    <rect x="0" y="0" width="220" height="38" rx="19" fill="rgba(56, 189, 248, 0.12)" stroke="#38bdf8" stroke-width="1.5" />
+    <text x="110" y="24" fill="#38bdf8" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="700" text-anchor="middle" letter-spacing="1.5">APPLE ECOSYSTEM &amp; AI</text>
+
+    <!-- Main Title -->
+    <text x="0" y="95" fill="#ffffff" font-family="'Plus Jakarta Sans', sans-serif" font-size="44" font-weight="800">Apple Intelligence,</text>
+    <text x="0" y="150" fill="url(#appleGrad)" font-family="'Plus Jakarta Sans', sans-serif" font-size="44" font-weight="800">M4 Silicon &amp; Privacy</text>
+    
+    <!-- Description -->
+    <text x="0" y="215" fill="#94a3b8" font-family="'Inter', sans-serif" font-size="17">On-device 3B LLMs, Private Cloud Compute &amp; 546 GB/s unified memory.</text>
+
+    <!-- Metadata -->
+    <g transform="translate(0, 275)">
+      <text x="0" y="0" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="14" font-weight="bold">● APPLE &amp; HARDWARE</text>
+      <text x="200" y="0" fill="#64748b" font-family="'Inter', sans-serif" font-size="14">|  5 min read</text>
+      <text x="310" y="0" fill="#a855f7" font-family="'Inter', sans-serif" font-size="14">|  ASI TECH EXCLUSIVE</text>
+    </g>
+  </g>
+</svg>

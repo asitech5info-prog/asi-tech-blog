@@ -15,7 +15,7 @@ def run_tests():
         # 1. Verify Database & Articles
         count = db.execute("SELECT COUNT(*) FROM blogs").fetchone()[0]
         print(f"✓ Total Blogs in Database: {count}")
-        assert count >= 12, "Should have at least 12 blogs seeded"
+        assert count >= 19, f"Should have at least 19 blogs seeded, found {count}"
         
         client = app.app.test_client()
 
@@ -68,6 +68,44 @@ def run_tests():
         assert 'Rust' in chat_data3['response']
         print(f"✓ AI Chatbot Systems Knowledge: \"{chat_data3['response'][:60]}...\"")
 
+        # Test Apple & Samsung Chatbot Knowledge
+        chat_resp_apple = client.post('/api/ai/chat', json={'prompt': 'What is Apple Intelligence and M4?'})
+        assert chat_resp_apple.status_code == 200
+        chat_data_apple = chat_resp_apple.get_json()
+        assert 'Apple' in chat_data_apple['response'] and 'Unified Memory' in chat_data_apple['response']
+        print("✓ AI Chatbot Apple & Silicon Knowledge Verified!")
+
+        chat_resp_samsung = client.post('/api/ai/chat', json={'prompt': 'Tell me about Samsung Galaxy S25 and Galaxy AI'})
+        assert chat_resp_samsung.status_code == 200
+        chat_data_samsung = chat_resp_samsung.get_json()
+        assert 'Samsung' in chat_data_samsung['response'] and 'Galaxy AI' in chat_data_samsung['response']
+        print("✓ AI Chatbot Samsung Galaxy & AI Knowledge Verified!")
+
+        # Test Out-of-Blog General Tech & Coding Questions
+        chat_resp_algo = client.post('/api/ai/chat', json={'prompt': 'How do I implement binary search in Python?'})
+        assert chat_resp_algo.status_code == 200
+        chat_data_algo = chat_resp_algo.get_json()
+        assert 'binary_search' in chat_data_algo['response'] or 'Binary Search' in chat_data_algo['response']
+        print("✓ AI Chatbot Out-of-Blog Algorithm Question Verified!")
+
+        chat_resp_net = client.post('/api/ai/chat', json={'prompt': 'What is the difference between TCP and UDP?'})
+        assert chat_resp_net.status_code == 200
+        chat_data_net = chat_resp_net.get_json()
+        assert 'TCP' in chat_data_net['response'] and 'UDP' in chat_data_net['response']
+        print("✓ AI Chatbot Out-of-Blog Networking Question Verified!")
+
+        chat_resp_docker = client.post('/api/ai/chat', json={'prompt': 'How do I write a Dockerfile for a web app?'})
+        assert chat_resp_docker.status_code == 200
+        chat_data_docker = chat_resp_docker.get_json()
+        assert 'docker' in chat_data_docker['response'].lower()
+        print("✓ AI Chatbot Out-of-Blog DevOps Question Verified!")
+
+        chat_resp_gen = client.post('/api/ai/chat', json={'prompt': 'Explain quantum superposition and Schrödinger equation'})
+        assert chat_resp_gen.status_code == 200
+        chat_data_gen = chat_resp_gen.get_json()
+        assert 'Quantum' in chat_data_gen['response'] or 'superposition' in chat_data_gen['response'].lower()
+        print("✓ AI Chatbot Out-of-Blog Science Question Verified!")
+
         # 6. Test User Registration (/api/auth/register)
         test_email = f"test_{os.getpid()}@gmail.com"
         reg_resp = client.post('/api/auth/register', json={
@@ -103,14 +141,28 @@ def run_tests():
         assert google_data['user']['email'] == google_email
         print(f"✓ Google / Gmail OAuth Sign-In Verified: {google_email}")
 
-        # 9. Test Blog Detail & Search
-        resp_blog = client.get('/blog/deepseek-r1-claude-3-7-reasoning-llms-frontier')
-        assert resp_blog.status_code == 200
-        print("✓ Blog Detail Route: 200 OK")
+        # 9. Test Blog Detail & Search for New Blogs
+        new_test_slugs = [
+            'apple-intelligence-m4-chips-unified-memory-architecture',
+            'samsung-galaxy-s25-ultra-galaxy-ai-breakthroughs',
+            'apple-vision-pro-spatial-computing-visionos-future',
+            'samsung-trifold-foldable-displays-utg-engineering',
+            'nvidia-blackwell-gb200-exascale-ai-supercomputing',
+            'humanoid-robotics-embodied-ai-optimus-atlas',
+            'wifi-7-and-6g-terahertz-wireless-networks'
+        ]
+        for slug in new_test_slugs:
+            resp_blog = client.get(f'/blog/{slug}')
+            assert resp_blog.status_code == 200, f"Blog detail failed for slug: {slug}"
+        print(f"✓ All {len(new_test_slugs)} New Apple, Samsung, and Tech Blog Routes Verified: 200 OK")
 
-        resp_search = client.get('/api/search?q=quantum')
-        assert resp_search.status_code == 200
-        print("✓ Search API: 200 OK")
+        # Test Search API
+        for query in ['apple', 'samsung', 'nvidia', 'robotics', 'wifi']:
+            resp_search = client.get(f'/api/search?q={query}')
+            assert resp_search.status_code == 200
+            search_results = resp_search.get_json()
+            assert len(search_results) > 0, f"No search results found for query: {query}"
+        print("✓ Search API with Apple, Samsung, and Tech Queries Verified: 200 OK")
 
     print("\n🎉 ALL TESTS PASSED WITH 100% SUCCESS! 🎉")
 
