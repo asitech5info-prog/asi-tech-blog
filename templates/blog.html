@@ -44,6 +44,11 @@
                 {% if reviews %}
                 <span style="color:#fbbf24;"><i class="fas fa-star"></i> {{ avg_rating }} ({{ reviews|length }})</span>
                 {% endif %}
+                <!-- Bookmark Button -->
+                <button type="button" class="article-bookmark-toggle-btn" id="articleBookmarkBtn" data-slug="{{ blog.slug }}" data-title="{{ blog.title }}" data-readtime="{{ blog.read_time or 4 }}" data-category="{{ blog.category }}" title="Save to Reading List">
+                    <i class="far fa-bookmark"></i>
+                    <span>Save</span>
+                </button>
             </div>
         </div>
     </div>
@@ -206,8 +211,93 @@
                     <button type="button" class="share-pill copy" onclick="copyArticleLink()" title="Copy Link to Clipboard" aria-label="Copy Link">
                         <i class="fas fa-link"></i>
                     </button>
+                    <!-- Download PDF / Clean Print -->
+                    <button type="button" class="share-pill print-btn" onclick="window.print()" title="Print / Save Clean Whitepaper PDF" aria-label="Print Article">
+                        <i class="fas fa-file-pdf"></i>
+                    </button>
                 </div>
             </div>
+
+            <!-- Emoji Micro-Reactions Deck -->
+            <div class="reactions-deck-card" id="reactionsDeckCard">
+                <div class="reactions-deck-header">
+                    <strong><i class="fas fa-bolt" style="color:var(--accent-pink-light);"></i> Reader Micro-Reactions</strong>
+                    <span>How did this publication impact your thinking?</span>
+                </div>
+                <div class="reactions-pill-grid">
+                    <button type="button" class="reaction-pill-btn" data-slug="{{ blog.slug }}" data-reaction="fire" title="Mind Blown">
+                        <span class="reaction-emoji">🔥</span>
+                        <span class="reaction-name">Mind Blown</span>
+                        <span class="reaction-counter" id="reactCount-fire">{{ reactions.get('fire', 0) }}</span>
+                    </button>
+                    <button type="button" class="reaction-pill-btn" data-slug="{{ blog.slug }}" data-reaction="bulb" title="Insightful">
+                        <span class="reaction-emoji">💡</span>
+                        <span class="reaction-name">Insightful</span>
+                        <span class="reaction-counter" id="reactCount-bulb">{{ reactions.get('bulb', 0) }}</span>
+                    </button>
+                    <button type="button" class="reaction-pill-btn" data-slug="{{ blog.slug }}" data-reaction="rocket" title="Next-Gen Tech">
+                        <span class="reaction-emoji">🚀</span>
+                        <span class="reaction-name">Next-Gen</span>
+                        <span class="reaction-counter" id="reactCount-rocket">{{ reactions.get('rocket', 0) }}</span>
+                    </button>
+                    <button type="button" class="reaction-pill-btn" data-slug="{{ blog.slug }}" data-reaction="mindblown" title="Mind Bending">
+                        <span class="reaction-emoji">🤯</span>
+                        <span class="reaction-name">Mind Bending</span>
+                        <span class="reaction-counter" id="reactCount-mindblown">{{ reactions.get('mindblown', 0) }}</span>
+                    </button>
+                    <button type="button" class="reaction-pill-btn" data-slug="{{ blog.slug }}" data-reaction="heart" title="Loved It">
+                        <span class="reaction-emoji">❤️</span>
+                        <span class="reaction-name">Loved It</span>
+                        <span class="reaction-counter" id="reactCount-heart">{{ reactions.get('heart', 0) }}</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Interactive Article Comprehension Quiz Module -->
+            <section class="article-quiz-container" id="articleQuizSection">
+                <div class="quiz-header-wrap">
+                    <div class="quiz-header-badge"><i class="fas fa-graduation-cap"></i> COMPREHENSION CHECK</div>
+                    <h3 class="quiz-title">Test Your Understanding: {{ blog.category }}</h3>
+                    <p class="quiz-subtitle">Answer these 3 quick technical questions to verify the core architectural takeaways.</p>
+                </div>
+
+                <div class="quiz-box-card" id="quizBoxCard" data-slug="{{ blog.slug }}">
+                    {% for q in quiz_data %}
+                    {% set q_idx = loop.index0 %}
+                    <div class="quiz-question-item" data-qindex="{{ q_idx }}" data-correct="{{ q.correct }}">
+                        <div class="quiz-q-header">
+                            <span class="quiz-q-num">Q{{ loop.index }}</span>
+                            <h4 class="quiz-q-text">{{ q.q }}</h4>
+                        </div>
+                        <div class="quiz-options-list">
+                            {% for opt in q.options %}
+                            <button type="button" class="quiz-option-btn" data-optindex="{{ loop.index0 }}" onclick="selectQuizOption(this, {{ q_idx }}, {{ loop.index0 }}, {{ q.correct }})">
+                                <span class="opt-bullet">{{ ['A', 'B', 'C'][loop.index0] }}</span>
+                                <span class="opt-text">{{ opt }}</span>
+                                <i class="fas fa-check opt-icon-correct"></i>
+                                <i class="fas fa-times opt-icon-wrong"></i>
+                            </button>
+                            {% endfor %}
+                        </div>
+                        <div class="quiz-explanation-box" id="quizExpl-{{ q_idx }}" style="display:none;">
+                            <i class="fas fa-lightbulb"></i>
+                            <span>{{ q.explanation }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <div class="quiz-score-summary" id="quizScoreSummary" style="display:none;">
+                        <div class="quiz-score-circle">
+                            <span id="quizScorePercentage">100%</span>
+                        </div>
+                        <div class="quiz-score-meta">
+                            <h4 id="quizScoreTitle">Mastery Achieved! 🎉</h4>
+                            <p id="quizScoreDesc">You answered all questions correctly. Excellent engineering intuition!</p>
+                        </div>
+                        <button type="button" class="btn-quiz-retry" onclick="resetQuiz()"><i class="fas fa-rotate-right"></i> Retake Quiz</button>
+                    </div>
+                </div>
+            </section>
 
             <!-- Prev / Next Navigation -->
             <div class="post-navigation-row">

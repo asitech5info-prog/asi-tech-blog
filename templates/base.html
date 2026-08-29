@@ -29,16 +29,23 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- FontAwesome Icons (v6.6.0 for x-twitter and all modern brand icons) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <!-- RSS Feed -->
+    <link rel="alternate" type="application/rss+xml" title="ASI TECH RSS Feed" href="{{ url_for('rss_feed') }}">
     
-    <!-- Custom Style System with Cache Busting -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=5.0">
+    <!-- FontAwesome 6 Pro-style icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    <!-- Top Reading Progress Indicator -->
+    <div class="reading-progress-track" id="readingProgressTrack">
+        <div class="reading-progress-bar" id="readingProgressBar"></div>
+    </div>
 
     <!-- Sticky Glassmorphic Navbar -->
     <header class="navbar">
@@ -100,17 +107,35 @@
                     </div>
                 </div>
 
+                <a href="{{ url_for('compare_page') }}" class="nav-link {% if request.endpoint == 'compare_page' %}active{% endif %}">
+                    <i class="fas fa-scale-balanced"></i> Compare Tech
+                </a>
+
                 <a href="{{ url_for('contact') }}" class="nav-link {% if request.endpoint == 'contact' %}active{% endif %}">
                     <i class="fas fa-paper-plane"></i> Contact
                 </a>
             </nav>
 
-            <!-- Actions: Day/Night Toggle, Search, User Auth & Mobile Toggle -->
+            <!-- Actions: Theme Selector, Bookmarks Drawer, Search, User Auth & Mobile Toggle -->
             <div class="nav-right">
-                <!-- Day / Night Toggle -->
-                <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Day / Night Theme" title="Toggle Day / Night Mode">
-                    <i class="fas fa-sun theme-icon-sun"></i>
-                    <i class="fas fa-moon theme-icon-moon"></i>
+                <!-- Multi-Theme Selector Dropdown -->
+                <div class="theme-dropdown-wrap" id="themeDropdownWrap">
+                    <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Select Theme" title="Choose Visual Theme">
+                        <i class="fas fa-palette theme-icon-palette"></i>
+                    </button>
+                    <div class="theme-menu-popover" id="themeMenuPopover">
+                        <div class="theme-menu-title"><i class="fas fa-swatchbook"></i> Visual Themes</div>
+                        <button type="button" class="theme-opt-btn" data-theme="dark"><i class="fas fa-moon" style="color:#a855f7;"></i> Dark Nebula</button>
+                        <button type="button" class="theme-opt-btn" data-theme="cyberpunk"><i class="fas fa-bolt" style="color:#06b6d4;"></i> Cyberpunk Neon</button>
+                        <button type="button" class="theme-opt-btn" data-theme="oled"><i class="fas fa-circle" style="color:#94a3b8;"></i> Pure OLED Black</button>
+                        <button type="button" class="theme-opt-btn" data-theme="light"><i class="fas fa-sun" style="color:#f59e0b;"></i> Clean Light</button>
+                    </div>
+                </div>
+
+                <!-- Bookmarks / Reading List Drawer Button -->
+                <button type="button" class="quick-nav-icon-btn" id="bookmarkDrawerBtn" title="Saved Articles / Reading List" aria-label="Saved Articles">
+                    <i class="fas fa-bookmark"></i>
+                    <span class="nav-bookmark-count" id="navBookmarkCount">0</span>
                 </button>
 
                 <!-- Search Button -->
@@ -309,6 +334,8 @@
                     <h4>Quick Links</h4>
                     <ul class="footer-link-list">
                         <li><a href="{{ url_for('home') }}"><i class="fas fa-chevron-right"></i> Home Page</a></li>
+                        <li><a href="{{ url_for('compare_page') }}"><i class="fas fa-scale-balanced" style="color:var(--accent-cyan);"></i> Compare Tech</a></li>
+                        <li><a href="{{ url_for('rss_feed') }}" target="_blank"><i class="fas fa-rss" style="color:#fb923c;"></i> RSS Feed</a></li>
                         <li><a href="{{ url_for('search') }}"><i class="fas fa-chevron-right"></i> Search Archive</a></li>
                         <li><a href="{{ url_for('contact') }}"><i class="fas fa-chevron-right"></i> Contact Us</a></li>
                         <li><a href="javascript:void(0)" onclick="openPrivacyModal()"><i class="fas fa-shield-halved"></i> Privacy Policy</a></li>
@@ -320,11 +347,34 @@
             <div class="footer-bottom-row">
                 <p>&copy; {{ now_year }} <strong>ASI TECH</strong>. Engineered with precision for the global tech community.</p>
                 <div style="display:flex; gap:16px;">
+                    <a href="{{ url_for('rss_feed') }}" target="_blank" style="color:var(--text-dim); font-size:0.82rem;"><i class="fas fa-rss"></i> RSS</a>
                     <a href="javascript:void(0)" onclick="openPrivacyModal()" style="color:var(--text-dim); font-size:0.82rem;">Privacy &amp; Terms</a>
                 </div>
             </div>
         </div>
     </footer>
+
+    <!-- Slide-out Bookmarks & Reading List Drawer -->
+    <div class="bookmarks-drawer-overlay" id="bookmarksOverlay"></div>
+    <aside class="bookmarks-drawer" id="bookmarksDrawer" aria-label="Saved Articles / Reading List">
+        <div class="drawer-header">
+            <div class="drawer-title-wrap">
+                <i class="fas fa-bookmark" style="color:var(--accent-cyan-light);"></i>
+                <h3>Reading List (<span id="drawerBookmarkCount">0</span>)</h3>
+            </div>
+            <button type="button" class="drawer-close-btn" id="closeBookmarksBtn" aria-label="Close bookmarks"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="drawer-body" id="bookmarksListContainer">
+            <!-- Dynamic bookmark items loaded via JS -->
+            <div class="drawer-empty-state">
+                <i class="far fa-bookmark"></i>
+                <p>No saved articles yet.<br>Click the <i class="fas fa-bookmark"></i> bookmark icon on any article or card to save it for later!</p>
+            </div>
+        </div>
+        <div class="drawer-footer">
+            <button type="button" class="btn-clear-bookmarks" id="clearBookmarksBtn"><i class="fas fa-trash-can"></i> Clear All</button>
+        </div>
+    </aside>
 
     <!-- ======================================================================
          PRIVACY POLICY CONSENT POPUP BANNER & DIALOG MODAL

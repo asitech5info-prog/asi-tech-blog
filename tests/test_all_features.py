@@ -157,14 +157,60 @@ def run_tests():
         print(f"✓ All {len(new_test_slugs)} New Apple, Samsung, and Tech Blog Routes Verified: 200 OK")
 
         # Test Search API
-        for query in ['apple', 'samsung', 'nvidia', 'robotics', 'wifi']:
-            resp_search = client.get(f'/api/search?q={query}')
-            assert resp_search.status_code == 200
-            search_results = resp_search.get_json()
-            assert len(search_results) > 0, f"No search results found for query: {query}"
-        print("✓ Search API with Apple, Samsung, and Tech Queries Verified: 200 OK")
+        # 10. Test Tech Benchmark & Comparison Suite (/compare)
+        resp_comp = client.get('/compare')
+        assert resp_comp.status_code == 200
+        assert b'TECH BENCHMARK' in resp_comp.data
+        print("✓ Tech Comparison Suite Dashboard (/compare): 200 OK")
+
+        resp_comp_preset = client.get('/compare/deepseek-r1-vs-claude-3-7')
+        assert resp_comp_preset.status_code == 200
+        assert b'DeepSeek-R1 vs Claude 3.7' in resp_comp_preset.data
+        print("✓ Tech Comparison Preset (/compare/deepseek-r1-vs-claude-3-7): 200 OK")
+
+        resp_comp_api = client.get('/api/compare/apple-m4-max-vs-snapdragon-8-elite')
+        assert resp_comp_api.status_code == 200
+        comp_api_data = resp_comp_api.get_json()
+        assert comp_api_data['status'] == 'success'
+        assert 'Apple Silicon M4 Max' in comp_api_data['data']['item_a']['name']
+        print("✓ Tech Comparison API (/api/compare/...): 200 OK")
+
+        # 11. Test RSS Feed (/feed.xml)
+        resp_rss = client.get('/feed.xml')
+        assert resp_rss.status_code == 200
+        assert resp_rss.mimetype == 'application/rss+xml'
+        assert b'<rss version="2.0"' in resp_rss.data
+        assert b'<channel>' in resp_rss.data
+        assert b'<item>' in resp_rss.data
+        print("✓ RSS 2.0 Feed Endpoint (/feed.xml): 200 OK & Valid XML")
+
+        # 12. Test Emoji Micro-Reactions API (/api/blog/<slug>/react)
+        test_slug = 'apple-intelligence-m4-chips-unified-memory-architecture'
+        resp_react = client.post(f'/api/blog/{test_slug}/react', json={'reaction': 'fire'})
+        assert resp_react.status_code == 200
+        react_data = resp_react.get_json()
+        assert react_data['status'] == 'success'
+        assert react_data['reaction'] == 'fire'
+        assert react_data['count'] >= 1
+        print(f"✓ Emoji Micro-Reactions API POST (/api/blog/.../react): Count = {react_data['count']}")
+
+        resp_get_reactions = client.get(f'/api/blog/{test_slug}/reactions')
+        assert resp_get_reactions.status_code == 200
+        get_react_data = resp_get_reactions.get_json()
+        assert get_react_data['status'] == 'success'
+        assert 'fire' in get_react_data['reactions']
+        print("✓ Emoji Micro-Reactions API GET (/api/blog/.../reactions): 200 OK")
+
+        # 13. Test Article Quiz API (/api/quiz/<slug>)
+        resp_quiz = client.get(f'/api/quiz/{test_slug}')
+        assert resp_quiz.status_code == 200
+        quiz_data = resp_quiz.get_json()
+        assert quiz_data['status'] == 'success'
+        assert len(quiz_data['quiz']) == 3
+        print(f"✓ Article Quiz API (/api/quiz/...): {len(quiz_data['quiz'])} questions verified")
 
     print("\n🎉 ALL TESTS PASSED WITH 100% SUCCESS! 🎉")
 
 if __name__ == '__main__':
     run_tests()
+

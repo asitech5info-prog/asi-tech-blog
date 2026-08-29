@@ -208,6 +208,15 @@ def init_db():
                 avatar TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
+
+            CREATE TABLE IF NOT EXISTS blog_reactions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                blog_id INTEGER NOT NULL,
+                reaction_type TEXT NOT NULL,
+                count INTEGER DEFAULT 0,
+                UNIQUE(blog_id, reaction_type),
+                FOREIGN KEY (blog_id) REFERENCES blogs (id)
+            );
         """)
         
         cursor = db.cursor()
@@ -1718,6 +1727,19 @@ def blog_detail(slug):
         eli5_content = generate_eli5_fallback(blog['title'], blog['content'])
     eli5_read_time = calculate_read_time(eli5_content)
 
+    # Fetch reaction counts
+    reactions_raw = db.execute(
+        "SELECT reaction_type, count FROM blog_reactions WHERE blog_id = ?",
+        (blog['id'],)
+    ).fetchall()
+    reactions = {r['reaction_type']: r['count'] for r in reactions_raw}
+    for rtype in ['fire', 'bulb', 'rocket', 'mindblown', 'heart']:
+        if rtype not in reactions:
+            reactions[rtype] = 0
+
+    # Fetch article quiz
+    quiz_data = get_article_quiz(blog)
+
     return render_template(
         'blog.html',
         blog=blog,
@@ -1729,6 +1751,8 @@ def blog_detail(slug):
         prev_blog=prev_blog,
         next_blog=next_blog,
         tag_list=tag_list,
+        reactions=reactions,
+        quiz_data=quiz_data,
         category_config=CATEGORY_CONFIG
     )
 
@@ -1774,6 +1798,539 @@ def like_blog(slug):
     db.execute("UPDATE blogs SET likes = ? WHERE id = ?", (new_likes, blog['id']))
     db.commit()
     return jsonify({'status': 'success', 'likes': new_likes})
+
+# ==============================================================================
+# TECH BENCHMARK & COMPARISON SUITE DATA
+# ==============================================================================
+TECH_COMPARISONS = {
+    'apple-m4-max-vs-snapdragon-8-elite': {
+        'id': 'apple-m4-max-vs-snapdragon-8-elite',
+        'title': 'Apple M4 Max vs Qualcomm Snapdragon 8 Elite',
+        'category': 'Silicon & Mobile Architecture',
+        'headline': 'The Battle for Maximum Efficiency & AI Inference Throughput',
+        'item_a': {
+            'name': 'Apple Silicon M4 Max',
+            'badge': 'macOS / Workstation',
+            'color': '#38bdf8',
+            'specs': {
+                'Process Node': 'TSMC 3nm (N3E)',
+                'Max Clock Speed': '4.50 GHz Performance Core',
+                'Memory Bandwidth': '546 GB/s Unified Memory',
+                'Max RAM Capacity': 'Up to 128 GB Unified RAM',
+                'NPU AI Power': '38 TOPS (16-Core)',
+                'Single-Core (GB6)': '4,060',
+                'Multi-Core (GB6)': '26,700',
+                'Target Form Factor': 'MacBook Pro & Mac Studio'
+            },
+            'pros': [
+                'Unmatched 546 GB/s zero-copy memory bandwidth',
+                'Runs local 70B quantized LLMs effortlessly in RAM',
+                'Class-leading single-core IPC and battery runtime'
+            ],
+            'cons': [
+                'Locked to Apple hardware ecosystem',
+                'Non-upgradable unified memory'
+            ]
+        },
+        'item_b': {
+            'name': 'Snapdragon 8 Elite (for Galaxy)',
+            'badge': 'Android / Flagship Mobile',
+            'color': '#a855f7',
+            'specs': {
+                'Process Node': 'TSMC 3nm (N3E)',
+                'Max Clock Speed': '4.32 GHz Oryon Prime Core',
+                'Memory Bandwidth': '100 GB/s LPDDR5X',
+                'Max RAM Capacity': 'Up to 24 GB Mobile RAM',
+                'NPU AI Power': '45 TOPS Hexagon NPU',
+                'Single-Core (GB6)': '3,250',
+                'Multi-Core (GB6)': '10,600',
+                'Target Form Factor': 'Samsung Galaxy S25 Ultra'
+            },
+            'pros': [
+                'Desktop-class custom Oryon core clock speeds',
+                '45 TOPS NPU specialized for multi-token speculation',
+                'Hardware-accelerated Nanite mesh shading for gaming'
+            ],
+            'cons': [
+                'Thermal throttling under sustained extreme loads',
+                'Limited memory bandwidth compared to desktop silicon'
+            ]
+        },
+        'verdict': 'Apple M4 Max reigns supreme for heavy workstation compute, video rendering, and multi-gigabyte local LLMs. Snapdragon 8 Elite is the undisputed king of pocket mobile flagships with superior peak clock speeds and on-device multimodal agents.'
+    },
+    'deepseek-r1-vs-claude-3-7': {
+        'id': 'deepseek-r1-vs-claude-3-7',
+        'title': 'DeepSeek-R1 vs Claude 3.7 Sonnet',
+        'category': 'Frontier Reasoning AI',
+        'headline': 'Pure Rule-Based Reinforcement Learning vs Hybrid Hybrid-Thinking Foundation Models',
+        'item_a': {
+            'name': 'DeepSeek-R1',
+            'badge': 'Open-Weights Frontier',
+            'color': '#38bdf8',
+            'specs': {
+                'Architecture': 'Mixture-of-Experts (MoE) 671B (37B active)',
+                'Training Paradigm': 'Pure Rule-Based Reinforcement Learning (RL)',
+                'Reasoning Mechanism': 'Autonomous Dynamic Chain-of-Thought',
+                'MATH-500 Benchmark': '97.3%',
+                'AIME 2024 Benchmark': '79.8%',
+                'Codeforces Percentile': '96.3%',
+                'Inference Cost': '$0.55 / 1M Input Tokens'
+            },
+            'pros': [
+                'Open weights downloadable for local and private deployment',
+                'Incredible reasoning capabilities emergent from pure RL',
+                'Extreme cost efficiency via MoE architectural sparsity'
+            ],
+            'cons': [
+                'Requires substantial local VRAM for unquantized weights',
+                'Less conversational polish compared to heavily aligned assistants'
+            ]
+        },
+        'item_b': {
+            'name': 'Claude 3.7 Sonnet',
+            'badge': 'Hybrid Frontier API',
+            'color': '#ec4899',
+            'specs': {
+                'Architecture': 'Dense / Hybrid Dynamic Reasoning Transformer',
+                'Training Paradigm': 'Constitutional RL + Test-Time Thinking Control',
+                'Reasoning Mechanism': 'Controllable Thinking Budget Slider',
+                'MATH-500 Benchmark': '96.8%',
+                'AIME 2024 Benchmark': '82.4%',
+                'Codeforces Percentile': '97.1%',
+                'Inference Cost': '$3.00 / 1M Input Tokens'
+            },
+            'pros': [
+                'Dynamic slider to dial thinking time up or down per query',
+                'Unrivaled software engineering & full-stack code refactoring',
+                'Nuanced natural language synthesis and ethical steerability'
+            ],
+            'cons': [
+                'Proprietary closed-source API model',
+                'Higher per-token pricing for heavy inference workloads'
+            ]
+        },
+        'verdict': 'DeepSeek-R1 broke the open-source barrier proving that pure RL yields frontier reasoning. Claude 3.7 Sonnet provides the most polished, controllable hybrid engineering assistant for enterprise teams.'
+    },
+    'rust-vs-zig-vs-mojo': {
+        'id': 'rust-vs-zig-vs-mojo',
+        'title': 'Rust vs Zig vs Mojo',
+        'category': 'High-Performance Systems & AI',
+        'headline': 'Memory Safety Champion vs Explicit Comptime Simplicity vs Hardware AI Velocity',
+        'item_a': {
+            'name': 'Rust',
+            'badge': 'Memory-Safe Standard',
+            'color': '#fb923c',
+            'specs': {
+                'Memory Management': 'Compile-Time Borrow Checker',
+                'Garbage Collector': 'Zero GC',
+                'Compilation Speed': 'Moderate (LLVM heavy)',
+                'C Interoperability': 'Via `extern "C"` FFI bindings',
+                'Primary Domain': 'OS Kernels, High-Throughput Backends, Cryptography',
+                'Ecosystem Maturity': 'Industry Standard (Linux kernel, Windows)'
+            },
+            'pros': [
+                'Guarantees zero data races and memory corruption at compile time',
+                'Massive crates.io ecosystem and production enterprise adoption',
+                'Rich trait system and ergonomic functional combinators'
+            ],
+            'cons': [
+                'Steep borrow-checker learning curve for newcomers',
+                'Slower compilation times on massive codebases'
+            ]
+        },
+        'item_b': {
+            'name': 'Mojo',
+            'badge': 'AI Accelerator',
+            'color': '#ef4444',
+            'specs': {
+                'Memory Management': 'Hybrid Ownership & MLIR Memory Allocation',
+                'Garbage Collector': 'Zero GC',
+                'Compilation Speed': 'Ultra-Fast (MLIR Native)',
+                'C Interoperability': 'Direct Python & C ABI interop',
+                'Primary Domain': 'AI Kernels, Tensor Compilers, GPU Acceleration',
+                'Ecosystem Maturity': 'Rapidly Growing (Modular MAX)'
+            },
+            'pros': [
+                'Python-like intuitive syntax compiling to C++ / SIMD performance',
+                'Direct access to GPU threads, tensor cores, and vector instructions',
+                'Built natively on Multi-Level Intermediate Representation (MLIR)'
+            ],
+            'cons': [
+                'Younger ecosystem compared to Rust and C++',
+                'Tooling and community libraries still maturing'
+            ]
+        },
+        'verdict': 'Rust is the undisputed foundation for mission-critical infrastructure, web backends, and operating systems. Mojo is the future high-velocity language for AI engineers needing Python ergonomics with CUDA-grade hardware parallelism.'
+    },
+    'nvidia-blackwell-vs-hopper': {
+        'id': 'nvidia-blackwell-vs-hopper',
+        'title': 'NVIDIA Blackwell GB200 vs Hopper H100',
+        'category': 'AI Hardware & Datacenter',
+        'headline': 'The Generational Leap to Exascale Liquid-Cooled Rack Supercomputing',
+        'item_a': {
+            'name': 'Blackwell GB200 NVL72',
+            'badge': 'Rack-Scale Exascale',
+            'color': '#76b900',
+            'specs': {
+                'Transistor Count': '208 Billion (Dual-Die)',
+                'Process Node': 'Custom TSMC 4NP',
+                'Interconnect Bandwidth': '10 TB/s NVLink-C2C',
+                'Memory Bandwidth': '8.0 TB/s (192 GB HBM3e)',
+                'FP4 Inference FLOPs': '40 PFLOPS per Dual-GPU',
+                'Cooling Solution': 'Direct-to-Chip Liquid Cooling CDU',
+                'Inference Speedup': '30x vs H100 for LLMs'
+            },
+            'pros': [
+                '130 TB/s aggregate rack bandwidth acts as one giant 13.5 TB GPU',
+                '25x reduction in energy consumption per token generated',
+                'Native FP4 micro-tensor engine doubles inference density'
+            ],
+            'cons': [
+                'Requires modern liquid-cooled datacenter plumbing and CDUs',
+                'High infrastructure deployment investment'
+            ]
+        },
+        'item_b': {
+            'name': 'Hopper H100 SXM',
+            'badge': 'Previous Gold Standard',
+            'color': '#94a3b8',
+            'specs': {
+                'Transistor Count': '80 Billion (Single Die)',
+                'Process Node': 'TSMC 4N',
+                'Interconnect Bandwidth': '900 GB/s NVLink 4',
+                'Memory Bandwidth': '3.35 TB/s (80 GB HBM3)',
+                'FP8 Inference FLOPs': '4 PFLOPS',
+                'Cooling Solution': 'Air Cooled / Liquid Optional',
+                'Inference Speedup': '1x Baseline'
+            },
+            'pros': [
+                'Extremely mature software ecosystem and cloud availability',
+                'Air-cooled configurations deployable in standard racks',
+                'Battle-tested reliability across all major cloud hyperscalers'
+            ],
+            'cons': [
+                'Limited by single-die reticle constraints',
+                'High power consumption when scaling to trillion-parameter models'
+            ]
+        },
+        'verdict': 'Hopper established modern generative AI. Blackwell GB200 NVL72 transitions the world to rack-scale exascale computing, slashing token generation costs by up to 25x.'
+    }
+}
+
+def get_article_quiz(blog):
+    """Returns 3 curated interactive multiple-choice questions for the article."""
+    title_lower = blog['title'].lower()
+    category = blog['category']
+
+    # Curated topic-specific quizzes
+    if 'deepseek' in title_lower or 'reasoning' in title_lower:
+        return [
+            {
+                'q': 'What core training breakthrough allowed DeepSeek-R1-Zero to develop reasoning capabilities?',
+                'options': [
+                    'Massive human supervised fine-tuning logs',
+                    'Pure rule-based reinforcement learning on deterministic proof verifiers',
+                    'Random token brute-forcing in inference loops'
+                ],
+                'correct': 1,
+                'explanation': 'DeepSeek-R1-Zero proved that reasoning behaviors like self-correction and chain-of-thought emerge naturally from pure RL with math and code verification rules without human demonstrations.'
+            },
+            {
+                'q': 'What is the primary benefit of test-time compute scaling in reasoning LLMs?',
+                'options': [
+                    'It shrinks the total number of weights on disk',
+                    'Allocating extra thinking tokens at query time yields exponential error reduction on hard proofs',
+                    'It completely eliminates the need for GPUs'
+                ],
+                'correct': 1,
+                'explanation': 'Reasoning models can deliberate, backtrack, and verify hypotheses during generation time, dramatically boosting accuracy on math and programming benchmarks.'
+            },
+            {
+                'q': 'What does the model do when it detects an error in its chain-of-thought?',
+                'options': [
+                    'Halts generation immediately and returns an error',
+                    'Autonomously backtracks in scratchpad memory and tries an alternative solving path',
+                    'Increases the temperature parameter to 2.0'
+                ],
+                'correct': 1,
+                'explanation': 'Dynamic chain-of-thought enables the model to catch logical fallacies mid-generation, self-correct, and verify the refined steps before delivering the final answer.'
+            }
+        ]
+    elif 'apple' in title_lower or 'm4' in title_lower:
+        return [
+            {
+                'q': 'What peak memory bandwidth does the Apple Silicon M4 Max architecture deliver?',
+                'options': [
+                    '100 GB/s standard LPDDR5',
+                    'Up to 546 GB/s Unified Memory Bandwidth',
+                    '25 GB/s PCIe Gen 3'
+                ],
+                'correct': 1,
+                'explanation': 'Apple M4 Max shatters data bus bottlenecks by delivering up to 546 GB/s of unified zero-copy memory bandwidth directly between CPU, GPU, and Neural Engine.'
+            },
+            {
+                'q': 'How does Unified Memory Architecture (UMA) benefit local AI models like 70B parameter LLMs?',
+                'options': [
+                    'It removes PCIe transfer latency by sharing up to 128GB RAM across CPU, GPU, and Neural Engine without copying',
+                    'It compresses model weights into low-res audio files',
+                    'It forces the model to run on the cloud instead'
+                ],
+                'correct': 0,
+                'explanation': 'Because CPU and GPU share the same memory space, multi-gigabyte neural weights don\'t need to be repeatedly copied over slow buses, allowing giant models to execute locally.'
+            },
+            {
+                'q': 'How does Apple Private Cloud Compute (PCC) guarantee user privacy on server queries?',
+                'options': [
+                    'It stores user logs in an encrypted SQL database for 30 days',
+                    'It runs on custom Apple Silicon servers with verifiable OS builds and zero data retention guarantees',
+                    'It sends queries anonymously through Tor proxies'
+                ],
+                'correct': 1,
+                'explanation': 'Private Cloud Compute nodes are cryptographically verifiable by independent researchers and operate statelessly with non-targetable hardware isolation.'
+            }
+        ]
+    elif 'samsung' in title_lower or 'galaxy' in title_lower or 'foldable' in title_lower:
+        return [
+            {
+                'q': 'What custom prime core CPU architecture powers the Snapdragon 8 Elite inside Galaxy S25?',
+                'options': [
+                    'Qualcomm Oryon Custom Architecture (@ 4.32 GHz)',
+                    'Standard ARM Cortex-A55 clusters',
+                    'Intel x86 Alder Lake'
+                ],
+                'correct': 0,
+                'explanation': 'Snapdragon 8 Elite departs from standard big.LITTLE ARM clusters by using custom high-frequency Oryon cores hitting up to 4.32 GHz.'
+            },
+            {
+                'q': 'What material innovation allows Samsung Tri-Fold displays to bend without creasing?',
+                'options': [
+                    'Thick acrylic sheets',
+                    'Sub-30 micron Ultra-Thin Glass (UTG 3.0) with dual waterdrop zero-gap hinges',
+                    'Paper-based optical film'
+                ],
+                'correct': 1,
+                'explanation': 'Ultra-Thin Glass (UTG) under 30 microns combined with dual waterdrop teardrop hinges minimizes mechanical stress, rated for 500,000+ fold cycles.'
+            },
+            {
+                'q': 'How does Samsung Galaxy AI 2.0 perform live phone call translation across 20+ languages?',
+                'options': [
+                    'It calls an external human call center',
+                    'It runs an on-device bidirectional neural model at 16kHz with zero cloud latency',
+                    'It sends text transcripts to Google Translate servers'
+                ],
+                'correct': 1,
+                'explanation': 'Galaxy AI processes live speech locally on the Hexagon NPU, translating vocal harmonics directly in real time.'
+            }
+        ]
+    elif 'nvidia' in title_lower or 'blackwell' in title_lower:
+        return [
+            {
+                'q': 'How many transistors are integrated on the dual-die NVIDIA Blackwell package?',
+                'options': [
+                    '80 Billion transistors',
+                    '208 Billion transistors',
+                    '1 Trillion transistors'
+                ],
+                'correct': 1,
+                'explanation': 'Blackwell packs 208 billion transistors across two reticle-sized TSMC 4NP dies unified via 10 TB/s NVLink-C2C.'
+            },
+            {
+                'q': 'What new micro-tensor numerical precision does Blackwell introduce for 30x faster inference?',
+                'options': [
+                    'FP4 (4-bit floating point)',
+                    'FP64 double precision only',
+                    'Int16 fixed point'
+                ],
+                'correct': 0,
+                'explanation': 'The 2nd-generation Transformer Engine supports FP4 precision, cutting memory bandwidth needs in half while doubling mathematical throughput.'
+            },
+            {
+                'q': 'How does the GB200 NVL72 rack maintain thermal stability under 120kW load?',
+                'options': [
+                    'Giant high-speed server fans',
+                    'Direct-to-chip liquid cooling with dedicated Coolant Distribution Units (CDUs)',
+                    'Liquid nitrogen immersion'
+                ],
+                'correct': 1,
+                'explanation': 'NVL72 uses closed-loop direct-to-chip liquid cooling to dissipate 120kW per rack quietly and efficiently.'
+            }
+        ]
+    else:
+        # High quality generic technical quiz based on category
+        return [
+            {
+                'q': f'What is the core engineering goal discussed in this {category} publication?',
+                'options': [
+                    'Maximizing architectural throughput, security, and computational efficiency',
+                    'Deprecating all legacy software and hardware unconditionally',
+                    'Relying exclusively on manual human operations'
+                ],
+                'correct': 0,
+                'explanation': f'Modern {category} engineering emphasizes architectural scalability, automated verification, and deterministic execution.'
+            },
+            {
+                'q': 'Why is hardware-software co-design critical for next-generation systems?',
+                'options': [
+                    'It increases power consumption unnecessarily',
+                    'Eliminating I/O and memory transfer bottlenecks unlocks logarithmic performance gains',
+                    'It prevents developers from writing Python code'
+                ],
+                'correct': 1,
+                'explanation': 'Tightly coupling software algorithms with dedicated silicon accelerators bypasses bus bottlenecks and maximizes energy efficiency.'
+            },
+            {
+                'q': 'What is the recommended best practice for implementing modern tech architectures?',
+                'options': [
+                    'Writing monolithic unverified scripts with no tests',
+                    'Adopting modular isolation, zero-trust security, and automated continuous testing',
+                    'Ignoring memory bandwidth limits'
+                ],
+                'correct': 1,
+                'explanation': 'Modular design paired with comprehensive verification guarantees system stability under high-concurrency production workloads.'
+            }
+        ]
+
+# ----------------- COMPARE ROUTE -----------------
+@app.route('/compare')
+@app.route('/compare/<comparison_id>')
+def compare_page(comparison_id=None):
+    if not comparison_id or comparison_id not in TECH_COMPARISONS:
+        comparison_id = 'apple-m4-max-vs-snapdragon-8-elite'
+    
+    current_comparison = TECH_COMPARISONS[comparison_id]
+    all_comparisons = [
+        {'id': k, 'title': v['title'], 'category': v['category'], 'headline': v['headline']}
+        for k, v in TECH_COMPARISONS.items()
+    ]
+    return render_template(
+        'compare.html',
+        current=current_comparison,
+        all_comparisons=all_comparisons,
+        category_config=CATEGORY_CONFIG
+    )
+
+@app.route('/api/compare/<comparison_id>')
+def api_compare_data(comparison_id):
+    if comparison_id in TECH_COMPARISONS:
+        return jsonify({'status': 'success', 'data': TECH_COMPARISONS[comparison_id]})
+    return jsonify({'status': 'error', 'message': 'Comparison dataset not found'}), 404
+
+# ----------------- RSS FEED ROUTE -----------------
+@app.route('/feed.xml')
+def rss_feed():
+    db = get_db()
+    blogs = db.execute("SELECT * FROM blogs ORDER BY created_at DESC LIMIT 30").fetchall()
+    host_url = request.host_url.rstrip('/')
+    
+    xml_items = []
+    for b in blogs:
+        clean_desc = re.sub(r'<[^>]+>', ' ', b['content'])
+        clean_desc = re.sub(r'#+\s*', '', clean_desc)[:350].strip()
+        pub_date = str(b['created_at'])
+        xml_items.append(f"""
+    <item>
+      <title><![CDATA[{b['title']}]]></title>
+      <link>{host_url}/blog/{b['slug']}</link>
+      <guid isPermaLink="true">{host_url}/blog/{b['slug']}</guid>
+      <category><![CDATA[{b['category']}]]></category>
+      <pubDate>{pub_date}</pubDate>
+      <description><![CDATA[{clean_desc}...]]></description>
+    </item>""")
+    
+    rss_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>ASI TECH - Technology, AI, Science &amp; Innovation</title>
+    <link>{host_url}</link>
+    <description>Exploring the frontiers of Technology, Artificial Intelligence, Science, Education, and Movies.</description>
+    <language>en-us</language>
+    <atom:link href="{host_url}/feed.xml" rel="self" type="application/rss+xml" />
+    {''.join(xml_items)}
+  </channel>
+</rss>"""
+    from flask import Response
+    return Response(rss_xml, mimetype='application/rss+xml')
+
+# ----------------- REACTION APIS -----------------
+@app.route('/api/blog/<slug>/react', methods=['POST'])
+def api_react_blog(slug):
+    db = get_db()
+    blog = db.execute("SELECT id FROM blogs WHERE slug = ?", (slug,)).fetchone()
+    if not blog:
+        return jsonify({'status': 'error', 'message': 'Blog not found'}), 404
+    
+    data = request.get_json() or {}
+    reaction_type = data.get('reaction', '').strip().lower()
+    valid_reactions = {'fire', 'bulb', 'rocket', 'mindblown', 'heart'}
+    
+    if reaction_type not in valid_reactions:
+        return jsonify({'status': 'error', 'message': 'Invalid reaction type'}), 400
+    
+    # Upsert reaction count
+    row = db.execute(
+        "SELECT count FROM blog_reactions WHERE blog_id = ? AND reaction_type = ?",
+        (blog['id'], reaction_type)
+    ).fetchone()
+    
+    if row:
+        new_count = row['count'] + 1
+        db.execute(
+            "UPDATE blog_reactions SET count = ? WHERE blog_id = ? AND reaction_type = ?",
+            (new_count, blog['id'], reaction_type)
+        )
+    else:
+        new_count = 1
+        db.execute(
+            "INSERT INTO blog_reactions (blog_id, reaction_type, count) VALUES (?, ?, ?)",
+            (blog['id'], reaction_type, 1)
+        )
+    db.commit()
+    
+    # Return all current reaction counts for this blog
+    all_reactions = db.execute(
+        "SELECT reaction_type, count FROM blog_reactions WHERE blog_id = ?",
+        (blog['id'],)
+    ).fetchall()
+    counts = {r['reaction_type']: r['count'] for r in all_reactions}
+    for r in valid_reactions:
+        if r not in counts:
+            counts[r] = 0
+            
+    return jsonify({
+        'status': 'success',
+        'reaction': reaction_type,
+        'count': new_count,
+        'reactions': counts
+    })
+
+@app.route('/api/blog/<slug>/reactions')
+def api_get_reactions(slug):
+    db = get_db()
+    blog = db.execute("SELECT id FROM blogs WHERE slug = ?", (slug,)).fetchone()
+    if not blog:
+        return jsonify({'status': 'error', 'message': 'Blog not found'}), 404
+    
+    all_reactions = db.execute(
+        "SELECT reaction_type, count FROM blog_reactions WHERE blog_id = ?",
+        (blog['id'],)
+    ).fetchall()
+    counts = {r['reaction_type']: r['count'] for r in all_reactions}
+    for r in {'fire', 'bulb', 'rocket', 'mindblown', 'heart'}:
+        if r not in counts:
+            counts[r] = 0
+            
+    return jsonify({'status': 'success', 'reactions': counts})
+
+# ----------------- QUIZ API -----------------
+@app.route('/api/quiz/<slug>')
+def api_get_quiz(slug):
+    db = get_db()
+    blog = db.execute("SELECT id, title, category FROM blogs WHERE slug = ?", (slug,)).fetchone()
+    if not blog:
+        return jsonify({'status': 'error', 'message': 'Blog not found'}), 404
+    
+    quiz_questions = get_article_quiz(blog)
+    return jsonify({'status': 'success', 'quiz': quiz_questions})
 
 @app.route('/category/<category>')
 def category_page(category):

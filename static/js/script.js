@@ -12,6 +12,8 @@ document.addEventListener('DOMContentLoaded', function() {
   initMobileMenu();
   initSearchModal();
   initReadingProgressBar();
+  initBookmarks();
+  initEmojiReactions();
   initTableOfContents();
   initEli5Toggle();
   initArticleTTS();
@@ -1571,3 +1573,424 @@ function initAdminEli5Helper() {
     }
   });
 }
+
+/* ==========================================================================
+   19. MULTI-THEME ENGINE (DARK, CYBERPUNK, OLED, LIGHT)
+   ========================================================================== */
+function initThemeToggle() {
+  const themeDropdownWrap = document.getElementById('themeDropdownWrap');
+  const themeToggleBtn = document.getElementById('themeToggleBtn');
+  const themeMenuPopover = document.getElementById('themeMenuPopover');
+  const themeOptBtns = document.querySelectorAll('.theme-opt-btn');
+
+  // Load saved theme or default to 'dark'
+  const savedTheme = localStorage.getItem('asi_theme') || 'dark';
+  applyTheme(savedTheme);
+
+  function applyTheme(themeName) {
+    document.body.classList.remove('theme-cyberpunk', 'theme-oled', 'light-theme');
+    if (themeName === 'cyberpunk') {
+      document.body.classList.add('theme-cyberpunk');
+    } else if (themeName === 'oled') {
+      document.body.classList.add('theme-oled');
+    } else if (themeName === 'light') {
+      document.body.classList.add('light-theme');
+    }
+    localStorage.setItem('asi_theme', themeName);
+
+    // Update active button state
+    themeOptBtns.forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.theme === themeName);
+    });
+  }
+
+  // Toggle Popover
+  if (themeToggleBtn && themeDropdownWrap) {
+    themeToggleBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      themeDropdownWrap.classList.toggle('active');
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!themeDropdownWrap.contains(e.target)) {
+        themeDropdownWrap.classList.remove('active');
+      }
+    });
+  }
+
+  themeOptBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const theme = this.dataset.theme;
+      applyTheme(theme);
+      if (themeDropdownWrap) themeDropdownWrap.classList.remove('active');
+    });
+  });
+}
+
+/* ==========================================================================
+   20. READING PROGRESS BAR
+   ========================================================================== */
+function initReadingProgressBar() {
+  const progressBar = document.getElementById('readingProgressBar');
+  if (!progressBar) return;
+
+  window.addEventListener('scroll', function() {
+    const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+    if (totalHeight <= 0) return;
+    const progress = (window.scrollY / totalHeight) * 100;
+    progressBar.style.width = Math.min(100, Math.max(0, progress)) + '%';
+  }, { passive: true });
+}
+
+/* ==========================================================================
+   21. BOOKMARKS & READING LIST DRAWER
+   ========================================================================== */
+function getBookmarks() {
+  try {
+    return JSON.parse(localStorage.getItem('asi_bookmarks') || '[]');
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveBookmarks(bms) {
+  localStorage.setItem('asi_bookmarks', JSON.stringify(bms));
+  updateBookmarkBadges();
+  renderBookmarksList();
+}
+
+function updateBookmarkBadges() {
+  const bms = getBookmarks();
+  const navBadge = document.getElementById('navBookmarkCount');
+  const drawerBadge = document.getElementById('drawerBookmarkCount');
+  if (navBadge) navBadge.textContent = bms.length;
+  if (drawerBadge) drawerBadge.textContent = bms.length;
+
+  // Update card buttons
+  document.querySelectorAll('.card-bookmark-btn').forEach(btn => {
+    const slug = btn.dataset.slug;
+    const isSaved = bms.some(b => b.slug === slug);
+    btn.classList.toggle('active', isSaved);
+    const icon = btn.querySelector('i');
+    if (icon) {
+      icon.className = isSaved ? 'fas fa-bookmark' : 'far fa-bookmark';
+    }
+  });
+
+  // Update article header button
+  const articleBmBtn = document.getElementById('articleBookmarkBtn');
+  if (articleBmBtn) {
+    const slug = articleBmBtn.dataset.slug;
+    const isSaved = bms.some(b => b.slug === slug);
+    articleBmBtn.classList.toggle('active', isSaved);
+    const icon = articleBmBtn.querySelector('i');
+    const span = articleBmBtn.querySelector('span');
+    if (icon) icon.className = isSaved ? 'fas fa-bookmark' : 'far fa-bookmark';
+    if (span) span.textContent = isSaved ? 'Saved' : 'Save';
+  }
+}
+
+function renderBookmarksList() {
+  const container = document.getElementById('bookmarksListContainer');
+  if (!container) return;
+  const bms = getBookmarks();
+
+  if (bms.length === 0) {
+    container.innerHTML = `
+      <div class="drawer-empty-state">
+        <i class="far fa-bookmark"></i>
+        <p>No saved articles yet.<br>Click the <i class="fas fa-bookmark"></i> bookmark icon on any article or card to save it for later!</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = bms.map(item => `
+    <div class="drawer-bookmark-item">
+      <div class="drawer-bm-info">
+        <a href="/blog/${encodeURIComponent(item.slug)}">${item.title}</a>
+        <div class="drawer-bm-meta">
+          <span><i class="fas fa-layer-group"></i> ${item.category || 'Tech'}</span>
+          <span><i class="fas fa-clock"></i> ${item.readtime || 4} min read</span>
+        </div>
+      </div>
+      <button type="button" class="drawer-bm-del-btn" title="Remove from list" onclick="removeBookmark('${item.slug}')">
+        <i class="fas fa-trash-can"></i>
+      </button>
+    </div>
+  `).join('');
+}
+
+window.removeBookmark = function(slug) {
+  let bms = getBookmarks();
+  bms = bms.filter(b => b.slug !== slug);
+  saveBookmarks(bms);
+};
+
+window.toggleCardBookmark = function(e, btn) {
+  if (e) e.preventDefault();
+  if (e) e.stopPropagation();
+  const slug = btn.dataset.slug;
+  const title = btn.dataset.title;
+  const readtime = btn.dataset.readtime;
+  const category = btn.dataset.category;
+
+  let bms = getBookmarks();
+  const idx = bms.findIndex(b => b.slug === slug);
+  if (idx > -1) {
+    bms.splice(idx, 1);
+  } else {
+    bms.unshift({ slug, title, readtime, category, timestamp: Date.now() });
+  }
+  saveBookmarks(bms);
+};
+
+function initBookmarks() {
+  const drawerBtn = document.getElementById('bookmarkDrawerBtn');
+  const drawer = document.getElementById('bookmarksDrawer');
+  const overlay = document.getElementById('bookmarksOverlay');
+  const closeBtn = document.getElementById('closeBookmarksBtn');
+  const clearBtn = document.getElementById('clearBookmarksBtn');
+  const articleBmBtn = document.getElementById('articleBookmarkBtn');
+
+  function openDrawer() {
+    if (drawer) drawer.classList.add('open');
+    if (overlay) overlay.classList.add('active');
+    renderBookmarksList();
+  }
+
+  function closeDrawer() {
+    if (drawer) drawer.classList.remove('open');
+    if (overlay) overlay.classList.remove('active');
+  }
+
+  if (drawerBtn) drawerBtn.addEventListener('click', openDrawer);
+  if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+  if (overlay) overlay.addEventListener('click', closeDrawer);
+
+  if (clearBtn) {
+    clearBtn.addEventListener('click', function() {
+      saveBookmarks([]);
+    });
+  }
+
+  if (articleBmBtn) {
+    articleBmBtn.addEventListener('click', function() {
+      const slug = this.dataset.slug;
+      const title = this.dataset.title;
+      const readtime = this.dataset.readtime;
+      const category = this.dataset.category;
+
+      let bms = getBookmarks();
+      const idx = bms.findIndex(b => b.slug === slug);
+      if (idx > -1) {
+        bms.splice(idx, 1);
+      } else {
+        bms.unshift({ slug, title, readtime, category, timestamp: Date.now() });
+      }
+      saveBookmarks(bms);
+    });
+  }
+
+  updateBookmarkBadges();
+  renderBookmarksList();
+}
+
+/* ==========================================================================
+   22. EMOJI MICRO-REACTIONS CONTROLLER
+   ========================================================================== */
+function initEmojiReactions() {
+  const buttons = document.querySelectorAll('.reaction-pill-btn');
+  if (buttons.length === 0) return;
+
+  buttons.forEach(btn => {
+    const slug = btn.dataset.slug;
+    const reaction = btn.dataset.reaction;
+
+    // Check if user already reacted
+    if (localStorage.getItem(`asi_react_${slug}_${reaction}`)) {
+      btn.classList.add('user-reacted');
+    }
+
+    btn.addEventListener('click', async function() {
+      const counterEl = document.getElementById(`reactCount-${reaction}`);
+      const curVal = parseInt(counterEl ? counterEl.textContent : '0') || 0;
+      
+      // Optimistic UI update
+      if (counterEl) counterEl.textContent = curVal + 1;
+      btn.classList.add('user-reacted');
+      btn.style.transform = 'scale(1.18)';
+      setTimeout(() => btn.style.transform = '', 250);
+
+      localStorage.setItem(`asi_react_${slug}_${reaction}`, 'true');
+
+      try {
+        const res = await fetch(`/api/blog/${encodeURIComponent(slug)}/react`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reaction: reaction })
+        });
+        const data = await res.json();
+        if (data.status === 'success' && data.reactions) {
+          Object.keys(data.reactions).forEach(rKey => {
+            const countSpan = document.getElementById(`reactCount-${rKey}`);
+            if (countSpan) countSpan.textContent = data.reactions[rKey];
+          });
+        }
+      } catch (err) {
+        console.error('Reaction sync error:', err);
+      }
+    });
+  });
+}
+
+/* ==========================================================================
+   23. INTERACTIVE ARTICLE COMPREHENSION QUIZ ENGINE
+   ========================================================================== */
+let userQuizScore = 0;
+let answeredCount = 0;
+
+window.selectQuizOption = function(btn, qIndex, optIndex, correctIndex) {
+  const parentQuestion = btn.closest('.quiz-question-item');
+  if (!parentQuestion) return;
+
+  const allBtns = parentQuestion.querySelectorAll('.quiz-option-btn');
+  allBtns.forEach(b => b.disabled = true);
+
+  const isCorrect = (optIndex === correctIndex);
+  if (isCorrect) {
+    btn.classList.add('correct');
+    userQuizScore++;
+  } else {
+    btn.classList.add('wrong');
+    // Highlight correct answer
+    if (allBtns[correctIndex]) {
+      allBtns[correctIndex].classList.add('correct');
+    }
+  }
+
+  // Show explanation
+  const expl = document.getElementById(`quizExpl-${qIndex}`);
+  if (expl) expl.style.display = 'flex';
+
+  answeredCount++;
+
+  const totalQuestions = document.querySelectorAll('.quiz-question-item').length;
+  if (answeredCount >= totalQuestions) {
+    showQuizResults(userQuizScore, totalQuestions);
+  }
+};
+
+function showQuizResults(score, total) {
+  const summaryBox = document.getElementById('quizScoreSummary');
+  const percentEl = document.getElementById('quizScorePercentage');
+  const titleEl = document.getElementById('quizScoreTitle');
+  const descEl = document.getElementById('quizScoreDesc');
+
+  if (!summaryBox || !percentEl) return;
+
+  const percent = Math.round((score / total) * 100);
+  percentEl.textContent = `${percent}%`;
+
+  if (percent === 100) {
+    titleEl.textContent = 'Flawless Architectural Mastery! 🏆';
+    descEl.textContent = 'You nailed every single question. Outstanding engineering comprehension!';
+    triggerConfetti();
+  } else if (percent >= 66) {
+    titleEl.textContent = 'Great Technical Intuition! 🚀';
+    descEl.textContent = 'Strong understanding of the core takeaways and architectural trade-offs.';
+    triggerConfetti();
+  } else {
+    titleEl.textContent = 'Good Effort! 💡';
+    descEl.textContent = 'Review the deep-dive explanations above to master the material.';
+  }
+
+  summaryBox.style.display = 'flex';
+  summaryBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+window.resetQuiz = function() {
+  userQuizScore = 0;
+  answeredCount = 0;
+
+  document.querySelectorAll('.quiz-question-item').forEach(q => {
+    const btns = q.querySelectorAll('.quiz-option-btn');
+    btns.forEach(b => {
+      b.disabled = false;
+      b.classList.remove('correct', 'wrong');
+    });
+  });
+
+  document.querySelectorAll('.quiz-explanation-box').forEach(el => {
+    el.style.display = 'none';
+  });
+
+  const summaryBox = document.getElementById('quizScoreSummary');
+  if (summaryBox) summaryBox.style.display = 'none';
+};
+
+window.triggerConfetti = function() {
+  const canvas = document.createElement('canvas');
+  canvas.style.position = 'fixed';
+  canvas.style.top = '0';
+  canvas.style.left = '0';
+  canvas.style.width = '100vw';
+  canvas.style.height = '100vh';
+  canvas.style.zIndex = '9999';
+  canvas.style.pointerEvents = 'none';
+  document.body.appendChild(canvas);
+
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const particles = [];
+  const colors = ['#a855f7', '#ec4899', '#38bdf8', '#10b981', '#fbbf24', '#fb923c'];
+
+  for (let i = 0; i < 90; i++) {
+    particles.push({
+      x: canvas.width / 2,
+      y: canvas.height / 2,
+      vx: (Math.random() - 0.5) * 16,
+      vy: (Math.random() - 0.7) * 18,
+      size: Math.random() * 8 + 4,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      alpha: 1,
+      rotation: Math.random() * 360,
+      rotSpeed: (Math.random() - 0.5) * 10
+    });
+  }
+
+  let startTime = Date.now();
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let alive = false;
+
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.4; // gravity
+      p.rotation += p.rotSpeed;
+      p.alpha -= 0.012;
+
+      if (p.alpha > 0) {
+        alive = true;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate((p.rotation * Math.PI) / 180);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+        ctx.restore();
+      }
+    });
+
+    if (alive && Date.now() - startTime < 3500) {
+      requestAnimationFrame(animate);
+    } else {
+      canvas.remove();
+    }
+  }
+  requestAnimationFrame(animate);
+};
+

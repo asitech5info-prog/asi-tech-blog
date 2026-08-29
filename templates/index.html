@@ -198,7 +198,12 @@
                         <span class="card-badge {% if blog.category == 'Artificial Intelligence' %}badge-ai{% elif blog.category == 'Technology' %}badge-tech{% elif blog.category == 'Science' %}badge-sci{% elif blog.category == 'Education' %}badge-edu{% else %}badge-mov{% endif %}">
                             {{ blog.category }}
                         </span>
-                        <span class="read-time-tag"><i class="fas fa-clock"></i> {{ blog.read_time or 3 }} min</span>
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <span class="read-time-tag"><i class="fas fa-clock"></i> {{ blog.read_time or 3 }} min</span>
+                            <button type="button" class="card-bookmark-btn" data-slug="{{ blog.slug }}" data-title="{{ blog.title }}" data-readtime="{{ blog.read_time or 3 }}" data-category="{{ blog.category }}" title="Save to Reading List" onclick="toggleCardBookmark(event, this)">
+                                <i class="far fa-bookmark"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -230,6 +235,29 @@
                 </div>
             </article>
             {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Tech Comparison Suite Spotlight Banner -->
+<section class="compare-spotlight-section">
+    <div class="container">
+        <div class="compare-spotlight-card">
+            <div class="compare-spotlight-content">
+                <span class="spotlight-tag"><i class="fas fa-scale-balanced"></i> INTERACTIVE ARCHITECTURAL LABS</span>
+                <h3>Tech Benchmark &amp; Silicon Comparison Suite</h3>
+                <p>Compare Apple M4 Max vs Snapdragon 8 Elite, DeepSeek-R1 vs Claude 3.7, Rust vs Mojo, NVIDIA Blackwell vs Hopper, and more in real-time side-by-side matrices.</p>
+                <div class="spotlight-actions">
+                    <a href="{{ url_for('compare_page') }}" class="btn-primary-gradient">
+                        <i class="fas fa-microchip"></i> Launch Tech Comparator
+                    </a>
+                </div>
+            </div>
+            <div class="compare-spotlight-art">
+                <div class="mini-spec-badge a"><i class="fab fa-apple"></i> M4 Max (546 GB/s)</div>
+                <div class="mini-vs">VS</div>
+                <div class="mini-spec-badge b"><i class="fas fa-bolt"></i> Snapdragon 8 Elite (4.32GHz)</div>
+            </div>
         </div>
     </div>
 </section>
